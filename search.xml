@@ -9,7 +9,7 @@
 <li>玩过一点树莓派</li>
 <li>拥有一个支持Clash的机场</li>
 </ul>
-<h2 id="二、下载Clash"><a href="#二、下载Clash" class="headerlink" title="二、下载Clash"></a>二、下载Clash</h2><p>在这里我们使用Clash作为科学上网的代理框架，你可以到GitHub下载<a href="https://github.com/Dreamacro/clash/releases">Clash内核</a>。如果你是<strong>树莓派4B 32位的操作系统</strong>，那么你应该下载对应armv7版本的<a href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz">clash-linux-armv7-v1.10.6.gz</a>。</p>
+<h2 id="二、下载Clash"><a href="#二、下载Clash" class="headerlink" title="二、下载Clash"></a>二、下载Clash</h2><p>在这里我们使用Clash作为科学上网的代理框架，你可以到GitHub下载<a href="https://github.com/Dreamacro/clash/releases">Clash内核</a>。如果你是<strong>树莓派4B 32位操作系统</strong>，那么你应该下载对应armv7版本的<a href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz">clash-linux-armv7-v1.11.0.gz</a>，如果是<strong>树莓派4B 64位操作系统</strong>，那么你应该下载对应armv7版本的<a href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz">clash-linux-armv8-v1.11.0.gz</a>。</p>
 <p>其他型号的树莓派可以通过以下命令查看树莓派的架构：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">arch</span></span><br></pre></td></tr></table></figure>
 
@@ -58,7 +58,7 @@
 <p>然后添加以下内容：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[http]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br><span class="line">[https]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div>
 
-<h2 id="五、使用Clash"><a href="#五、使用Clash" class="headerlink" title="五、使用Clash"></a>五、使用Clash</h2><p>配置完成后我们就可以使用在终端也可以正常使用代理了，不过在使用之前保证你已经<strong>重启过树莓派</strong>，这样配置才能生效。</p>
+<h2 id="五、使用Clash"><a href="#五、使用Clash" class="headerlink" title="五、使用Clash"></a>五、使用Clash</h2><p>配置完成后需要重启树莓派让配置生效，这样配置才能生效。理论上这样一波配置后，大部分终端应用都可以正常使用了，如果你有其他的终端应用可自行参考相关文档进行配置。</p>
 <p>重启之后在终端中输入clash，如果输出类似以下内容那么就说明Clash启动成功了。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">INFO[0000] Start initial compatible provider 手动选择</span><br><span class="line">INFO[0000] Start initial compatible provider 节点选择</span><br><span class="line">INFO[0000] Start initial compatible provider 故障切换</span><br><span class="line">INFO[0000] Start initial compatible provider 自动选择</span><br><span class="line">INFO[0000] HTTP proxy listening at: [::]:7890</span><br><span class="line">INFO[0000] RESTful API listening at: 127.0.0.1:9090</span><br><span class="line">INFO[0000] SOCKS proxy listening at: [::]:7891</span><br></pre></td></tr></table></figure>
 
