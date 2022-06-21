@@ -125,13 +125,13 @@ cover:
 # Replace Broken Images (替換無法顯示的圖片)
 error_img:
   flink: /img/friend_404.gif
-  post_page: /img/404.jpg
+  post_page: /img/404.png
 
 # A simple 404 page
 error_404:
   enable: false
   subtitle: "Page Not Found"
-  background: https://i.loli.net/2020/05/19/aKOcLiyPl2JQdFD.png
+  background: /img/404.png
 
 post_meta:
   page: # Home Page
@@ -257,13 +257,13 @@ addtoany:
 comments:
   # Up to two comments system, the first will be shown as default
   # Choose: Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo/Giscus
-  use: # Valine,Disqus
+  use: Valine # Valine,Disqus
   text: true # Display the comment name next to the button
   # lazyload: The comment system will be load when comment element enters the browser's viewport.
   # If you set it to true, the comment count will be invalid
   lazyload: false
-  count: false # Display comment count in post's top_img
-  card_post_count: false # Display comment count in Home Page
+  count: true # Display comment count in post's top_img
+  card_post_count: true # Display comment count in Home Page
 
 # disqus
 # https://disqus.com/
@@ -297,12 +297,20 @@ gitalk:
 # valine
 # https://valine.js.org
 valine:
-  appId: # leancloud application app id
-  appKey: # leancloud application app key
-  avatar: monsterid # gravatar style https://valine.js.org/#/avatar
+  appId: VcgKPqWtCiNXIqN7gIRkJsIO-9Nh9j0Va # leancloud application app id
+  appKey: EGE2zKydvE7rYHTXHgSEfTd2 # leancloud application app key
+  avatar: robohash # gravatar style https://valine.js.org/#/avatar
   serverURLs: # This configuration is suitable for domestic custom domain name users, overseas version will be automatically detected (no need to manually fill in)
-  bg: # valine background
-  visitor: false
+  bg: /img/comment_bg.png # valine background
+  visitor: true
+  pageSize: 10 # comment list page size
+  lang: zh-CN # i18n: zh-CN/zh-TW/en/ja
+  placeholder: 说点什么吧！\n昵称填写QQ号可自动识别邮箱哦！ # valine comment input placeholder (like: Please leave your footprints)
+  guest_info: nick,mail # valine comment header info (nick/mail/link)
+  recordIP: false # Record reviewer IP
+  count: true
+  emojiCDN: # emoji CDN
+  enableQQ: true # 是否启用昵称框自动获取QQ昵称和QQ头像, 默认关闭，需博/网站主主动启用
   option:
 
 # waline - A simple comment system with backend support fork from Valine
@@ -572,9 +580,9 @@ beautify:
 # Global font settings
 # Don't modify the following settings unless you know how they work (非必要不要修改)
 font:
-  global-font-size: 17px
+  global-font-size: 16px
   code-font-size:
-  font-family: cursive
+  font-family:
   code-font-family:
 
 # Font settings for the site title and site subtitle
@@ -832,6 +840,9 @@ inject:
 # Don't modify the following settings unless you know how they work
 # 非必要請不要修改
 CDN:
+  # 评论美化
+  # valine: https://fastly.jsdelivr.net/npm/valine/dist/Valine.min.js
+  valine: https://fastly.jsdelivr.net/gh/HCLonely/Valine@latest/dist/Valine.min.js
   # The CDN provider of internal scripts (主題內部 js 的 cdn 配置)
   # option: local/jsdelivr
   # Dev version cannot choose jsdelivr (dev版的主題不能設置為 jsdelivr)

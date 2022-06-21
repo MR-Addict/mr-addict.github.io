@@ -27,7 +27,7 @@ categories: 笔记
 arch
 ```
 
-![clash-release](clash-on-raspberry/clash-release.png)
+![clash-release](clash-on-rpi/clash-release.png)
 
 下载完成后解压文件，建议把文件名改为`clash`， 然后移动到`/usr/local/bin/clash`位置，同时给该文件以执行的权限：
 
@@ -237,6 +237,6 @@ external-controller: 127.0.0.1:9090
 
 然后在浏览器中输入[http://127.0.0.1:9090/ui](http://127.0.0.1:9090/ui)就可以看到Clash的控制面板了。
 
-![clash-dashboard](clash-on-raspberry/clash-dashboard.png)
+![clash-dashboard](clash-on-rpi/clash-dashboard.png)
 
 ---
