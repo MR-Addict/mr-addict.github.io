@@ -19,7 +19,7 @@ categories: 笔记
 
 ## 二、下载Clash
 
-在这里我们使用Clash作为科学上网的代理框架，你可以到GitHub下载[Clash内核](https://github.com/Dreamacro/clash/releases)。如果你是**树莓派4B 32位的操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv7-v1.10.6.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz)。
+在这里我们使用Clash作为科学上网的代理框架，你可以到GitHub下载[Clash内核](https://github.com/Dreamacro/clash/releases)。如果你是**树莓派4B 32位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv7-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz)，如果是**树莓派4B 64位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv8-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz)。
 
 其他型号的树莓派可以通过以下命令查看树莓派的架构：
 
@@ -181,7 +181,7 @@ vim ~/.cargo/config
 
 ## 五、使用Clash
 
-配置完成后我们就可以使用在终端也可以正常使用代理了，不过在使用之前保证你已经**重启过树莓派**，这样配置才能生效。
+配置完成后需要重启树莓派让配置生效，这样配置才能生效。理论上这样一波配置后，大部分终端应用都可以正常使用了，如果你有其他的终端应用可自行参考相关文档进行配置。
 
 重启之后在终端中输入clash，如果输出类似以下内容那么就说明Clash启动成功了。
 
