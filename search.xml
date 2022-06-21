@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>如何在树莓派上使用Clash</title>
-    <url>/posts/clash-on-raspberry/</url>
+    <url>/posts/clash-on-rpi/</url>
     <content><![CDATA[<hr>
 <h2 id="一、前提条件"><a href="#一、前提条件" class="headerlink" title="一、前提条件"></a>一、前提条件</h2><p>在开始之前，我首先默认你已经具备以下基本条件和前提：</p>
 <ul>
@@ -13,7 +13,7 @@
 <p>其他型号的树莓派可以通过以下命令查看树莓派的架构：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">arch</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/posts/clash-on-raspberry/clash-release.png" alt="clash-release"></p>
+<p><img src="/posts/clash-on-rpi/clash-release.png" alt="clash-release"></p>
 <p>下载完成后解压文件，建议把文件名改为<code>clash</code>， 然后移动到<code>/usr/local/bin/clash</code>位置，同时给该文件以执行的权限：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://github.com/Dreamacro/clash/releases/download/v1.10.6/clash-linux-armv7-v1.10.6.gz</span><br><span class="line">gunzip clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">rm</span> -rf clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">mv</span> clash-linux-armv7 clash</span><br><span class="line">sudo <span class="built_in">mv</span> clash /usr/local/bin</span><br><span class="line">sudo <span class="built_in">chmod</span> a+x /usr/local/bin/clash</span><br></pre></td></tr></table></figure>
 
@@ -81,7 +81,7 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">external-ui: clash-dashboard</span><br><span class="line">external-controller: 127.0.0.1:9090</span><br></pre></td></tr></table></figure>
 
 <p>然后在浏览器中输入<a href="http://127.0.0.1:9090/ui">http://127.0.0.1:9090/ui</a>就可以看到Clash的控制面板了。</p>
-<p><img src="/posts/clash-on-raspberry/clash-dashboard.png" alt="clash-dashboard"></p>
+<p><img src="/posts/clash-on-rpi/clash-dashboard.png" alt="clash-dashboard"></p>
 <hr>
 ]]></content>
       <categories>
