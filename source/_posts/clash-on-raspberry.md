@@ -5,7 +5,7 @@ tags:
   - Clash
 date: 2022-06-13 20:16:43
 description: 玩树莓派的小伙伴们一定想过如何在树莓派上使用代理，这里做一点避坑指南
-cover: clash-on-RPI.png
+cover: clash-on-rpi.png
 categories: 笔记
 ---
 ---
@@ -197,7 +197,7 @@ INFO[0000] SOCKS proxy listening at: [::]:7891
 
 你可以更新一下系统或者打开浏览器测试一下Google，如果可以访问你就可以愉快地玩耍了！
 
-> 注意：在终端请不要使用`ping google.com`来测试，因为ping使用的协议不同，无法被Clash代理。
+> 注意：在终端请不要使用`ping google.com`来测试，因为ping使用不同的协议无法被Clash代理，不过你可以使用`curl google.com`。
 
 ## 六、开机自启
 
