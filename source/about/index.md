@@ -1,6 +1,7 @@
 ---
 title: 关于
 date: 2022-06-03 13:31:17
+comments: false
 type: "about"
 ---
 {% tabs Tags %}

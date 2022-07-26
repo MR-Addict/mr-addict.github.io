@@ -1,7 +1,7 @@
+--- # --------------------------------------
+
 # Main menu navigation (導航目錄)
 # see https://butterfly.js.org/posts/4aa8abbe/#導航菜單
-# --------------------------------------
-
 menu:
   首页: / || fas fa-home
   文章: /archives/ || fas fa-book
@@ -183,7 +183,7 @@ post_copyright:
   enable: true
   decode: false
   author_href: https://github.com/MR-Addict
-  license: GNU General Public License v3.0
+  license: GNU GPL v3.0
   license_url: https://www.gnu.org/licenses/gpl-3.0.en.html
 
 # Sponsor/reward
@@ -524,7 +524,7 @@ canvas_ribbon:
 # Fluttering Ribbon (動態彩帶)
 canvas_fluttering_ribbon:
   enable: true
-  mobile: true
+  mobile: false
 
 # canvas_nest
 # https://github.com/hustcc/canvas-nest.js
@@ -787,7 +787,7 @@ aplayerInject:
 # 可選 top-left / top-center / top-right / bottom-left / bottom-center / bottom-right
 snackbar:
   enable: true
-  position: bottom-left
+  position: top-center
   bg_light: "#49b1f5" # The background color of Toast Notification in light mode
   bg_dark: "#1f1f1f" # The background color of Toast Notification in dark mode
 
@@ -832,7 +832,7 @@ css_prefix: true
 # 插入代码到头部 </head> 之前 和 底部 </body> 之前
 inject:
   head:
-    # - <link rel="stylesheet" href="/xxx.css">
+  # - <link rel="stylesheet" href="/xxx.css">
   bottom:
     # - <script src="xxxx"></script>
 

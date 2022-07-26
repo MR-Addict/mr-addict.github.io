@@ -1,25 +1,28 @@
 ---
 title: 如何在树莓派上使用Clash
+date: 2022-06-13 20:16:43
+comments: true
 tags:
   - 树莓派
   - Clash
-date: 2022-06-13 20:16:43
-description: 玩树莓派的小伙伴们一定想过如何在树莓派上使用代理，这里做一点避坑指南
+description: 经常玩树莓派的小伙伴们有没有想过树莓派上怎么能使用代理呢，有兴趣的可以点进来看看
 cover: clash-on-rpi.png
 categories: 笔记
 ---
 ---
 
-## 一、前提条件
+## 一、前期准备
 
-在开始之前，我首先默认你已经具备以下基本条件和前提：
+在开始之前，我首先认为你已经具备以下基础和条件：
 
 - 玩过一点树莓派
 - 拥有一个支持Clash的机场
 
 ## 二、下载Clash
 
-在这里我们使用Clash作为科学上网的代理框架，你可以到GitHub下载[Clash内核](https://github.com/Dreamacro/clash/releases)。如果你是**树莓派4B 32位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv7-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz)，如果是**树莓派4B 64位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv8-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz)。
+在这里我们使用Clash作为科学上网的代理框架，为什么使用Clash呢，那是因为Clash内核支持各种Unix平台的各个架构；还支持各种代理协议，像Trojan、Vmess、Shadowsocks等等；以及强大的分流规则，可以非常方便地自定义各种规则。
+
+你可以到GitHub下载[Clash内核](https://github.com/Dreamacro/clash/releases)。如果你是**树莓派4B 32位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv7-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz)，如果是**树莓派4B 64位操作系统**，那么你应该下载对应armv7版本的[clash-linux-armv8-v1.11.0.gz](https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz)。
 
 其他型号的树莓派可以通过以下命令查看树莓派的架构：
 

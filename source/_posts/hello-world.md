@@ -1,6 +1,7 @@
 ---
 title: Hello World
 date: 2022-06-01 12:30:30
+comments: true
 description: Offical initilized blog from Hexo framework, nothing special but for testing.
 cover: smile.png
 categories: 笔记
