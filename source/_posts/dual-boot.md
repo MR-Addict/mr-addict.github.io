@@ -7,7 +7,7 @@ tags:
   - Mint
 date: 2022-07-27 10:38:55
 description: 教你如何在你的电脑上同时安装Windows和Linux两个系统
-cover: dual-boot.png
+cover: DualBoot.png
 categories: 笔记
 ---
 
