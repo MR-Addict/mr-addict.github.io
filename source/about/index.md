@@ -2,6 +2,7 @@
 title: 关于
 date: 2022-06-03 13:31:17
 comments: false
+top_img: false
 type: "about"
 ---
 {% tabs Tags %}
