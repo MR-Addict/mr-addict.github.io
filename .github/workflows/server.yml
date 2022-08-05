@@ -8,7 +8,7 @@ on:
 
 jobs:
   Deploy-To-Server:
-    runs-on: HIPAA
+    runs-on: Ubuntu-Cloud
     steps:
       - name: SSH Action
         uses: appleboy/ssh-action@master
