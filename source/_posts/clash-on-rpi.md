@@ -5,7 +5,7 @@ comments: true
 tags:
   - 树莓派
   - Clash
-description: 教你如何借助Clash让树莓派实现科学上网
+description: 树莓派自己也可以科学上网
 cover: clash-on-rpi.png
 categories: 笔记
 ---

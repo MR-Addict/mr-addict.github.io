@@ -5,8 +5,8 @@
 menu:
   首页: / || fas fa-home
   文章: /archives/ || fas fa-book
-  标签: /tags/ || fas fa-tags
   分类: /categories/ || fas fa-list
+  标签: /tags/ || fas fa-tags
   # 友链: /link/ || fas fa-heart
   关于: /about/ || fas fa-user
 

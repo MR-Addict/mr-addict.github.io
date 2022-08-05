@@ -6,11 +6,11 @@ tags:
 date: 2022-08-05 10:37:35
 description: 给我的个人主页添加ICP备案信息
 cover: ship.png
-categories: 笔记
+categories: 小品
 ---
 ---
 
-提到Butterfly主题添加ICP备案信息，如果你用过Butterfly一段时间，好像它的配置文件没有提到添加备案信息。其实不然，你可以通过添加网页页脚定制文字的方式添加ICP备案信息。
+提到Butterfly主题添加ICP备案信息，如果你用过Butterfly一段时间，好像它的配置文件没有提到添加备案信息。其实不然，你可以通过添加自定义网页页脚的方式添加ICP备案信息。
 
 在Butterfly主题的配置文件中找到以下配置，然后将内容更改为你自己的备案信息就可以了：
 

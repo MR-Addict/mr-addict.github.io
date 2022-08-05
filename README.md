@@ -3,5 +3,5 @@
 
 你可以通过以下网址访问我的个人主页：
 
-- [https://mraddict.one](https://mraddict.one)
-- [https://mraddict.top](https://mraddict.top)
+- [https://mraddict.top](https://mraddict.top)(国内)
+- [https://mraddict.one](https://mraddict.one)(国外)
