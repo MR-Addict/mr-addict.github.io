@@ -1,0 +1,24 @@
+name: server
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  Deploy-To-Server:
+    runs-on: HIPAA
+    steps:
+      - name: SSH Action
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/$USERNAME/Projects/Blog
+            git pull
+            npm install
+            npm run build
