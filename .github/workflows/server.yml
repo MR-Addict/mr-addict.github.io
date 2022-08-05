@@ -17,8 +17,9 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
+          script_stop: true
           script: |
-            cd /home/$USERNAME/Projects/Blog
+            cd /home/$USER/Projects/Blog
             git pull
             npm install
             npm run build
