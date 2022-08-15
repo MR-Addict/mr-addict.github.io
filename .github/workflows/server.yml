@@ -24,4 +24,5 @@ jobs:
             docker-compose down
             docker rmi blog
             docker build -t blog --rm .
+            docker image prune -f
             docker-compose up -d
