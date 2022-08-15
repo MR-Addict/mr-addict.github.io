@@ -20,9 +20,8 @@ jobs:
           script_stop: true
           script: |
             cd /home/$USER/Projects/Blog
-            git pull -f
+            git pull
             docker-compose down
-            docker rmi blog
             docker build -t blog --rm .
-            docker image prune -f
+            docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
             docker-compose up -d
