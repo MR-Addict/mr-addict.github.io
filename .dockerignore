@@ -1,0 +1,10 @@
+CNAME
+public
+db.json
+README.md
+node_modules
+npm-debug.log
+actions-runner
+.git
+.github
+.gitignore

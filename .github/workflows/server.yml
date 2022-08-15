@@ -20,6 +20,8 @@ jobs:
           script_stop: true
           script: |
             cd /home/$USER/Projects/Blog
-            git pull
-            npm install
-            npm run build
+            git pull -f
+            docker-compose down
+            docker rmi blog
+            docker build -t blog --rm .
+            docker-compose up -d

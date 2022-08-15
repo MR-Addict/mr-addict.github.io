@@ -1,0 +1,8 @@
+version: '3'
+services:
+  blog:
+    image: blog
+    container_name: blog
+    restart: unless-stopped
+    ports:
+      - 8080:80
