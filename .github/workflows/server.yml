@@ -1,9 +1,10 @@
 name: server
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["docker"]
+    types:
+      - completed
   pull_request:
 
 jobs:
