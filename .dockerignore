@@ -2,9 +2,11 @@ CNAME
 public
 db.json
 README.md
+Dockerfile
 node_modules
 npm-debug.log
 actions-runner
+docker-compose.yml
 .git
 .github
 .gitignore

@@ -8,7 +8,7 @@ on:
 
 jobs:
   Deploy-To-Server:
-    runs-on: Ubuntu-Cloud
+    runs-on: self-hosted
     steps:
       - name: SSH Action
         uses: appleboy/ssh-action@master
