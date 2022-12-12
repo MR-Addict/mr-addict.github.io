@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  Deploy-To-Server:
+  server:
     runs-on: self-hosted
     steps:
       - name: SSH Action
@@ -22,6 +22,6 @@ jobs:
             cd /home/$USER/Projects/Blog
             git pull
             docker-compose down
-            docker build -t mraddict063/blog --rm .
-            docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+            docker rmi mraddict063/blog
+            docker-compose pull
             docker-compose up -d

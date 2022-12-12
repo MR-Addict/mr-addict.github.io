@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  Deploy-Github-Pages:
+  pages:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout current branch
