@@ -5,10 +5,11 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
   pages:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout current branch
         uses: actions/checkout@v3
