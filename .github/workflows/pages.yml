@@ -27,8 +27,6 @@ jobs:
         run: npm install
       - name: Build project
         run: npm run build
-      - name: Add CNAME
-        run: cp CNAME ./public
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
