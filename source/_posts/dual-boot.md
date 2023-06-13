@@ -7,7 +7,7 @@ tags:
   - Mint
 date: 2022-07-27 10:38:55
 description: 让你的电脑同时拥有Windows和Linux两个系统
-cover: /images/post/dual-boot/cover.png
+cover: /images/posts/dual-boot/cover.png
 categories: 笔记
 ---
 
@@ -19,7 +19,7 @@ categories: 笔记
 
 我装这个双系统的时候，特地买了一块 500G 的机械硬盘，这样我就可以让 Mint 系统使用整个硬盘了。不过如果你的固态硬盘足够大的话，你也可以把你的固态硬盘重新分区，腾出 30-100G 的空间给你的 Linux 系统。甚至于你也可以把系统装在 U 盘或者其他移动硬盘上。
 
-![HDD](/images/post/dual-boot/HDD.png)
+![HDD](/images/posts/dual-boot/HDD.png)
 
 ### 2. 分区
 
@@ -27,7 +27,7 @@ categories: 笔记
 
 使用整块硬盘的分区方法很简单，只要直接将整个硬盘删除就可以了。比如我要把系统安装在 U 盘上，具体分区方法是，在 Windows 的搜索栏中搜索`Create and Format Hard Disk`这个应用然后打开。那么只要选中 E 盘符，然后右键选择`Delete-Volume`就可以了，操作完成后会显示`Unallocated`。
 
-![Delete-Volume](/images/post/dual-boot/Delete-Volume.png)
+![Delete-Volume](/images/posts/dual-boot/Delete-Volume.png)
 
 > 注意：已经使用的硬盘也可以分区，比如你本来装有 Windows 的固态硬盘，但是安装双系统有风险，不建议大家这么做。
 
@@ -39,15 +39,15 @@ categories: 笔记
 
 烧录当然少不了系统，这边我以[Linux Mint](https://linuxmint.com/)为例，你也可以选择你喜欢的 Linux 发行版。
 
-![Linux-Mint](/images/post/dual-boot/Linux-Mint.png)
+![Linux-Mint](/images/posts/dual-boot/Linux-Mint.png)
 
 ### 2. 安装烧录软件
 
 烧录系统可以使用的软件很多，推荐使用以下三个软件：
 
-|         [Rufus](https://rufus.ie)          |   [Etcher](https://www.balena.io/etcher/)    | [Raspberry Pi Imager](https://www.raspberrypi.com/software/) |
-| :----------------------------------------: | :------------------------------------------: | :----------------------------------------------------------: |
-| ![Rufus](/images/post/dual-boot/Rufus.png) | ![Etcher](/images/post/dual-boot/Etcher.png) |     ![RPI-Imager](/images/post/dual-boot/RPI-Imager.png)     |
+|          [Rufus](https://rufus.ie)          |    [Etcher](https://www.balena.io/etcher/)    | [Raspberry Pi Imager](https://www.raspberrypi.com/software/) |
+| :-----------------------------------------: | :-------------------------------------------: | :----------------------------------------------------------: |
+| ![Rufus](/images/posts/dual-boot/Rufus.png) | ![Etcher](/images/posts/dual-boot/Etcher.png) |    ![RPI-Imager](/images/posts/dual-boot/RPI-Imager.png)     |
 
 ### 3. 烧录系统
 
@@ -55,7 +55,7 @@ categories: 笔记
 
 以树莓派 Imager 为例，一般的流程就是选择系统，选择需要烧录的硬盘，最后烧录就可以了。
 
-![Burn-OS](/images/post/dual-boot/Burn-OS.png)
+![Burn-OS](/images/posts/dual-boot/Burn-OS.png)
 
 这个过程我就不做详细介绍了，可以参考相应的软件文档或者相关视频。
 
@@ -67,7 +67,7 @@ categories: 笔记
 
 进入 BIOS 后到`Boot Override`选项，选择你烧录的 U 盘回车就可以进入安装界面了。
 
-![Boot-Override](/images/post/dual-boot/bootoverride.png)
+![Boot-Override](/images/posts/dual-boot/bootoverride.png)
 
 ## 四、安装系统
 
@@ -77,31 +77,31 @@ categories: 笔记
 
 首先是选择语言，这边我选择英文：
 
-![Language](/images/post/dual-boot/Language.png)
+![Language](/images/posts/dual-boot/Language.png)
 
 ### 2. 键盘布局
 
 然后会让你选择键盘布局，一般都是美式布局：
 
-![Keyboard-Layout](/images/post/dual-boot/Keyboard.png)
+![Keyboard-Layout](/images/posts/dual-boot/Keyboard.png)
 
 ### 3. WiFi
 
 然后会问你是否需要连接 WiFi，非常不建议连接 WiFi，不然使用国外源的时候安装会非常慢，建议跳过：
 
-![WiFi](/images/post/dual-boot/WiFi.png)
+![WiFi](/images/posts/dual-boot/WiFi.png)
 
 ### 4. 多媒体解码器
 
 然后会询问你是否安装多媒体编解码器，因为没有网络，所以不安装，你可以在后面装好系统换了源后在安装：
 
-![Multimedia-Codecs](/images/post/dual-boot/Multidedia-Codecs.png)
+![Multimedia-Codecs](/images/posts/dual-boot/Multidedia-Codecs.png)
 
 ### 5. 安装类型
 
 然后是安装类型，这边我们选择其他类型，也就是自定义类型：
 
-![Install-Type](/images/post/dual-boot/Install-Type.png)
+![Install-Type](/images/posts/dual-boot/Install-Type.png)
 
 ### 6. 系统分区
 
@@ -115,13 +115,13 @@ categories: 笔记
 
 这里我就直接将机械硬盘只分一个根目录，不做其他分区。大家可以参考下面图片进行分区：
 
-![Create-Partition](/images/post/dual-boot/Create-Partition.png)
+![Create-Partition](/images/posts/dual-boot/Create-Partition.png)
 
 ### 7. Bootloader
 
 分区结束后要选择 Bootloader 的位置，这一点也一定不能错，记得安装在我们分好的根目录下，或者对应的硬盘下面就可以了，这样即使系统安装失败或者删除系统也不会影响我们的固态硬盘。
 
-![Bootloader-Location](/images/post/dual-boot/Bootloader-Location.png)
+![Bootloader-Location](/images/posts/dual-boot/Bootloader-Location.png)
 
 最后点击 Install Now 直接安装就可以了，应该会弹出其他警示弹窗，选择 Continue 就好了。
 
@@ -129,19 +129,19 @@ categories: 笔记
 
 下面会让你选择时区，我们就直接选择上海：
 
-![Timezone](/images/post/dual-boot/TimeZone.png)
+![Timezone](/images/posts/dual-boot/TimeZone.png)
 
 ### 9. 主机名和用户名
 
 紧接着会让你配置一下主机名和用户名，配置完就可以安装系统了。
 
-![User](/images/post/dual-boot/User.png)
+![User](/images/posts/dual-boot/User.png)
 
 ### 10. 完成安装重启电脑
 
 安装完会提示你重启电脑，重启后输入你设置的用户密码就可以看见 Mint 的欢迎界面了。
 
-![Welcome](/images/post/dual-boot/Welcome.png)
+![Welcome](/images/posts/dual-boot/Welcome.png)
 
 ## 五、使用双系统
 
@@ -157,7 +157,7 @@ sudo vim /etc/default/grub
 
 找到**GRUB_TIMEOUT=10**这一选项，将其改为**GRUB_TIMEOUT=0**：
 
-![Edit-Grub](/images/post/dual-boot/Grub.png)
+![Edit-Grub](/images/posts/dual-boot/Grub.png)
 
 然后再禁止系统修改 TIMROUT。
 
@@ -169,7 +169,7 @@ sudo vim /etc/grub.d/30_os-prober
 
 然后找到最后一行，注释掉**adjust_timeout**：
 
-![Adjust-Timeout](/images/post/dual-boot/Adjust-Timeout.png)
+![Adjust-Timeout](/images/posts/dual-boot/Adjust-Timeout.png)
 
 最后更新一下 gurb，重启之后就可以生效了：
 
@@ -181,6 +181,6 @@ sudo update-grub
 
 如果我们想要切换不同的系统，需要修改系统的启动项，进入 BIOS 找到 BOOT 将你常用的系统放在第一个就好了。
 
-![Boot-Options](/images/post/dual-boot/Boot-Options.png)
+![Boot-Options](/images/posts/dual-boot/Boot-Options.png)
 
 如果只是临时使用，可以进入 BIOS 后选择对应的 BootOverride 进入，这和前面进入 USB 启动盘是一样的。

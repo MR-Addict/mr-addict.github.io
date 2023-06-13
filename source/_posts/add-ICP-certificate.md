@@ -5,7 +5,7 @@ tags:
   - 网站备案
 date: 2022-08-05 10:37:35
 description: 给我的个人主页添加ICP备案信息
-cover: /images/post/add-icp-certificate/cover.png
+cover: /images/posts/add-icp-certificate/cover.png
 categories: 小品
 ---
 

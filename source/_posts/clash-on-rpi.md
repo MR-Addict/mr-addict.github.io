@@ -6,7 +6,7 @@ tags:
   - 树莓派
   - Clash
 description: 树莓派自己也可以科学上网
-cover: /images/post/clash-on-rpi/cover.png
+cover: /images/posts/clash-on-rpi/cover.png
 categories: 笔记
 ---
 
@@ -31,7 +31,7 @@ categories: 笔记
 arch
 ```
 
-![clash-release](/images/post/clash-on-rpi/clash-release.png)
+![clash-release](/images/posts/clash-on-rpi/clash-release.png)
 
 ### 2. 解压移动 Clash 内核
 
@@ -261,4 +261,4 @@ external-controller: 127.0.0.1:9090
 
 然后在浏览器中输入[http://127.0.0.1:9090/ui](http://127.0.0.1:9090/ui)就可以看到 Clash 的控制面板了。
 
-![clash-dashboard](/images/post/clash-on-rpi/clash-dashboard.png)
+![clash-dashboard](/images/posts/clash-on-rpi/clash-dashboard.png)
