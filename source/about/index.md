@@ -12,21 +12,21 @@ type: "about"
 
 |               C                |             C++             |              Python              |                 Powershell                  |
 | :----------------------------: | :-------------------------: | :------------------------------: | :-----------------------------------------: |
-| ![Python](/images/about/C.png) | ![C](/images/about/C++.png) | ![C++](/images/about/Python.png) | ![Powershell](/images/about/Powershell.png) |
+| ![Python](/images/about/c.png) | ![C](/images/about/cpp.png) | ![C++](/images/about/python.png) | ![Powershell](/images/about/powershell.png) |
 
 <!-- endtab -->
 <!-- tab 我主要使用的单片机@fas fa-microchip -->
 
 |                Arduino                |              C51              |               STM32               |                Pi Pico                |
 | :-----------------------------------: | :---------------------------: | :-------------------------------: | :-----------------------------------: |
-| ![Arduino](/images/about/Arduino.png) | ![C51](/images/about/C51.png) | ![STM32](/images/about/STM32.png) | ![Pi-Pico](/images/about/Pi-Pico.png) |
+| ![Arduino](/images/about/arduino.png) | ![C51](/images/about/c51.png) | ![STM32](/images/about/stm32.png) | ![Pi-Pico](/images/about/pi-pico.png) |
 
 <!-- endtab -->
 <!-- tab 我主要使用的软件@fas fa-computer -->
 
-|               KiCad               |                 Solidworks                  |                 PhotoShop                 |               Matlab                |
+|               KiCad               |                 Solidworks                  |                 photoshop                 |               Matlab                |
 | :-------------------------------: | :-----------------------------------------: | :---------------------------------------: | :---------------------------------: |
-| ![KiCad](/images/about/KiCad.png) | ![Solidworks](/images/about/Solidworks.png) | ![PhotoShop](/images/about/PhotoShop.png) | ![Matlab](/images/about/Matlab.png) |
+| ![KiCad](/images/about/kicad.png) | ![Solidworks](/images/about/solidworks.png) | ![PhotoShop](/images/about/PhotoShop.png) | ![Matlab](/images/about/matlab.png) |
 
 <!-- endtab -->
 

@@ -447,13 +447,6 @@ valine:
   serverURLs: # This configuration is suitable for domestic custom domain name users, overseas version will be automatically detected (no need to manually fill in)
   bg: /images/site/comment_bg.png # valine background
   visitor: true
-  lang: zh-CN
-  placeholder: 说点什么吧！\n昵称填写QQ号可自动识别邮箱哦！
-  guest_info: nick
-  recordIP: false # Record reviewer IP
-  count: true
-  emojiCDN: # emoji CDN
-  enableQQ: true
   option:
 
 # waline - A simple comment system with backend support fork from Valine
