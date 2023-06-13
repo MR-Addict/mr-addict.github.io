@@ -3,13 +3,13 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: MR Addict
-subtitle: "Welcome to MR Addict Home"
-description: ""
+title: MR-Addict
+subtitle:
+description: "MR-Addict的个人主页"
 keywords:
-author: MR Addict
+author: MR-Addict
 language: zh-CN
-timezone: "Asia/Shanghai"
+timezone: Asia/Shanghai
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -48,7 +48,7 @@ external_link:
   exclude: ""
 filename_case: 0
 render_drafts: false
-post_asset_folder: true
+post_asset_folder: false
 relative_link: false
 future: true
 highlight:

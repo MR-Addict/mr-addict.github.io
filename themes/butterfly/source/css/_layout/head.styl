@@ -7,12 +7,13 @@
   background-repeat: no-repeat
   transition: all .5s
 
-  &:not(.not-top-img):before
-    position: absolute
-    width: 100%
-    height: 100%
-    background-color: alpha($dark-black, .3)
-    content: ''
+  if hexo-config('mask.header')
+    &:not(.not-top-img):before
+      position: absolute
+      width: 100%
+      height: 100%
+      background-color: var(--mark-bg)
+      content: ''
 
   // index
   &.full_page
@@ -97,9 +98,6 @@
     +maxWidth768()
       height: 360px
 
-    &:before
-      background-color: alpha($dark-black, .5)
-
   #post-info
     position: absolute
     bottom: 100px
@@ -124,7 +122,8 @@
       background: rgba(255, 255, 255, .8)
       box-shadow: 0 5px 6px -5px rgba(133, 133, 133, .6)
 
-      a
+      a,
+      .site-name
         color: var(--font-color)
         text-shadow: none
 
@@ -137,8 +136,16 @@
       box-shadow: 0 5px 6px -5px alpha($grey, .6)
       transition: transform .2s ease-in-out, opacity .2s ease-in-out
 
+      #blog-info
+        color: var(--font-color)
+
+        &:hover
+          color: $light-blue
+
+        .site-name
+          text-shadow: none
+
       a,
-      #site-name,
       #toggle-menu
         color: var(--font-color)
         text-shadow: none
@@ -146,7 +153,12 @@
         &:hover
           color: $light-blue
 
-  &.nav-visible
+    &.fixed
+      #nav
+        top: 0
+        transition: all .5s
+
+  &.nav-visible:not(.fixed)
     #nav
       transition: all .5s
       transform: translate3d(0, 100%, 0)
@@ -155,6 +167,19 @@
       & > .aside-content > .sticky_layout
         top: 70px
         transition: top .5s
+
+  &.fixed
+    #nav
+      position: fixed
+
+    & + .layout
+      & > .aside-content > .sticky_layout
+        top: 70px
+        transition: top .5s
+
+      #card-toc
+        .toc-content
+          max-height: calc(100vh - 170px)
 
 #page
   h1.page-title
@@ -253,8 +278,15 @@
   &.show
     opacity: 1
 
-  #blog_name
+  #blog-info
     flex: 1
+    color: var(--light-grey)
+    @extend .limit-one-line
+
+    .site-icon
+      margin-right: 6px
+      height: 36px
+      vertical-align: middle
 
   #toggle-menu
     display: none
@@ -270,10 +302,9 @@
     &:hover
       color: var(--white)
 
-  #site-name
+  .site-name
     text-shadow: 2px 2px 4px rgba($dark-black, .15)
     font-weight: bold
-    cursor: pointer
 
   .menus_items
     display: inline
@@ -301,10 +332,10 @@
         margin-top: 8px
         padding: 0
         width: max-content
+        border-radius: 5px
         background-color: var(--sidebar-bg)
         box-shadow: 0 5px 20px -4px rgba($dark-black, .5)
         animation: sub_menus .3s .1s ease both
-        border-radius: 5px
 
         &:before
           position: absolute
@@ -321,9 +352,13 @@
             background: var(--text-bg-hover)
 
           &:first-child
-            border-radius: 5px 5px 0 0
+            border-top-left-radius: 5px
+            border-top-right-radius: 5px
+
           &:last-child
-            border-radius: 0 0 5px 5px
+            border-bottom-right-radius: 5px
+            border-bottom-left-radius: 5px
+
           a
             display: inline-block
             padding: 8px 16px

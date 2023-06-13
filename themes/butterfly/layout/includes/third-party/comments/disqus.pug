@@ -2,18 +2,20 @@
 
 script.
   function loadDisqus () {
-    var disqus_config = function () {
+    const disqus_config = function () {
       this.page.url = '!{ page.permalink }'
-      this.page.identifier = '!{ page.path }'
+      this.page.identifier = '!{ url_for(page.path) }'
       this.page.title = '!{ disqusPageTitle }'
-    };
+    }
 
-    window.disqusReset = () => {
+    const disqusReset = () => {
       DISQUS.reset({
         reload: true,
         config: disqus_config
       })
     }
+
+    btf.addModeChange('disqus', disqusReset)
 
     if (window.DISQUS) disqusReset()
     else {

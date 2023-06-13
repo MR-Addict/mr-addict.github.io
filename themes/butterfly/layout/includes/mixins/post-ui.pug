@@ -5,7 +5,7 @@ mixin postUI(posts)
         let link = article.link || article.path
         let title = article.title || _p('no_title')
         const position = theme.cover.position
-        let leftOrRight = position === 'both' 
+        let leftOrRight = position === 'both'
           ? index%2 == 0 ? 'left' : 'right'
           : position === 'left' ? 'left' : 'right'
         let post_cover = article.cover
@@ -14,7 +14,10 @@ mixin postUI(posts)
       if post_cover && theme.cover.index_enable
         .post_cover(class=leftOrRight)
           a(href=url_for(link) title=title)
-            img.post_bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='`+ url_for(theme.error_img.post_page) + `'` alt=title)
+            if article.cover_type === 'img'
+              img.post-bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='${url_for(theme.error_img.post_page)}'` alt=title)
+            else
+              div.post-bg(style=`background: ${post_cover}`)
       .recent-post-info(class=no_cover)
         a.article-title(href=url_for(link) title=title)= title
         .article-meta-wrap
@@ -67,27 +70,45 @@ mixin postUI(posts)
                 block
               span.article-meta-label= ' ' + _p('card_post_count')
           
-          if theme.comments.card_post_count
+          if theme.comments.card_post_count && theme.comments.use
             case theme.comments.use[0]
               when 'Disqus'
-              when 'Disqusjs'
                 +countBlockInIndex
                   a(href=full_url_for(link) + '#disqus_thread')
+                    i.fa-solid.fa-spinner.fa-spin
+              when 'Disqusjs'
+                +countBlockInIndex
+                  a(href=full_url_for(link) + '#disqusjs')
+                    span.disqus-comment-count(data-disqus-url=full_url_for(link))
+                      i.fa-solid.fa-spinner.fa-spin
               when 'Valine'
                 +countBlockInIndex
-                  a(href=url_for(link) + '#post-comment' itemprop="discussionUrl")
-                    span.valine-comment-count(data-xid=url_for(link) itemprop="commentCount")
+                  a(href=url_for(link) + '#post-comment')
+                    span.valine-comment-count(data-xid=url_for(link))
+                      i.fa-solid.fa-spinner.fa-spin
               when 'Waline'
                 +countBlockInIndex
                   a(href=url_for(link) + '#post-comment')
-                    span.waline-comment-count(id=url_for(link))
+                    span.waline-comment-count(data-path=url_for(link))
+                      i.fa-solid.fa-spinner.fa-spin
               when 'Twikoo'
                 +countBlockInIndex
                   a.twikoo-count(href=url_for(link) + '#post-comment')
+                    i.fa-solid.fa-spinner.fa-spin
               when 'Facebook Comments'
                 +countBlockInIndex
                   a(href=url_for(link) + '#post-comment')
                     span.fb-comments-count(data-href=urlNoIndex(article.permalink))
+              when 'Remark42'
+                +countBlockInIndex
+                  a(href=url_for(link) + '#post-comment')
+                    span.remark42__counter(data-url=urlNoIndex(article.permalink))
+                      i.fa-solid.fa-spinner.fa-spin
+              when 'Artalk'
+                +countBlockInIndex
+                  a(href=url_for(link) + '#post-comment')
+                    span.artalk-count(data-page-key=url_for(link))
+                      i.fa-solid.fa-spinner.fa-spin
 
         //- Display the article introduction on homepage
         case theme.index_post_content.method
