@@ -15,8 +15,8 @@
     "hexo-theme-butterfly"
   ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/jerryc127/hexo-theme-butterfly.git"
+    "type": "git",
+    "url": "https://github.com/jerryc127/hexo-theme-butterfly.git"
   },
   "bugs": {
     "url": "https://github.com/jerryc127/hexo-theme-butterfly/issues",

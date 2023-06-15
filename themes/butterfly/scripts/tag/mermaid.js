@@ -4,14 +4,14 @@
  * https://github.com/mermaid-js/mermaid
  */
 
-'use strict'
+"use strict";
 
-const { escapeHTML } = require('hexo-util')
+const { escapeHTML } = require("hexo-util");
 
-function mermaid (args, content) {
+function mermaid(args, content) {
   return `<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
   ${escapeHTML(content)}
-  </pre></div>`
+  </pre></div>`;
 }
 
-hexo.extend.tag.register('mermaid', mermaid, { ends: true })
+hexo.extend.tag.register("mermaid", mermaid, { ends: true });

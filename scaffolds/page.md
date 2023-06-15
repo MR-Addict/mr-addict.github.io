@@ -1,6 +1,6 @@
 ---
-title: {{ title }}
-date: {{ date }}
+title: { { title } }
+date: { { date } }
 comments: false
 top_img: false
 ---
