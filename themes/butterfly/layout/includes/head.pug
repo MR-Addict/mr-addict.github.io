@@ -67,3 +67,9 @@ include ./head/noscript.pug
 !=fragment_cache('injectHeadJs', function(){return inject_head_js()})
 
 !=fragment_cache('injectHead', function(){return injectHtml(theme.inject.head)})
+
+//- cronitor script
+script(src="https://rum.cronitor.io/script.js" async)
+script.
+  window.cronitor = window.cronitor || function() { (window.cronitor.q = window.cronitor.q || []).push(arguments); };
+  cronitor('config', { clientKey: '6048fba5ca57df67175eaa9eb92543f0' });
