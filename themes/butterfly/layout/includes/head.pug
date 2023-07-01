@@ -68,8 +68,5 @@ include ./head/noscript.pug
 
 !=fragment_cache('injectHead', function(){return injectHtml(theme.inject.head)})
 
-//- cronitor script
-script(src="https://rum.cronitor.io/script.js" async)
-script.
-  window.cronitor = window.cronitor || function() { (window.cronitor.q = window.cronitor.q || []).push(arguments); };
-  cronitor('config', { clientKey: '6048fba5ca57df67175eaa9eb92543f0' });
+//- umami script
+script(src="https://umami.mraddict.one/script.js" data-website-id="9f80d480-acec-4842-8cb7-23db54bc3820" async)
