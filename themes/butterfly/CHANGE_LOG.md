@@ -20,15 +20,3 @@ const valine = new Valine(Object.assign({
 +  meta: ['nick','mail']
 }, !{JSON.stringify(theme.valine.option)}))
 ```
-
-## 2. Custom umami script tag
-
-[File path](layout\includes\head.pug)
-
-```diff
-!=fragment_cache('injectHeadJs', function(){return inject_head_js()})
-!=fragment_cache('injectHead', function(){return injectHtml(theme.inject.head)})
-
-+//- umami script
-+script(src="https://umami.mraddict.one/script.js" data-website-id="9f80d480-acec-4842-8cb7-23db54bc3820" async)
-```
