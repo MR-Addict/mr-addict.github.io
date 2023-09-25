@@ -1,8 +1,0 @@
-version: "3"
-services:
-  blog:
-    image: mraddict063/blog
-    container_name: blog
-    restart: unless-stopped
-    ports:
-      - 8080:80

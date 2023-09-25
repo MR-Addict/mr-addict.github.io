@@ -11,23 +11,28 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout current branch
+      - name: checkout
         uses: actions/checkout@v3
-      - name: Setup nodejs
+
+      - name: setup
         uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Cache npm dependencies
+
+      - name: cache
         uses: actions/cache@v3.0.4
         with:
           path: node_modules
           key: ${{ runner.OS }}-npm-cache
           restore-keys: ${{ runner.OS }}-npm-cache
-      - name: Install npm dependencies
+
+      - name: install
         run: npm install
-      - name: Build project
+
+      - name: build
         run: npm run build
-      - name: Deploy
+
+      - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
