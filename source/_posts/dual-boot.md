@@ -152,7 +152,7 @@ categories: 教程
 
 首先进入 grub 的配置文件：
 
-```bash
+```sh
 sudo vim /etc/default/grub
 ```
 
@@ -164,7 +164,7 @@ sudo vim /etc/default/grub
 
 首先进入配置文件：
 
-```bash
+```sh
 sudo vim /etc/grub.d/30_os-prober
 ```
 
@@ -174,7 +174,7 @@ sudo vim /etc/grub.d/30_os-prober
 
 最后更新一下 gurb，重启之后就可以生效了：
 
-```bash
+```sh
 sudo update-grub
 ```
 

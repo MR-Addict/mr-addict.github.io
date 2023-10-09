@@ -1,11 +1,11 @@
 ---
-title: 在Ubuntu服务器上安装WiFi驱动
+title: 给Ubuntu服务器上安装WiFi驱动
+date: 2023-10-08 23:55:30
 comments: true
 tags:
   - ubuntu
   - 驱动
-date: 2023-10-08 23:55:30
-description: 在Ubuntu服务器上安装WiFi驱动
+description: 给Ubuntu服务器上安装WiFi驱动
 cover: /images/posts/install-wifi-driver-for-ubuntu-server/cover.jpg
 categories: 教程
 ---
