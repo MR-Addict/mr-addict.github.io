@@ -7,8 +7,11 @@ tags:
   - Clash
 description: 树莓派自己也可以科学上网
 cover: /images/posts/clash-on-rpi/cover.png
-categories: 笔记
+categories: 教程
 ---
+
+> 注意：
+> 本教程可以用于给你的树莓派安装代理软件，同时亲测也使用于其他架构的 Linux 主机，只要 Clash 内核含有你的主机架构即可。
 
 ## 一、前期准备
 

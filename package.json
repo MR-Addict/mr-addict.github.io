@@ -2,15 +2,14 @@
   "name": "hexo-site",
   "version": "0.0.0",
   "private": true,
+  "hexo": {
+    "version": "7.0.0-rc2"
+  },
   "scripts": {
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
-    "server": "hexo server",
-    "format": "prettier --write ."
-  },
-  "hexo": {
-    "version": "7.0.0-rc2"
+    "server": "hexo server"
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.12",
@@ -24,13 +23,6 @@
     "hexo-renderer-pug": "^3.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-wordcount": "^6.0.1",
-    "prettier": "^3.0.3"
-  },
-  "prettier": {
-    "useTabs": false,
-    "singleQuote": false,
-    "trailingComma": "none",
-    "printWidth": 120
+    "hexo-wordcount": "^6.0.1"
   }
 }
