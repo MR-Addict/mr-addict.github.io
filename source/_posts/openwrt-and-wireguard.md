@@ -20,7 +20,7 @@ Wireguard 我已经接触很久了，中间断断续续用过很多回，总是�
 >
 > - [MULTI-HOP WIREGUARD](https://www.procustodibus.com/blog/2022/06/multi-hop-wireguard/)
 
-## 一、网络结构
+# 一、网络结构
 
 在部署前，我们先认识一下我们的网络结构：
 
@@ -32,17 +32,17 @@ Wireguard 的 VPN 隧道的网段是 `172.22.192.0/24`，Openwrt 的内网网段
 
 即实现了 Openwrt 和 Wireguard 之间的互通。
 
-## 二、部署服务端
+# 二、部署服务端
 
 我们需要一台有公网的服务器，然后在上面安装 wiregaurd，这里我用的是 Ubuntu 22.04，其他系统也是类似的。
 
-### 1. 安装 Wireguard
+## 1. 安装 Wireguard
 
 ```sh
 sudo apt-get install wireguard -y
 ```
 
-### 2. 配置 Wireguard
+## 2. 配置 Wireguard
 
 使用以下命令分别为`服务器`，`openwrt`和`客户端`生成三对公钥和私钥，后面的配置会用到：
 
@@ -95,7 +95,7 @@ ip route list table main default
 
 这就是我们能够访问 Openwrt 内网网段的关键！
 
-### 3. 配置防火墙
+## 3. 配置防火墙
 
 首先我们需要打开 Ubuntu 的防火墙，如果你的 ufw 防火墙没有打开，那么你就不需要打开。
 
@@ -109,7 +109,7 @@ sudo ufw allow 51820/udp
 net.ipv4.ip_forward=1
 ```
 
-### 3. 启动 Wireguard
+## 3. 启动 Wireguard
 
 最后启动 wireguard 就可以了：
 
@@ -117,33 +117,43 @@ net.ipv4.ip_forward=1
 wg-quick up wg0
 ```
 
-## 三、配置 Openwrt
+# 三、配置 Openwrt
 
 你的 Openwrt 需要安装 Wireguard 插件，这里我就跳过这一步骤了。
 
-### 1. 配置 Wireguard
+## 1. 配置 Wireguard
 
-在 Openwrt 的网络配置中，添加一个 Wireguard 接口
+### 1.1 添加接口
+
+在 Openwrt 的网络配置中，添加一个 Wireguard 接口：
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-new.png)
 
-然后在常规设置中添加重要的的配置，如私钥和 IP 地址，这里的 IP 地址可以填 `172.22.192.111/24`，也可以填 `172.22.192.111/32`：
+### 1.2 修改常规设置
+
+然后在常规设置中添加重要的的配置，如私钥和 IP 地址：
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-general.png)
+
+### 1.3 创建防火墙
 
 在防火墙设置中，创建一个新的防火墙区域 wg：
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-firewall.png)
 
+### 1.4 添加对端
+
 最后新建一个 Peer 对端，也就是配置公网服务的信息，允许的 IP 必须是 `172.22.192.0/24`，勾选路由允许的 IP，可以给一个持续 Keep-Alive 让 Openwrt 主动保持连接服务器：
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-peer.png)
+
+### 1.5 检查 Wireguard 连接
 
 最后保存并应用就可以了，如果一切正常，你就可以在 Openwrt 的网络状态中看到 Wireguard 的状态了：
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-status.png)
 
-### 2. 配置防火墙
+## 2. 配置防火墙
 
 虽然我们在 Wireguard 的 Peer 中配置了防火墙，但是 Openwrt 的防火墙还是需要配置一下的，这里我就不多说了，直接上图：
 
@@ -155,17 +165,9 @@ wg-quick up wg0
 
 ![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-firewall-mss.png)
 
-最后，如果我们想要 wireguard 的设备能够访问 Openwrt 下的设备，我们还要在防火墙自定义规则里面添加下面的命令，让来自 wg 口的请求能够访问 lan 口的设备：
-
-```sh
-iptables -t nat -A POSTROUTING -s 172.22.192.0/24 -o br-lan -j MASQUERADE
-```
-
-![openwrt-wireguard](/images/posts/openwrt-and-wireguard/openwrt-wireguard-firewall-custom.png)
-
 至此我们就完成了 Openwrt 和 Wireguard 的配置了，如果一切正常，我们就可以在 Wireguard 的客户端访问到 Openwrt 的内网网段了。最后让我们简单配置以下客户端的 Wireguard。
 
-## 四、配置客户端
+# 四、配置客户端
 
 客户端的话，你可以使用 Wireguard 官方的客户端，Linux，Windows，MacOS，Android，iOS 都有，下载地址在这里[https://www.wireguard.com/install](https://www.wireguard.com/install)。
 
@@ -182,10 +184,10 @@ AllowedIPs = 172.22.192.0/24, 192.168.6.0/24
 Endpoint = server_pubic_ip:51820
 ```
 
-这里尤其要注意添加 172.22.192.110/32 和 192.168.6.0/24，这样 Wireguard 客户端才能访问到 Openwrt 的内网网段。
+这里尤其要注意添加 172.22.192.0/24 和 192.168.6.0/24，这样 Wireguard 客户端才能访问到 Openwrt 的内网网段。
 
 然后你就可以试试，是不是可以访问到 Openwrt 的内网网段，以及在 Openwrt 下访问 Wireguard 的内网网段。
 
-## 五、总结
+# 五、总结
 
 这篇文章主要是记录了我在配置 Wireguard 和 Openwrt 之间的互通的过程，希望对你能有帮助。
