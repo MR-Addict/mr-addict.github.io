@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     if (init) {
-      const blogInfoWidth = getAllWidth(document.querySelector("#blog-info > a").children);
+      const blogInfoWidth = getAllWidth(
+        document.querySelector("#blog-info > a").children,
+      );
       const menusWidth = getAllWidth(document.getElementById("menus").children);
       headerContentWidth = blogInfoWidth + menusWidth;
       $nav = document.getElementById("nav");
@@ -52,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btf.animateOut(document.getElementById("menu-mask"), "to_hide 0.5s");
       document.getElementById("sidebar-menus").classList.remove("open");
       mobileSidebarOpen = false;
-    }
+    },
   };
 
   /**
@@ -62,7 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const $scrollDownEle = document.getElementById("scroll-down");
     $scrollDownEle &&
       $scrollDownEle.addEventListener("click", function () {
-        btf.scrollToDest(document.getElementById("content-inner").offsetTop, 300);
+        btf.scrollToDest(
+          document.getElementById("content-inner").offsetTop,
+          300,
+        );
       });
   };
 
@@ -74,26 +79,34 @@ document.addEventListener("DOMContentLoaded", function () {
     const highLight = GLOBAL_CONFIG.highlight;
     if (!highLight) return;
 
-    const { highlightCopy, highlightLang, highlightHeightLimit, plugin } = highLight;
+    const { highlightCopy, highlightLang, highlightHeightLimit, plugin } =
+      highLight;
     const isHighlightShrink = GLOBAL_CONFIG_SITE.isHighlightShrink;
-    const isShowTool = highlightCopy || highlightLang || isHighlightShrink !== undefined;
+    const isShowTool =
+      highlightCopy || highlightLang || isHighlightShrink !== undefined;
     const $figureHighlight =
       plugin === "highlighjs"
         ? document.querySelectorAll("figure.highlight")
         : document.querySelectorAll('pre[class*="language-"]');
 
-    if (!((isShowTool || highlightHeightLimit) && $figureHighlight.length)) return;
+    if (!((isShowTool || highlightHeightLimit) && $figureHighlight.length))
+      return;
 
     const isPrismjs = plugin === "prismjs";
     const highlightShrinkClass = isHighlightShrink === true ? "closed" : "";
     const highlightShrinkEle =
-      isHighlightShrink !== undefined ? `<i class="fas fa-angle-down expand ${highlightShrinkClass}"></i>` : "";
+      isHighlightShrink !== undefined
+        ? `<i class="fas fa-angle-down expand ${highlightShrinkClass}"></i>`
+        : "";
     const highlightCopyEle = highlightCopy
       ? '<div class="copy-notice"></div><i class="fas fa-paste copy-button"></i>'
       : "";
 
     const copy = (text, ctx) => {
-      if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+      if (
+        document.queryCommandSupported &&
+        document.queryCommandSupported("copy")
+      ) {
         document.execCommand("copy");
         if (GLOBAL_CONFIG.Snackbar !== undefined) {
           btf.snackbarShow(GLOBAL_CONFIG.copy.success);
@@ -121,7 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const selection = window.getSelection();
       const range = document.createRange();
       const preCodeSelector = isPrismjs ? "pre code" : "table .code pre";
-      range.selectNodeContents($buttonParent.querySelectorAll(`${preCodeSelector}`)[0]);
+      range.selectNodeContents(
+        $buttonParent.querySelectorAll(`${preCodeSelector}`)[0],
+      );
       selection.removeAllRanges();
       selection.addRange(range);
       const text = selection.toString();
@@ -165,7 +180,10 @@ document.addEventListener("DOMContentLoaded", function () {
         fragment.appendChild(hlTools);
       }
 
-      if (highlightHeightLimit && item.offsetHeight > highlightHeightLimit + 30) {
+      if (
+        highlightHeightLimit &&
+        item.offsetHeight > highlightHeightLimit + 30
+      ) {
         const ele = document.createElement("div");
         ele.className = "code-expand-btn";
         ele.innerHTML = '<i class="fas fa-angle-double-down"></i>';
@@ -210,23 +228,30 @@ document.addEventListener("DOMContentLoaded", function () {
    * PhotoFigcaption
    */
   function addPhotoFigcaption() {
-    document.querySelectorAll("#article-container img").forEach(function (item) {
-      const parentEle = item.parentNode;
-      const altValue = item.title || item.alt;
-      if (altValue && !parentEle.parentNode.classList.contains("justified-gallery")) {
-        const ele = document.createElement("div");
-        ele.className = "img-alt is-center";
-        ele.textContent = altValue;
-        parentEle.insertBefore(ele, item.nextSibling);
-      }
-    });
+    document
+      .querySelectorAll("#article-container img")
+      .forEach(function (item) {
+        const parentEle = item.parentNode;
+        const altValue = item.title || item.alt;
+        if (
+          altValue &&
+          !parentEle.parentNode.classList.contains("justified-gallery")
+        ) {
+          const ele = document.createElement("div");
+          ele.className = "img-alt is-center";
+          ele.textContent = altValue;
+          parentEle.insertBefore(ele, item.nextSibling);
+        }
+      });
   }
 
   /**
    * Lightbox
    */
   const runLightbox = () => {
-    btf.loadLightbox(document.querySelectorAll("#article-container img:not(.no-lightbox)"));
+    btf.loadLightbox(
+      document.querySelectorAll("#article-container img:not(.no-lightbox)"),
+    );
   };
 
   /**
@@ -239,7 +264,9 @@ document.addEventListener("DOMContentLoaded", function () {
       arr.forEach((i) => {
         const alt = i.alt ? `alt="${replaceDq(i.alt)}"` : "";
         const title = i.title ? `title="${replaceDq(i.title)}"` : "";
-        str += `<div class="fj-gallery-item"><img src="${i.url}" ${alt + title}"></div>`;
+        str += `<div class="fj-gallery-item"><img src="${i.url}" ${
+          alt + title
+        }"></div>`;
       });
       return str;
     };
@@ -247,7 +274,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const lazyloadFn = (i, arr, limit) => {
       const loadItem = limit;
       const arrLength = arr.length;
-      if (arrLength > loadItem) i.insertAdjacentHTML("beforeend", htmlStr(arr.splice(0, loadItem)));
+      if (arrLength > loadItem)
+        i.insertAdjacentHTML("beforeend", htmlStr(arr.splice(0, loadItem)));
       else {
         i.insertAdjacentHTML("beforeend", htmlStr(arr));
         i.classList.remove("lazyload");
@@ -270,10 +298,13 @@ document.addEventListener("DOMContentLoaded", function () {
           fjGallery(
             item,
             "appendImages",
-            item.querySelectorAll(`.fj-gallery-item:nth-last-child(-n+${lastItemLength})`)
+            item.querySelectorAll(
+              `.fj-gallery-item:nth-last-child(-n+${lastItemLength})`,
+            ),
           );
           btf.loadLightbox(item.querySelectorAll("img"));
-          lastItemLength < limit && item.nextElementSibling.removeEventListener("click", clickBtnFn);
+          lastItemLength < limit &&
+            item.nextElementSibling.removeEventListener("click", clickBtnFn);
         };
         item.nextElementSibling.addEventListener("click", clickBtnFn);
       }
@@ -297,7 +328,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     getCSS(`${GLOBAL_CONFIG.source.justifiedGallery.css}`);
-    getScript(`${GLOBAL_CONFIG.source.justifiedGallery.js}`).then(addJustifiedGallery);
+    getScript(`${GLOBAL_CONFIG.source.justifiedGallery.js}`).then(
+      addJustifiedGallery,
+    );
   };
 
   /**
@@ -344,21 +377,27 @@ document.addEventListener("DOMContentLoaded", function () {
       const isDown = scrollDirection(currentTop);
       if (currentTop > 56) {
         if (isDown) {
-          if ($header.classList.contains("nav-visible")) $header.classList.remove("nav-visible");
+          if ($header.classList.contains("nav-visible"))
+            $header.classList.remove("nav-visible");
           if (isChatBtn && isChatShow === true) {
             window.chatBtn.hide();
             isChatShow = false;
           }
         } else {
-          if (!$header.classList.contains("nav-visible")) $header.classList.add("nav-visible");
+          if (!$header.classList.contains("nav-visible"))
+            $header.classList.add("nav-visible");
           if (isChatBtn && isChatShow === false) {
             window.chatBtn.show();
             isChatShow = true;
           }
         }
         $header.classList.add("nav-fixed");
-        if (window.getComputedStyle($rightside).getPropertyValue("opacity") === "0") {
-          $rightside.style.cssText = "opacity: 0.8; transform: translateX(-58px)";
+        if (
+          window.getComputedStyle($rightside).getPropertyValue("opacity") ===
+          "0"
+        ) {
+          $rightside.style.cssText =
+            "opacity: 0.8; transform: translateX(-58px)";
         }
       } else {
         if (currentTop === 0) {
@@ -400,15 +439,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
       window.mobileToc = {
         open: () => {
-          $cardTocLayout.style.cssText = "animation: toc-open .3s; opacity: 1; right: 55px";
+          $cardTocLayout.style.cssText =
+            "animation: toc-open .3s; opacity: 1; right: 55px";
         },
 
         close: () => {
           $cardTocLayout.style.animation = "toc-close .2s";
           setTimeout(() => {
-            $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''";
+            $cardTocLayout.style.cssText =
+              "opacity:''; animation: ''; right: ''";
           }, 100);
-        }
+        },
       };
 
       // toc元素點擊
@@ -416,10 +457,16 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
         const target = e.target.classList;
         if (target.contains("toc-content")) return;
-        const $target = target.contains("toc-link") ? e.target : e.target.parentElement;
+        const $target = target.contains("toc-link")
+          ? e.target
+          : e.target.parentElement;
         btf.scrollToDest(
-          btf.getEleTop(document.getElementById(decodeURI($target.getAttribute("href")).replace("#", ""))),
-          300
+          btf.getEleTop(
+            document.getElementById(
+              decodeURI($target.getAttribute("href")).replace("#", ""),
+            ),
+          ),
+          300,
         );
         if (window.innerWidth < 900) {
           window.mobileToc.close();
@@ -539,21 +586,28 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     switchDarkMode: () => {
       // Switch Between Light And Dark Mode
-      const willChangeMode = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      const willChangeMode =
+        document.documentElement.getAttribute("data-theme") === "dark"
+          ? "light"
+          : "dark";
       if (willChangeMode === "dark") {
         activateDarkMode();
         saveToLocal.set("theme", "dark", 2);
-        GLOBAL_CONFIG.Snackbar !== undefined && btf.snackbarShow(GLOBAL_CONFIG.Snackbar.day_to_night);
+        GLOBAL_CONFIG.Snackbar !== undefined &&
+          btf.snackbarShow(GLOBAL_CONFIG.Snackbar.day_to_night);
       } else {
         activateLightMode();
         saveToLocal.set("theme", "light", 2);
-        GLOBAL_CONFIG.Snackbar !== undefined && btf.snackbarShow(GLOBAL_CONFIG.Snackbar.night_to_day);
+        GLOBAL_CONFIG.Snackbar !== undefined &&
+          btf.snackbarShow(GLOBAL_CONFIG.Snackbar.night_to_day);
       }
       modeChangeFn(willChangeMode);
     },
     showOrHideBtn: (e) => {
       // rightside 點擊設置 按鈕 展開
-      const rightsideHideClassList = document.getElementById("rightside-config-hide").classList;
+      const rightsideHideClassList = document.getElementById(
+        "rightside-config-hide",
+      ).classList;
       rightsideHideClassList.toggle("show");
       if (e.classList.contains("show")) {
         rightsideHideClassList.add("status");
@@ -575,13 +629,17 @@ document.addEventListener("DOMContentLoaded", function () {
       $htmlDom.toggle("hide-aside");
     },
     runMobileToc: () => {
-      if (window.getComputedStyle(document.getElementById("card-toc")).getPropertyValue("opacity") === "0")
+      if (
+        window
+          .getComputedStyle(document.getElementById("card-toc"))
+          .getPropertyValue("opacity") === "0"
+      )
         window.mobileToc.open();
       else window.mobileToc.close();
     },
     toggleChatDisplay: () => {
       window.chatBtnFn();
-    }
+    },
   };
 
   document.getElementById("rightside").addEventListener("click", function (e) {
@@ -618,11 +676,13 @@ document.addEventListener("DOMContentLoaded", function () {
    * 側邊欄sub-menu 展開/收縮
    */
   const clickFnOfSubMenu = () => {
-    document.querySelectorAll("#sidebar-menus .site-page.group").forEach(function (item) {
-      item.addEventListener("click", function () {
-        this.classList.toggle("hide");
+    document
+      .querySelectorAll("#sidebar-menus .site-page.group")
+      .forEach(function (item) {
+        item.addEventListener("click", function () {
+          this.classList.toggle("hide");
+        });
       });
-    });
   };
 
   /**
@@ -652,7 +712,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const $runtimeCount = document.getElementById("runtimeshow");
     if ($runtimeCount) {
       const publishDate = $runtimeCount.getAttribute("data-publishDate");
-      $runtimeCount.textContent = `${btf.diffDate(publishDate)} ${GLOBAL_CONFIG.runtime}`;
+      $runtimeCount.textContent = `${btf.diffDate(publishDate)} ${
+        GLOBAL_CONFIG.runtime
+      }`;
     }
   };
 
@@ -671,7 +733,9 @@ document.addEventListener("DOMContentLoaded", function () {
    * table overflow
    */
   const addTableWrap = () => {
-    const $table = document.querySelectorAll("#article-container :not(.highlight) > table, #article-container > table");
+    const $table = document.querySelectorAll(
+      "#article-container :not(.highlight) > table, #article-container > table",
+    );
     if ($table.length) {
       $table.forEach((item) => {
         btf.wrap(item, "div", { class: "table-wrap" });
@@ -683,13 +747,16 @@ document.addEventListener("DOMContentLoaded", function () {
    * tag-hide
    */
   const clickFnOfTagHide = function () {
-    const $hideInline = document.querySelectorAll("#article-container .hide-button");
+    const $hideInline = document.querySelectorAll(
+      "#article-container .hide-button",
+    );
     if ($hideInline.length) {
       $hideInline.forEach(function (item) {
         item.addEventListener("click", function (e) {
           const $this = this;
           $this.classList.add("open");
-          const $fjGallery = $this.nextElementSibling.querySelectorAll(".fj-gallery");
+          const $fjGallery =
+            $this.nextElementSibling.querySelectorAll(".fj-gallery");
           $fjGallery.length && btf.initJustifiedGallery($fjGallery);
         });
       });
@@ -698,41 +765,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const tabsFn = {
     clickFnOfTabs: function () {
-      document.querySelectorAll("#article-container .tab > button").forEach(function (item) {
-        item.addEventListener("click", function (e) {
-          const $this = this;
-          const $tabItem = $this.parentNode;
+      document
+        .querySelectorAll("#article-container .tab > button")
+        .forEach(function (item) {
+          item.addEventListener("click", function (e) {
+            const $this = this;
+            const $tabItem = $this.parentNode;
 
-          if (!$tabItem.classList.contains("active")) {
-            const $tabContent = $tabItem.parentNode.nextElementSibling;
-            const $siblings = btf.siblings($tabItem, ".active")[0];
-            $siblings && $siblings.classList.remove("active");
-            $tabItem.classList.add("active");
-            const tabId = $this.getAttribute("data-href").replace("#", "");
-            const childList = [...$tabContent.children];
-            childList.forEach((item) => {
-              if (item.id === tabId) item.classList.add("active");
-              else item.classList.remove("active");
-            });
-            const $isTabJustifiedGallery = $tabContent.querySelectorAll(`#${tabId} .fj-gallery`);
-            if ($isTabJustifiedGallery.length > 0) {
-              btf.initJustifiedGallery($isTabJustifiedGallery);
+            if (!$tabItem.classList.contains("active")) {
+              const $tabContent = $tabItem.parentNode.nextElementSibling;
+              const $siblings = btf.siblings($tabItem, ".active")[0];
+              $siblings && $siblings.classList.remove("active");
+              $tabItem.classList.add("active");
+              const tabId = $this.getAttribute("data-href").replace("#", "");
+              const childList = [...$tabContent.children];
+              childList.forEach((item) => {
+                if (item.id === tabId) item.classList.add("active");
+                else item.classList.remove("active");
+              });
+              const $isTabJustifiedGallery = $tabContent.querySelectorAll(
+                `#${tabId} .fj-gallery`,
+              );
+              if ($isTabJustifiedGallery.length > 0) {
+                btf.initJustifiedGallery($isTabJustifiedGallery);
+              }
             }
-          }
+          });
         });
-      });
     },
     backToTop: () => {
-      document.querySelectorAll("#article-container .tabs .tab-to-top").forEach(function (item) {
-        item.addEventListener("click", function () {
-          btf.scrollToDest(btf.getEleTop(btf.getParents(this, ".tabs")), 300);
+      document
+        .querySelectorAll("#article-container .tabs .tab-to-top")
+        .forEach(function (item) {
+          item.addEventListener("click", function () {
+            btf.scrollToDest(btf.getEleTop(btf.getParents(this, ".tabs")), 300);
+          });
         });
-      });
-    }
+    },
   };
 
   const toggleCardCategory = function () {
-    const $cardCategory = document.querySelectorAll("#aside-cat-list .card-category-list-item.parent i");
+    const $cardCategory = document.querySelectorAll(
+      "#aside-cat-list .card-category-list-item.parent i",
+    );
     if ($cardCategory.length) {
       $cardCategory.forEach(function (item) {
         item.addEventListener("click", function (e) {
@@ -756,13 +831,15 @@ document.addEventListener("DOMContentLoaded", function () {
     $switchBtn &&
       $switchBtn.addEventListener("click", function () {
         this.classList.toggle("move");
-        document.querySelectorAll("#post-comment > .comment-wrap > div").forEach(function (item) {
-          if (btf.isHidden(item)) {
-            item.style.cssText = "display: block;animation: tabshow .5s";
-          } else {
-            item.style.cssText = "display: none;animation: ''";
-          }
-        });
+        document
+          .querySelectorAll("#post-comment > .comment-wrap > div")
+          .forEach(function (item) {
+            if (btf.isHidden(item)) {
+              item.style.cssText = "display: block;animation: tabshow .5s";
+            } else {
+              item.style.cssText = "display: none;animation: ''";
+            }
+          });
 
         if (!switchDone && typeof loadOtherComment === "function") {
           switchDone = true;
@@ -777,7 +854,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (diffDay >= data.limitDay) {
       const ele = document.createElement("div");
       ele.className = "post-outdate-notice";
-      ele.textContent = data.messagePrev + " " + diffDay + " " + data.messageNext;
+      ele.textContent =
+        data.messagePrev + " " + diffDay + " " + data.messageNext;
       const $targetEle = document.getElementById("article-container");
       if (data.position === "top") {
         $targetEle.insertBefore(ele, $targetEle.firstChild);
@@ -791,7 +869,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.lazyLoadInstance = new LazyLoad({
       elements_selector: "img",
       threshold: 0,
-      data_src: "lazy-src"
+      data_src: "lazy-src",
     });
   };
 
@@ -806,7 +884,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const unRefreshFn = function () {
     window.addEventListener("resize", () => {
       adjustMenu(false);
-      btf.isHidden(document.getElementById("toggle-menu")) && mobileSidebarOpen && sidebarFn.close();
+      btf.isHidden(document.getElementById("toggle-menu")) &&
+        mobileSidebarOpen &&
+        sidebarFn.close();
     });
 
     document.getElementById("menu-mask").addEventListener("click", (e) => {
@@ -818,10 +898,12 @@ document.addEventListener("DOMContentLoaded", function () {
     GLOBAL_CONFIG.copyright !== undefined && addCopyright();
 
     if (GLOBAL_CONFIG.autoDarkmode) {
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-        if (saveToLocal.get("theme") !== undefined) return;
-        e.matches ? modeChangeFn("dark") : modeChangeFn("light");
-      });
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+          if (saveToLocal.get("theme") !== undefined) return;
+          e.matches ? modeChangeFn("dark") : modeChangeFn("light");
+        });
     }
   };
 
@@ -830,9 +912,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (GLOBAL_CONFIG_SITE.isPost) {
       GLOBAL_CONFIG.noticeOutdate !== undefined && addPostOutdateNotice();
-      GLOBAL_CONFIG.relativeDate.post && relativeDate(document.querySelectorAll("#post-meta time"));
+      GLOBAL_CONFIG.relativeDate.post &&
+        relativeDate(document.querySelectorAll("#post-meta time"));
     } else {
-      GLOBAL_CONFIG.relativeDate.homepage && relativeDate(document.querySelectorAll("#recent-posts time"));
+      GLOBAL_CONFIG.relativeDate.homepage &&
+        relativeDate(document.querySelectorAll("#recent-posts time"));
       GLOBAL_CONFIG.runtime && addRuntime();
       addLastPushDate();
       toggleCardCategory();

@@ -12,8 +12,12 @@ const flinkFn = (args, content) => {
   let result = "";
 
   content.forEach((i) => {
-    const className = i.class_name ? `<div class="flink-name">${i.class_name}</div>` : "";
-    const classDesc = i.class_desc ? `<div class="flink-desc">${i.class_desc}</div>` : "";
+    const className = i.class_name
+      ? `<div class="flink-name">${i.class_name}</div>`
+      : "";
+    const classDesc = i.class_desc
+      ? `<div class="flink-desc">${i.class_desc}</div>`
+      : "";
 
     let listResult = "";
 
@@ -22,8 +26,10 @@ const flinkFn = (args, content) => {
           <div class="flink-list-item">
             <a href="${j.link}" title="${j.name}" target="_blank">
               <div class="flink-item-icon">
-                <img class="no-lightbox" src="${j.avatar}" onerror='this.onerror=null;this.src="${urlFor(
-                  hexo.theme.config.error_img.flink
+                <img class="no-lightbox" src="${
+                  j.avatar
+                }" onerror='this.onerror=null;this.src="${urlFor(
+                  hexo.theme.config.error_img.flink,
                 )}"' alt="${j.name}" />
               </div>
               <div class="flink-item-name">${j.name}</div> 

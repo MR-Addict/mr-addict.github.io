@@ -12,7 +12,9 @@ hexo.extend.filter.register("before_generate", () => {
   if (locals.get) {
     const data = locals.get("data");
     if (data && data.butterfly) {
-      log.error("'butterfly.yml' is deprecated. Please use '_config.butterfly.yml'");
+      log.error(
+        "'butterfly.yml' is deprecated. Please use '_config.butterfly.yml'",
+      );
       log.error("'butterfly.yml' 已經棄用，請使用 '_config.butterfly.yml'");
       process.exit(-1);
     }

@@ -12,17 +12,21 @@ const crypto = require("crypto");
 
 hexo.extend.helper.register("page_description", function () {
   const { config, page } = this;
-  let description = page.description || page.content || page.title || config.description;
+  let description =
+    page.description || page.content || page.title || config.description;
 
   if (description) {
-    description = escapeHTML(stripHTML(description).substring(0, 150).trim()).replace(/\n/g, " ");
+    description = escapeHTML(
+      stripHTML(description).substring(0, 150).trim(),
+    ).replace(/\n/g, " ");
     return description;
   }
 });
 
 hexo.extend.helper.register("cloudTags", function (options = {}) {
   const env = this;
-  let { source, minfontsize, maxfontsize, limit, unit, orderby, order } = options;
+  let { source, minfontsize, maxfontsize, limit, unit, orderby, order } =
+    options;
   unit = unit || "px";
 
   let result = "";
@@ -51,14 +55,22 @@ hexo.extend.helper.register("cloudTags", function (options = {}) {
       Math.floor(Math.random() * 201) +
       ")"; // 0,0,0 -> 200,200,200
     style += ` color: ${color}`;
-    result += `<a href="${env.url_for(tag.path)}" style="${style}">${tag.name}</a>`;
+    result += `<a href="${env.url_for(tag.path)}" style="${style}">${
+      tag.name
+    }</a>`;
   });
   return result;
 });
 
-hexo.extend.helper.register("urlNoIndex", function (url = null, trailingIndex = false, trailingHtml = false) {
-  return prettyUrls(url || this.url, { trailing_index: trailingIndex, trailing_html: trailingHtml });
-});
+hexo.extend.helper.register(
+  "urlNoIndex",
+  function (url = null, trailingIndex = false, trailingHtml = false) {
+    return prettyUrls(url || this.url, {
+      trailing_index: trailingIndex,
+      trailing_html: trailingHtml,
+    });
+  },
+);
 
 hexo.extend.helper.register("md5", function (path) {
   return crypto
@@ -79,7 +91,9 @@ hexo.extend.helper.register("injectHtml", function (data) {
 hexo.extend.helper.register("findArchivesTitle", function (page, menu, date) {
   if (page.year) {
     const dateStr = page.month ? `${page.year}-${page.month}` : `${page.year}`;
-    const dateFormat = page.month ? hexo.theme.config.aside.card_archives.format : "YYYY";
+    const dateFormat = page.month
+      ? hexo.theme.config.aside.card_archives.format
+      : "YYYY";
     return date(dateStr, dateFormat);
   }
 

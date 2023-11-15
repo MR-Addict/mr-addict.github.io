@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const { defaultEncoding, translateDelay, msgToTraditionalChinese, msgToSimplifiedChinese } = GLOBAL_CONFIG.translate;
+  const {
+    defaultEncoding,
+    translateDelay,
+    msgToTraditionalChinese,
+    msgToSimplifiedChinese,
+  } = GLOBAL_CONFIG.translate;
   const snackbarData = GLOBAL_CONFIG.Snackbar;
   let currentEncoding = defaultEncoding;
   const targetEncodingCookie = "translate-chn-cht";
@@ -27,7 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
     else objs = document.body.childNodes;
     for (let i = 0; i < objs.length; i++) {
       const obj = objs.item(i);
-      if ("||BR|HR|".indexOf("|" + obj.tagName + "|") > 0 || obj === translateButtonObject) {
+      if (
+        "||BR|HR|".indexOf("|" + obj.tagName + "|") > 0 ||
+        obj === translateButtonObject
+      ) {
         continue;
       }
       if (obj.title !== "" && obj.title != null) {
@@ -37,7 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (obj.placeholder !== "" && obj.placeholder != null) {
         obj.placeholder = translateText(obj.placeholder);
       }
-      if (obj.tagName === "INPUT" && obj.value !== "" && obj.type !== "text" && obj.type !== "hidden") {
+      if (
+        obj.tagName === "INPUT" &&
+        obj.value !== "" &&
+        obj.type !== "text" &&
+        obj.type !== "hidden"
+      ) {
         obj.value = translateText(obj.value);
       }
       if (obj.nodeType === 3) obj.data = translateText(obj.data);
@@ -94,7 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
     translateButtonObject = document.getElementById("translateLink");
     if (translateButtonObject) {
       if (currentEncoding !== targetEncoding) {
-        translateButtonObject.textContent = targetEncoding === 1 ? msgToSimplifiedChinese : msgToTraditionalChinese;
+        translateButtonObject.textContent =
+          targetEncoding === 1
+            ? msgToSimplifiedChinese
+            : msgToTraditionalChinese;
         setLang();
         setTimeout(translateBody, translateDelay);
       }

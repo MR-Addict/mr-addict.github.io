@@ -60,14 +60,17 @@ const btf = {
 
   snackbarShow: (text, showAction = false, duration = 2000) => {
     const { position, bgLight, bgDark } = GLOBAL_CONFIG.Snackbar;
-    const bg = document.documentElement.getAttribute("data-theme") === "light" ? bgLight : bgDark;
+    const bg =
+      document.documentElement.getAttribute("data-theme") === "light"
+        ? bgLight
+        : bgDark;
     Snackbar.show({
       text,
       backgroundColor: bg,
       showAction,
       duration,
       pos: position,
-      customClass: "snackbar-css"
+      customClass: "snackbar-css",
     });
   },
 
@@ -105,7 +108,7 @@ const btf = {
             observerItem.disconnect();
           }
         },
-        { threshold: [0] }
+        { threshold: [0] },
       );
       observerItem.observe(dom);
     } else {
@@ -115,13 +118,15 @@ const btf = {
 
   scrollToDest: (pos, time = 500) => {
     const currentPos = window.pageYOffset;
-    const isNavFixed = document.getElementById("page-header").classList.contains("fixed");
+    const isNavFixed = document
+      .getElementById("page-header")
+      .classList.contains("fixed");
     if (currentPos > pos || isNavFixed) pos = pos - 70;
 
     if ("scrollBehavior" in document.documentElement.style) {
       window.scrollTo({
         top: pos,
-        behavior: "smooth"
+        behavior: "smooth",
       });
       return;
     }
@@ -225,7 +230,7 @@ const btf = {
             href: dataSrc,
             "data-fancybox": "gallery",
             "data-caption": dataCaption,
-            "data-thumb": dataSrc
+            "data-thumb": dataSrc,
           });
         }
       });
@@ -234,23 +239,31 @@ const btf = {
         Fancybox.bind("[data-fancybox]", {
           Hash: false,
           Thumbs: {
-            showOnStart: false
+            showOnStart: false,
           },
           Images: {
             Panzoom: {
-              maxScale: 4
-            }
+              maxScale: 4,
+            },
           },
           Carousel: {
-            transition: "slide"
+            transition: "slide",
           },
           Toolbar: {
             display: {
               left: ["infobar"],
-              middle: ["zoomIn", "zoomOut", "toggle1to1", "rotateCCW", "rotateCW", "flipX", "flipY"],
-              right: ["slideshow", "thumbs", "close"]
-            }
-          }
+              middle: [
+                "zoomIn",
+                "zoomOut",
+                "toggle1to1",
+                "rotateCCW",
+                "rotateCW",
+                "flipX",
+                "flipY",
+              ],
+              right: ["slideshow", "thumbs", "close"],
+            },
+          },
         });
         window.fancyboxRun = true;
       }
@@ -266,7 +279,7 @@ const btf = {
           gutter: 4,
           onJustify: function () {
             this.$container.style.opacity = "1";
-          }
+          },
         });
       }
     };
@@ -285,10 +298,10 @@ const btf = {
       window.history.replaceState(
         {
           url: location.href,
-          title
+          title,
         },
         title,
-        anchor
+        anchor,
       );
     }
   },
@@ -298,10 +311,17 @@ const btf = {
     const winHeight = document.documentElement.clientHeight;
     const headerHeight = ele.offsetTop;
     const contentMath =
-      docHeight > winHeight ? docHeight - winHeight : document.documentElement.scrollHeight - winHeight;
+      docHeight > winHeight
+        ? docHeight - winHeight
+        : document.documentElement.scrollHeight - winHeight;
     const scrollPercent = (currentTop - headerHeight) / contentMath;
     const scrollPercentRounded = Math.round(scrollPercent * 100);
-    const percentage = scrollPercentRounded > 100 ? 100 : scrollPercentRounded <= 0 ? 0 : scrollPercentRounded;
+    const percentage =
+      scrollPercentRounded > 100
+        ? 100
+        : scrollPercentRounded <= 0
+          ? 0
+          : scrollPercentRounded;
     return percentage;
   },
 
@@ -309,7 +329,7 @@ const btf = {
     if (window.themeChange && window.themeChange[name]) return;
     window.themeChange = {
       ...window.themeChange,
-      [name]: fn
+      [name]: fn,
     };
-  }
+  },
 };

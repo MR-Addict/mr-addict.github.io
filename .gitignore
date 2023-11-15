@@ -1,9 +1,8 @@
-.DS_Store
-Thumbs.db
-db.json
 *.log
-node_modules/
-public/
-.deploy*/
+.DS_Store
+.deploy*
+db.json
+public
+Thumbs.db
+node_modules
 _multiconfig.yml
-actions-runner/

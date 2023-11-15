@@ -12,7 +12,7 @@ function score(args, content) {
       '"': "&quot;",
       "'": "&apos;",
       "<": "&lt;",
-      ">": "&gt;"
+      ">": "&gt;",
     };
     return s.replace(/[&"'<>]/g, (c) => lookup[c]);
   }

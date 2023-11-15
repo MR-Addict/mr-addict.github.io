@@ -12,33 +12,36 @@ hexo.extend.filter.register("before_generate", () => {
   const themeConfig = hexo.theme.config;
   const { CDN } = themeConfig;
 
-  const thirdPartySrc = hexo.render.renderSync({ path: path.join(hexo.theme_dir, "/plugins.yml"), engine: "yaml" });
+  const thirdPartySrc = hexo.render.renderSync({
+    path: path.join(hexo.theme_dir, "/plugins.yml"),
+    engine: "yaml",
+  });
   const internalSrc = {
     main: {
       name: "hexo-theme-butterfly",
       file: "js/main.js",
-      version
+      version,
     },
     utils: {
       name: "hexo-theme-butterfly",
       file: "js/utils.js",
-      version
+      version,
     },
     translate: {
       name: "hexo-theme-butterfly",
       file: "js/tw_cn.js",
-      version
+      version,
     },
     local_search: {
       name: "hexo-theme-butterfly",
       file: "js/search/local-search.js",
-      version
+      version,
     },
     algolia_js: {
       name: "hexo-theme-butterfly",
       file: "js/search/algolia.js",
-      version
-    }
+      version,
+    },
   };
 
   const minFile = (file) => {
@@ -53,7 +56,11 @@ hexo.extend.filter.register("before_generate", () => {
       const min_cdnjs_file = minFile(cdnjs_file);
       if (cond === "internal") file = `source/${file}`;
       const min_file = minFile(file);
-      const verType = CDN.version ? (type === "local" ? `?v=${version}` : `@${version}`) : "";
+      const verType = CDN.version
+        ? type === "local"
+          ? `?v=${version}`
+          : `@${version}`
+        : "";
 
       const value = {
         version,
@@ -62,21 +69,28 @@ hexo.extend.filter.register("before_generate", () => {
         cdnjs_file,
         min_file,
         min_cdnjs_file,
-        cdnjs_name
+        cdnjs_name,
       };
 
       const cdnSource = {
-        local: cond === "internal" ? `${cdnjs_file + verType}` : `/pluginsSrc/${name}/${file + verType}`,
+        local:
+          cond === "internal"
+            ? `${cdnjs_file + verType}`
+            : `/pluginsSrc/${name}/${file + verType}`,
         jsdelivr: `https://cdn.jsdelivr.net/npm/${name}${verType}/${min_file}`,
         unpkg: `https://unpkg.com/${name}${verType}/${file}`,
         cdnjs: `https://cdnjs.cloudflare.com/ajax/libs/${cdnjs_name}/${version}/${min_cdnjs_file}`,
-        custom: (CDN.custom_format || "").replace(/\$\{(.+?)\}/g, (match, $1) => value[$1])
+        custom: (CDN.custom_format || "").replace(
+          /\$\{(.+?)\}/g,
+          (match, $1) => value[$1],
+        ),
       };
 
       data[key] = cdnSource[type];
     });
 
-    if (cond === "internal") data.main_css = "css/index.css" + (CDN.version ? `?v=${version}` : "");
+    if (cond === "internal")
+      data.main_css = "css/index.css" + (CDN.version ? `?v=${version}` : "");
     return data;
   };
 
@@ -92,6 +106,6 @@ hexo.extend.filter.register("before_generate", () => {
   themeConfig.asset = Object.assign(
     createCDNLink(internalSrc, CDN.internal_provider, "internal"),
     createCDNLink(thirdPartySrc, CDN.third_party_provider),
-    deleteNullValue(CDN.option)
+    deleteNullValue(CDN.option),
   );
 });

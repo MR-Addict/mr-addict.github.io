@@ -1,6 +1,10 @@
 hexo.extend.helper.register("findArchiveLength", function (func) {
   const allPostsLength = this.site.posts.length;
-  if (hexo.config.archive_generator && hexo.config.archive_generator.enable === false) return allPostsLength;
+  if (
+    hexo.config.archive_generator &&
+    hexo.config.archive_generator.enable === false
+  )
+    return allPostsLength;
   const { yearly, monthly, daily } = hexo.config.archive_generator;
   const { year, month, day } = this.page;
   if (yearly === false || !year) return allPostsLength;
@@ -28,14 +32,30 @@ hexo.extend.helper.register("findArchiveLength", function (func) {
       const day = date.date();
       const lastData = dateObj[length - 1];
 
-      if (!lastData || !compareFunc(type, lastData.year, lastData.month, lastData.day, year, month, day)) {
-        const name = type === "year" ? year : type === "month" ? `${year}-${month}` : `${year}-${month}-${day}`;
+      if (
+        !lastData ||
+        !compareFunc(
+          type,
+          lastData.year,
+          lastData.month,
+          lastData.day,
+          year,
+          month,
+          day,
+        )
+      ) {
+        const name =
+          type === "year"
+            ? year
+            : type === "month"
+              ? `${year}-${month}`
+              : `${year}-${month}-${day}`;
         length = dateObj.push({
           name,
           year,
           month,
           day,
-          count: 1
+          count: 1,
         });
       } else {
         lastData.count++;
@@ -53,6 +73,10 @@ hexo.extend.helper.register("findArchiveLength", function (func) {
     return fullObj;
   });
 
-  const name = month ? (day ? `${year}-${month}-${day}` : `${year}-${month}`) : year;
+  const name = month
+    ? day
+      ? `${year}-${month}-${day}`
+      : `${year}-${month}`
+    : year;
   return data.find((item) => item.name === name).count;
 });

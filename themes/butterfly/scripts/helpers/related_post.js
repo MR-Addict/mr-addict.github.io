@@ -18,7 +18,7 @@ hexo.extend.helper.register("related_posts", function (currentPost, allPosts) {
           cover_type: post.cover_type,
           weight: 1,
           updated: post.updated,
-          created: post.date
+          created: post.date,
         };
         const index = findItem(relatedPosts, "path", post.path);
         if (index !== -1) {
@@ -52,21 +52,25 @@ hexo.extend.helper.register("related_posts", function (currentPost, allPosts) {
     for (let i = 0; i < Math.min(relatedPosts.length, limitNum); i++) {
       const cover = relatedPosts[i].cover || "var(--default-bg-color)";
       const title = this.escape_html(relatedPosts[i].title);
-      result += `<div><a href="${this.url_for(relatedPosts[i].path)}" title="${title}">`;
+      result += `<div><a href="${this.url_for(
+        relatedPosts[i].path,
+      )}" title="${title}">`;
       if (relatedPosts[i].cover_type === "img") {
-        result += `<img class="cover" src="${this.url_for(cover)}" alt="cover">`;
+        result += `<img class="cover" src="${this.url_for(
+          cover,
+        )}" alt="cover">`;
       } else {
         result += `<div class="cover" style="background: ${cover}"></div>`;
       }
       if (dateType === "created") {
         result += `<div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> ${this.date(
           relatedPosts[i].created,
-          hexoConfig.date_format
+          hexoConfig.date_format,
         )}</div>`;
       } else {
         result += `<div class="content is-center"><div class="date"><i class="fas fa-history fa-fw"></i> ${this.date(
           relatedPosts[i].updated,
-          hexoConfig.date_format
+          hexoConfig.date_format,
         )}</div>`;
       }
       result += `<div class="title">${title}</div>`;

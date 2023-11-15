@@ -59,7 +59,7 @@ class LocalSearch {
       count.add(word);
       hits.push({
         position,
-        length: word.length
+        length: word.length,
       });
       const wordEnd = position + word.length;
 
@@ -80,7 +80,7 @@ class LocalSearch {
       hits,
       start,
       end,
-      count: count.size
+      count: count.size,
     };
   }
 
@@ -91,7 +91,10 @@ class LocalSearch {
     for (const { position, length } of slice.hits) {
       result += val.substring(index, position);
       index = position + length;
-      result += `<mark class="search-keyword">${val.substr(position, length)}</mark>`;
+      result += `<mark class="search-keyword">${val.substr(
+        position,
+        length,
+      )}</mark>`;
     }
     result += val.substring(index, slice.end);
     return result;
@@ -102,7 +105,10 @@ class LocalSearch {
     this.datas.forEach(({ title, content, url }) => {
       // The number of different keywords included in the article.
       const [indexOfTitle, keysOfTitle] = this.getIndexByWord(keywords, title);
-      const [indexOfContent, keysOfContent] = this.getIndexByWord(keywords, content);
+      const [indexOfContent, keysOfContent] = this.getIndexByWord(
+        keywords,
+        content,
+      );
       const includedCount = new Set([...keysOfTitle, ...keysOfContent]).size;
 
       // Show search results
@@ -148,13 +154,19 @@ class LocalSearch {
       if (slicesOfTitle.length !== 0) {
         resultItem += `<div class="local-search-hit-item"><a href="${
           url.href
-        }"><span class="search-result-title">${this.highlightKeyword(title, slicesOfTitle[0])}</span>`;
+        }"><span class="search-result-title">${this.highlightKeyword(
+          title,
+          slicesOfTitle[0],
+        )}</span>`;
       } else {
         resultItem += `<div class="local-search-hit-item"><a href="${url.href}"><span class="search-result-title">${title}</span>`;
       }
 
       slicesOfContent.forEach((slice) => {
-        resultItem += `<p class="search-result">${this.highlightKeyword(content, slice)}...</p></a>`;
+        resultItem += `<p class="search-result">${this.highlightKeyword(
+          content,
+          slice,
+        )}...</p></a>`;
       });
 
       resultItem += "</div>";
@@ -162,7 +174,7 @@ class LocalSearch {
         item: resultItem,
         id: resultItems.length,
         hitCount,
-        includedCount
+        includedCount,
       });
     });
     return resultItems;
@@ -176,10 +188,14 @@ class LocalSearch {
         // Get the contents from search data
         this.isfetched = true;
         this.datas = isXml
-          ? [...new DOMParser().parseFromString(res, "text/xml").querySelectorAll("entry")].map((element) => ({
+          ? [
+              ...new DOMParser()
+                .parseFromString(res, "text/xml")
+                .querySelectorAll("entry"),
+            ].map((element) => ({
               title: element.querySelector("title").textContent,
               content: element.querySelector("content").textContent,
-              url: element.querySelector("url").textContent
+              url: element.querySelector("url").textContent,
             }))
           : JSON.parse(res);
         // Only match articles with non-empty titles
@@ -187,7 +203,9 @@ class LocalSearch {
           .filter((data) => data.title)
           .map((data) => {
             data.title = data.title.trim();
-            data.content = data.content ? data.content.trim().replace(/<[^>]+>/g, "") : "";
+            data.content = data.content
+              ? data.content.trim().replace(/<[^>]+>/g, "")
+              : "";
             data.url = decodeURIComponent(data.url).replace(/\/{2,}/g, "/");
             return data;
           });
@@ -223,7 +241,12 @@ class LocalSearch {
     const walk = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, null);
     const allNodes = [];
     while (walk.nextNode()) {
-      if (!walk.currentNode.parentNode.matches("button, select, textarea, .mermaid")) allNodes.push(walk.currentNode);
+      if (
+        !walk.currentNode.parentNode.matches(
+          "button, select, textarea, .mermaid",
+        )
+      )
+        allNodes.push(walk.currentNode);
     }
     allNodes.forEach((node) => {
       const [indexOfNode] = this.getIndexByWord(keywords, node.nodeValue);
@@ -236,11 +259,12 @@ class LocalSearch {
 
 window.addEventListener("load", () => {
   // Search
-  const { path, top_n_per_article, unescape, languages } = GLOBAL_CONFIG.localSearch;
+  const { path, top_n_per_article, unescape, languages } =
+    GLOBAL_CONFIG.localSearch;
   const localSearch = new LocalSearch({
     path,
     top_n_per_article,
-    unescape
+    unescape,
   });
 
   const input = document.querySelector("#local-search-input input");
@@ -250,7 +274,8 @@ window.addEventListener("load", () => {
   const inputEventFunction = () => {
     if (!localSearch.isfetched) return;
     const searchText = input.value.trim().toLowerCase();
-    if (searchText !== "") $loadingStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+    if (searchText !== "")
+      $loadingStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
     const keywords = searchText.split(/[-\s]+/);
     const container = document.getElementById("local-search-results");
     let resultItems = [];
@@ -265,7 +290,7 @@ window.addEventListener("load", () => {
       container.textContent = "";
       statsItem.innerHTML = `<div class="search-result-stats">${languages.hits_empty.replace(
         /\$\{query}/,
-        searchText
+        searchText,
       )}</div>`;
     } else {
       resultItems.sort((left, right) => {
@@ -277,7 +302,10 @@ window.addEventListener("load", () => {
         return right.id - left.id;
       });
 
-      const stats = languages.hits_stats.replace(/\$\{hits}/, resultItems.length);
+      const stats = languages.hits_stats.replace(
+        /\$\{hits}/,
+        resultItems.length,
+      );
 
       container.classList.remove("no-result");
       container.innerHTML = `<div class="search-result-list">${resultItems
@@ -297,7 +325,10 @@ window.addEventListener("load", () => {
   // fix safari
   const fixSafariHeight = () => {
     if (window.innerWidth < 768) {
-      $searchDialog.style.setProperty("--search-height", window.innerHeight + "px");
+      $searchDialog.style.setProperty(
+        "--search-height",
+        window.innerHeight + "px",
+      );
     }
   };
 
@@ -337,16 +368,22 @@ window.addEventListener("load", () => {
   };
 
   const searchClickFn = () => {
-    document.querySelector("#search-button > .search").addEventListener("click", openSearch);
+    document
+      .querySelector("#search-button > .search")
+      .addEventListener("click", openSearch);
   };
 
   const searchFnOnce = () => {
-    document.querySelector("#local-search .search-close-button").addEventListener("click", closeSearch);
+    document
+      .querySelector("#local-search .search-close-button")
+      .addEventListener("click", closeSearch);
     $searchMask.addEventListener("click", closeSearch);
     if (GLOBAL_CONFIG.localSearch.preload) {
       localSearch.fetchData();
     }
-    localSearch.highlightSearchWords(document.getElementById("article-container"));
+    localSearch.highlightSearchWords(
+      document.getElementById("article-container"),
+    );
   };
 
   window.addEventListener("search:loaded", () => {
@@ -361,7 +398,9 @@ window.addEventListener("load", () => {
   // pjax
   window.addEventListener("pjax:complete", () => {
     !btf.isHidden($searchMask) && closeSearch();
-    localSearch.highlightSearchWords(document.getElementById("article-container"));
+    localSearch.highlightSearchWords(
+      document.getElementById("article-container"),
+    );
     searchClickFn();
   });
 });

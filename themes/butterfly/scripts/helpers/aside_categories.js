@@ -6,7 +6,10 @@
 "use strict";
 
 hexo.extend.helper.register("aside_categories", function (categories, options) {
-  if (!options && (!categories || !Object.prototype.hasOwnProperty.call(categories, "length"))) {
+  if (
+    !options &&
+    (!categories || !Object.prototype.hasOwnProperty.call(categories, "length"))
+  ) {
     options = categories;
     categories = this.site.categories;
   }
@@ -14,7 +17,9 @@ hexo.extend.helper.register("aside_categories", function (categories, options) {
   if (!categories || !categories.length) return "";
   options = options || {};
   const { config } = this;
-  const showCount = Object.prototype.hasOwnProperty.call(options, "show_count") ? options.show_count : true;
+  const showCount = Object.prototype.hasOwnProperty.call(options, "show_count")
+    ? options.show_count
+    : true;
   const depth = options.depth ? parseInt(options.depth, 10) : 0;
   const orderby = options.orderby || "name";
   const order = options.order || 1;
@@ -54,7 +59,9 @@ hexo.extend.helper.register("aside_categories", function (categories, options) {
 
           result += `<li class="card-category-list-item ${parentClass}">`;
 
-          result += `<a class="card-category-list-link" href="${this.url_for(cat.path)}">`;
+          result += `<a class="card-category-list-link" href="${this.url_for(
+            cat.path,
+          )}">`;
 
           result += `<span class="card-category-list-name">${cat.name}</span>`;
 

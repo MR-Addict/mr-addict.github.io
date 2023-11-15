@@ -9,7 +9,14 @@
 function postNote(args, content) {
   const styleConfig = hexo.theme.config.note.style;
   const lastArgs = args[args.length - 1];
-  if (!(lastArgs === "flat" || lastArgs === "modern" || lastArgs === "simple" || lastArgs === "disabled")) {
+  if (
+    !(
+      lastArgs === "flat" ||
+      lastArgs === "modern" ||
+      lastArgs === "simple" ||
+      lastArgs === "disabled"
+    )
+  ) {
     args.push(styleConfig);
   }
 

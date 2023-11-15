@@ -1,6 +1,8 @@
 window.addEventListener("load", () => {
   const $searchMask = document.getElementById("search-mask");
-  const $searchDialog = document.querySelector("#algolia-search .search-dialog");
+  const $searchDialog = document.querySelector(
+    "#algolia-search .search-dialog",
+  );
 
   const openSearch = () => {
     const bodyStyle = document.body.style;
@@ -36,17 +38,24 @@ window.addEventListener("load", () => {
   // fix safari
   const fixSafariHeight = () => {
     if (window.innerWidth < 768) {
-      $searchDialog.style.setProperty("--search-height", window.innerHeight + "px");
+      $searchDialog.style.setProperty(
+        "--search-height",
+        window.innerHeight + "px",
+      );
     }
   };
 
   const searchClickFn = () => {
-    document.querySelector("#search-button > .search").addEventListener("click", openSearch);
+    document
+      .querySelector("#search-button > .search")
+      .addEventListener("click", openSearch);
   };
 
   const searchFnOnce = () => {
     $searchMask.addEventListener("click", closeSearch);
-    document.querySelector("#algolia-search .search-close-button").addEventListener("click", closeSearch);
+    document
+      .querySelector("#algolia-search .search-close-button")
+      .addEventListener("click", closeSearch);
   };
 
   const cutContent = (content) => {
@@ -88,11 +97,11 @@ window.addEventListener("load", () => {
     searchClient: algoliasearch(algolia.appId, algolia.apiKey),
     searchFunction(helper) {
       helper.state.query && helper.search();
-    }
+    },
   });
 
   const configure = instantsearch.widgets.configure({
-    hitsPerPage: 5
+    hitsPerPage: 5,
   });
 
   const searchBox = instantsearch.widgets.searchBox({
@@ -100,36 +109,43 @@ window.addEventListener("load", () => {
     showReset: false,
     showSubmit: false,
     placeholder: GLOBAL_CONFIG.algolia.languages.input_placeholder,
-    showLoadingIndicator: true
+    showLoadingIndicator: true,
   });
 
   const hits = instantsearch.widgets.hits({
     container: "#algolia-hits",
     templates: {
       item(data) {
-        const link = data.permalink ? data.permalink : GLOBAL_CONFIG.root + data.path;
+        const link = data.permalink
+          ? data.permalink
+          : GLOBAL_CONFIG.root + data.path;
         const result = data._highlightResult;
         const content = result.contentStripTruncate
           ? cutContent(result.contentStripTruncate.value)
           : result.contentStrip
-          ? cutContent(result.contentStrip.value)
-          : result.content
-          ? cutContent(result.content.value)
-          : "";
+            ? cutContent(result.contentStrip.value)
+            : result.content
+              ? cutContent(result.content.value)
+              : "";
         return `
           <a href="${link}" class="algolia-hit-item-link">
-          <span class="algolia-hits-item-title">${result.title.value || "no-title"}</span>
+          <span class="algolia-hits-item-title">${
+            result.title.value || "no-title"
+          }</span>
           <p class="algolia-hit-item-content">${content}</p>
           </a>`;
       },
       empty: function (data) {
         return (
           '<div id="algolia-hits-empty">' +
-          GLOBAL_CONFIG.algolia.languages.hits_empty.replace(/\$\{query}/, data.query) +
+          GLOBAL_CONFIG.algolia.languages.hits_empty.replace(
+            /\$\{query}/,
+            data.query,
+          ) +
           "</div>"
         );
-      }
-    }
+      },
+    },
   });
 
   const stats = instantsearch.widgets.stats({
@@ -140,12 +156,12 @@ window.addEventListener("load", () => {
           .replace(/\$\{hits}/, data.nbHits)
           .replace(/\$\{time}/, data.processingTimeMS);
         return `<hr>${stats}`;
-      }
-    }
+      },
+    },
   });
 
   const powerBy = instantsearch.widgets.poweredBy({
-    container: "#algolia-info > .algolia-poweredBy"
+    container: "#algolia-info > .algolia-poweredBy",
   });
 
   const pagination = instantsearch.widgets.pagination({
@@ -155,8 +171,8 @@ window.addEventListener("load", () => {
       first: '<i class="fas fa-angle-double-left"></i>',
       last: '<i class="fas fa-angle-double-right"></i>',
       previous: '<i class="fas fa-angle-left"></i>',
-      next: '<i class="fas fa-angle-right"></i>'
-    }
+      next: '<i class="fas fa-angle-right"></i>',
+    },
   });
 
   search.addWidgets([configure, searchBox, hits, stats, powerBy, pagination]); // add the widgets to the instantsearch instance

@@ -44,7 +44,10 @@ function hideBlock(args, content) {
   group += '"';
 
   return `<div class="hide-block"><button type="button" class="hide-button" ${group}>${display}
-    </button><div class="hide-content">${hexo.render.renderSync({ text: content, engine: "markdown" })}</div></div>`;
+    </button><div class="hide-content">${hexo.render.renderSync({
+      text: content,
+      engine: "markdown",
+    })}</div></div>`;
 }
 
 function hideToggle(args, content) {
@@ -63,7 +66,7 @@ function hideToggle(args, content) {
   group += '"';
 
   return `<details class="toggle" ${border}><summary class="toggle-button" ${group}>${display}</summary><div class="toggle-content">${hexo.render.renderSync(
-    { text: content, engine: "markdown" }
+    { text: content, engine: "markdown" },
   )}</div></details>`;
 }
 

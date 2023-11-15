@@ -9,11 +9,15 @@ hexo.extend.helper.register("aside_archives", function (options = {}) {
   const { config } = this;
   const archiveDir = config.archive_dir;
   const { timezone } = config;
-  const lang = toMomentLocale(this.page.lang || this.page.language || config.language);
+  const lang = toMomentLocale(
+    this.page.lang || this.page.language || config.language,
+  );
   let { format } = options;
   const type = options.type || "monthly";
   const { transform } = options;
-  const showCount = Object.prototype.hasOwnProperty.call(options, "show_count") ? options.show_count : true;
+  const showCount = Object.prototype.hasOwnProperty.call(options, "show_count")
+    ? options.show_count
+    : true;
   const order = options.order || -1;
   const compareFunc =
     type === "monthly"
@@ -49,7 +53,7 @@ hexo.extend.helper.register("aside_archives", function (options = {}) {
         name,
         year,
         month,
-        count: 1
+        count: 1,
       });
     } else {
       lastData.count++;
@@ -70,10 +74,14 @@ hexo.extend.helper.register("aside_archives", function (options = {}) {
   const len = data.length;
   const Judge = limit === 0 ? len : Math.min(len, limit);
 
-  result += `<div class="item-headline"><i class="fas fa-archive"></i><span>${this._p("aside.card_archives")}</span>`;
+  result += `<div class="item-headline"><i class="fas fa-archive"></i><span>${this._p(
+    "aside.card_archives",
+  )}</span>`;
 
   if (len > Judge) {
-    result += `<a class="card-more-btn" href="${this.url_for(archiveDir)}/" title="${this._p("aside.more_button")}">
+    result += `<a class="card-more-btn" href="${this.url_for(
+      archiveDir,
+    )}/" title="${this._p("aside.more_button")}">
     <i class="fas fa-angle-right"></i></a>`;
   }
 

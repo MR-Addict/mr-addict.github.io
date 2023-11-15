@@ -6,14 +6,18 @@
 "use strict";
 
 function timeLineFn(args, content) {
-  const tlBlock = /<!--\s*timeline (.*?)\s*-->\n([\w\W\s\S]*?)<!--\s*endtimeline\s*-->/g;
+  const tlBlock =
+    /<!--\s*timeline (.*?)\s*-->\n([\w\W\s\S]*?)<!--\s*endtimeline\s*-->/g;
 
   let result = "";
   let color = "";
   if (args.length) {
     args = args.join(" ").split(",");
     color = args[1];
-    const mdContent = hexo.render.renderSync({ text: args[0], engine: "markdown" });
+    const mdContent = hexo.render.renderSync({
+      text: args[0],
+      engine: "markdown",
+    });
     result += `<div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'>${mdContent}</div></div></div>`;
   }
 
@@ -26,8 +30,14 @@ function timeLineFn(args, content) {
   }
 
   for (let i = 0; i < matches.length; i += 2) {
-    const tlChildTitle = hexo.render.renderSync({ text: matches[i], engine: "markdown" });
-    const tlChildContent = hexo.render.renderSync({ text: matches[i + 1], engine: "markdown" });
+    const tlChildTitle = hexo.render.renderSync({
+      text: matches[i],
+      engine: "markdown",
+    });
+    const tlChildContent = hexo.render.renderSync({
+      text: matches[i + 1],
+      engine: "markdown",
+    });
 
     const tlTitleHtml = `<div class='timeline-item-title'><div class='item-circle'>${tlChildTitle}</div></div>`;
     const tlContentHtml = `<div class='timeline-item-content'>${tlChildContent}</div>`;

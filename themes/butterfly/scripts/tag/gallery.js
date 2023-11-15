@@ -29,7 +29,7 @@ function gallery(args, content) {
       arr.push({
         url: m[2],
         alt: m[1],
-        title: m[3]
+        title: m[3],
       });
     }
 
@@ -40,7 +40,9 @@ function gallery(args, content) {
   const lazyloadClass = lazyload === "true" ? "lazyload" : "";
 
   return `<div class="gallery">
-    <div class="fj-gallery ${lazyloadClass + type}" data-rowHeight="${rowHeight}" data-limit="${limit}">
+    <div class="fj-gallery ${
+      lazyloadClass + type
+    }" data-rowHeight="${rowHeight}" data-limit="${limit}">
     <span class="gallery-data">${dataStr}</span>
     </div>
     <button class="gallery-load-more"><span>${
