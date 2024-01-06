@@ -4,13 +4,11 @@
  * {% label text color %}
  */
 
-"use strict";
+'use strict'
 
-function addLabel(args, content) {
-  const text = args[0];
-  const className = args[1] || "default";
-
-  return `<mark class="hl-label ${className}">${text}</mark> `;
+const addLabel = args => {
+  const [text, className = 'default'] = args
+  return `<mark class="hl-label ${className}">${text}</mark> `
 }
 
-hexo.extend.tag.register("label", addLabel, { ends: false });
+hexo.extend.tag.register('label', addLabel, { ends: false })

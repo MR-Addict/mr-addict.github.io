@@ -401,7 +401,7 @@ addtoany:
 comments:
   # Up to two comments system, the first will be shown as default
   # Choose: Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo/Giscus/Remark42/Artalk
-  use: Valine # Valine,Disqus
+  use: Giscus # Valine,Disqus
   text: true # Display the comment name next to the button
   # lazyload: The comment system will be load when comment element enters the browser's viewport.
   # If you set it to true, the comment count will be invalid
@@ -487,9 +487,9 @@ twikoo:
 # Giscus
 # https://giscus.app/
 giscus:
-  repo:
-  repo_id:
-  category_id:
+  repo: MR-Addict/mr-addict.github.io
+  repo_id: MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=
+  category_id: DIC_kwDOF-d4784CXLQ-
   theme:
     light: light
     dark: dark

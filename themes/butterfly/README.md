@@ -12,9 +12,9 @@
 
 ![](https://cdn.jsdelivr.net/gh/jerryc127/CDN@m2/img/theme-butterfly-readme.png)
 
-Demo: 👍 [Butterfly](https://butterfly.js.org/) || 🤞 [CrazyWong](https://blog.crazywong.com/)
+📢 Demo: [Butterfly](https://butterfly.js.org/) || [CrazyWong](https://blog.crazywong.com/)
 
-Docs: 📖 [Butterfly Docs](https://butterfly.js.org/posts/21cfbf15/)
+📖 Docs: [English](https://butterfly.js.org/en/posts/butterfly-docs-en-get-started/) || [Chinese](https://butterfly.js.org/posts/21cfbf15/)
 
 Based on [hexo-theme-melody](https://github.com/Molunerfinn/hexo-theme-melody) theme.
 
@@ -40,7 +40,7 @@ git clone -b dev https://github.com/jerryc127/hexo-theme-butterfly.git themes/bu
 
 > It supports Hexo 5.0.0 or later
 
-In Hexo site root directory
+In Hexo site root directory 
 
 ```powershell
 npm i hexo-theme-butterfly
@@ -48,36 +48,36 @@ npm i hexo-theme-butterfly
 
 ## ⚙ Configuration
 
-Set theme in the hexo work folder's root config file `_config.yml`:
+ Set theme in the hexo work folder's root config file `_config.yml`: 
 
 > theme: butterfly
 
-If you don't have pug & stylus renderer, try this:
+ If you don't have pug & stylus renderer, try this: 
 
 > npm install hexo-renderer-pug hexo-renderer-stylus
 
 ## 🎉 Features
 
 - [x] Card UI Design
-- [x] Support sub-menu
+- [X] Support sub-menu
 - [x] Two-column layout
 - [x] Responsive Web Design
 - [x] Dark Mode
 - [x] Pjax
 - [x] Read Mode
 - [x] Conversion between Traditional and Simplified Chinese
-- [x] TOC catalog is available for both computers and mobile phones
-- [x] Built-in Syntax Highlighting Themes (darker/pale night/light/ocean/mac/mac light), also support customization
-- [x] Code Blocks (Display code language/close or expand Code Blocks/Copy Button/word wrap)
-- [x] Disable copy/Add a Copyright Notice to the Copied Text
-- [x] Search (Algolia Search/Local Search)
+- [X] TOC catalog is available for both computers and mobile phones
+- [X] Built-in Syntax Highlighting Themes (darker/pale night/light/ocean/mac/mac light), also support customization
+- [X] Code Blocks (Display code language/close or expand Code Blocks/Copy Button/word wrap)
+- [X] Disable copy/Add a Copyright Notice to the Copied Text
+- [X] Search (Algolia Search/Local Search)
 - [x] Mathjax and Katex
 - [x] Built-in 404 page
 - [x] WordCount
 - [x] Related articles
 - [x] Displays outdated notice for a post
-- [x] Share (AddThis/Sharejs/Addtoany)
-- [x] Comment (Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo/Giscus/Remark42/artalk)
+- [x] Share (Sharejs/Addtoany)
+- [X] Comment (Disqus/Disqusjs/Livere/Gitalk/Valine/Waline/Utterances/Facebook Comments/Twikoo/Giscus/Remark42/artalk)
 - [x] Multiple Comment System Support
 - [x] Online Chats (Chatra/Tidio/Daovoice/Crisp/messenger)
 - [x] Web analytics
