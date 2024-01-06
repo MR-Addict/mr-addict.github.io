@@ -125,4 +125,4 @@ scsi1: /dev/disk/by-id/ata-Kingchuxing_1TB_2023092202777,size=1000204632K,serial
 
 最后启动虚拟机，进入 TrueNAS 的安装界面就可以正常安装了，这里就不做介绍了，你也可以参考下面的视频进行配置。
 
-- [TrueNAS CORE Setup Guide for Beginners](https://www.youtube.com/watch?v=Z5QXgBjYJ7M)
+{% youtube WjLaK8yQAag %}

@@ -6,10 +6,10 @@
     "version": "7.0.0"
   },
   "scripts": {
-    "build": "hexo generate",
     "clean": "hexo clean",
-    "deploy": "hexo deploy",
     "server": "hexo server",
+    "build": "hexo generate",
+    "dev": "hexo clean && hexo server",
     "format": "prettier -c . --write ."
   },
   "devDependencies": {
@@ -24,6 +24,7 @@
     "hexo-renderer-pug": "^3.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
+    "hexo-tag-embed": "^1.0.0",
     "hexo-wordcount": "^6.0.1",
     "prettier": "^3.1.1"
   }
