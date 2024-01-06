@@ -5,7 +5,6 @@ comments: true
 tags:
   - proxmox
   - homelab
-  - linux
 description: 几个简单配置，让你的 Proxmox 更好用
 cover: /images/posts/setup-your-proxmox-server/cover.png
 categories: 教程
