@@ -1,5 +1,5 @@
 {
-  "name": "hexo-site",
+  "name": "blog",
   "version": "0.0.0",
   "private": true,
   "hexo": {
@@ -20,11 +20,11 @@
     "hexo-generator-index": "^3.0.0",
     "hexo-generator-searchdb": "^1.4.1",
     "hexo-generator-tag": "^2.0.0",
-    "hexo-renderer-marked": "^6.1.1",
+    "hexo-renderer-marked": "^6.2.0",
     "hexo-renderer-pug": "^3.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
     "hexo-wordcount": "^6.0.1",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.1"
   }
 }
