@@ -11,9 +11,10 @@ nav:
 menu:
   首页: / || fas fa-home
   文章: /archives/ || fas fa-book
-  分类: /categories/ || fas fa-list
-  标签: /tags/ || fas fa-tags
-  关于: /about/ || fas fa-user
+  友链: /link/ || fas fa-user
+  关于: /about/ || fas fa-circle-info
+  # 分类: /categories/ || fas fa-list
+  # 标签: /tags/ || fas fa-tags
 
 # Code Blocks (代碼相關)
 # --------------------------------------
@@ -758,7 +759,7 @@ subtitle:
   source: false
   # 如果關閉打字效果，subtitle 只會顯示 sub 的第一行文字
   sub:
-    - 欢迎来到我的个人主页
+    - 生命的定义就是拥有今天
 
 # Loading Animation (加載動畫)
 preloader:

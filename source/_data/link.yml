@@ -1,0 +1,23 @@
+- class_name: 友链
+  class_desc: 海内存知己，天涯若比邻
+  link_list:
+    - name: ptsfdtz
+      link: https://github.com/ptsfdtz
+      avatar: https://avatars.githubusercontent.com/ptsfdtz
+      descr: ptsfdtz
+    - name: rosettarosettarosetta
+      link: https://github.com/rosettarosettarosetta
+      avatar: https://avatars.githubusercontent.com/rosettarosettarosetta
+      descr: rosettarosettarosetta
+    - name: DoiryCool
+      link: https://github.com/DoiryCool
+      avatar: https://avatars.githubusercontent.com/DoiryCool
+      descr: DoiryCool
+    - name: NGUAlexZhang
+      link: https://github.com/NGUAlexZhang
+      avatar: https://avatars.githubusercontent.com/NGUAlexZhang
+      descr: 風雨中抱緊自由
+    - name: dingyang666
+      link: https://github.com/dingyang666
+      avatar: https://avatars.githubusercontent.com/dingyang666
+      descr: dingyang666
