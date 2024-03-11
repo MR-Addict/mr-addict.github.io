@@ -48,6 +48,9 @@ if (theme.snackbar && theme.snackbar.enable)
 if theme.fancybox
   link(rel='stylesheet' href=url_for(theme.asset.fancybox_css) media="print" onload="this.media='all'")
 
+//- umami
+script(src="https://us.umami.is/script.js", data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async, defer)
+
 //- google_adsense
 !=partial('includes/head/google_adsense', {}, {cache: true})
 
