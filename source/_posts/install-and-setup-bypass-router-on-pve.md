@@ -104,4 +104,38 @@ Successfully imported disk as 'unused0:local-lvm:vm-100-disk-0'
 
 ## 六、使用旁路由
 
-通过IStoreOS设置的旁路由，如果你禁用了DHCP，你需要手动设置IP地址，网关和DNS来使用旁路由。
+这里我只介绍如何在单个设备上使用旁路由，如果你想在整个局域网上使用旁路由，你需要在主路由上设置静态路由，将旁路由的流量转发到旁路由上。
+
+下面默认主路由的IP地址是 `192.168.10.1`，旁路由的IP地址是 `192.168.10.10`。
+
+**在手机上使用旁路由**
+
+参考下面的截图：
+
+![bypass-router-on-phone](/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-phone.png)
+
+**在电脑上使用旁路由**
+
+参考下面的截图：
+
+![bypass-router-on-computer](/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-computer.png)
+
+**在Ubuntu上使用旁路由**
+
+参考下面的网络配置：
+
+```plaintext
+network:
+  ethernets:
+    ens18:
+      addresses:
+      - 192.168.10.20/24
+      nameservers:
+        addresses:
+        - 223.5.5.5
+        search: []
+      routes:
+      - to: default
+        via: 192.168.10.10
+  version: 2
+```
