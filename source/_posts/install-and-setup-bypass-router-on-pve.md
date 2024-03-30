@@ -96,27 +96,31 @@ IP地址是你编译时设置的IP地址，你可以通过浏览器访问旁路�
 
 由于编译时我们已经设置好了旁路由的功能，所以你可以直接使用旁路由了。
 
+安装完成后，你需要在防火墙中关掉的lan口的 `IP动态伪装`，以保证你能在非局域网中访问旁路由下的设备：
+
+![configure-firewall](/images/posts/install-and-setup-bypass-router-on-pve/configure-firewall.png)
+
 ## 五、使用旁路由
 
 这里我只介绍如何在单个设备上使用旁路由，如果你想在整个局域网上使用旁路由，你需要在主路由上设置静态路由，将旁路由的流量转发到旁路由上。
 
 下面默认主路由的IP地址是 `192.168.10.1`，旁路由的IP地址是 `192.168.10.10`。
 
-**在手机上使用旁路由**
+### 1. 在手机上使用旁路由
 
 参考下面的截图：
 
 ![bypass-router-on-phone](/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-phone.png)
 
-**在电脑上使用旁路由**
+### 2. 在电脑上使用旁路由
 
 参考下面的截图：
 
 ![bypass-router-on-computer](/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-computer.png)
 
-**在Ubuntu上使用旁路由**
+### 3. 在Ubuntu上使用旁路由
 
-参考下面的网络配置：
+修改 `/etc/netplan/*.yaml` 的内容，参考修改为下面的网络配置：
 
 ```plaintext
 network:
@@ -133,3 +137,26 @@ network:
         via: 192.168.10.10
   version: 2
 ```
+
+### 4. 在 Home Assistant 上使用旁路由
+
+打开HA的终端，输入下面的命令：
+
+```bash
+net update eth0 --ipv4-method static
+net update eth0 --ipv4-address 192.168.10.12
+net update eth0 --ipv4-gateway 192.168.10.10
+net update eth0 --ipv4-nameservers 223.5.5.5
+
+net update eth0 --ipv6-method disabled
+```
+
+### 5. 在TrueNAS上使用旁路由
+
+进入 TrueNAS 的 Web 界面，点击 **Network**，找到 **Global Configuration**，修改为下面的内容：
+
+![truenas-global-configuration](/images/posts/install-and-setup-bypass-router-on-pve/truenas-global-configuration.png)
+
+然后进入 TrueNAS 的控制台，输入1按照提示修改网络配置。
+
+![truenas-shell-configuration](/images/posts/install-and-setup-bypass-router-on-pve/truenas-shell-configuration.png)
