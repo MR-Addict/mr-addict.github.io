@@ -2,6 +2,5 @@
 
 你可以通过以下网址访问我的个人主页：
 
-- [https://mraddict.top](https://mraddict.top)
 - [https://mr-addict.github.io](https://mr-addict.github.io)
 - [https://blog.mraddict.vercel.app](https://blog.mraddict.vercel.app)
