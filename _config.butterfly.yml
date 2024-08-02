@@ -41,7 +41,7 @@ favicon: /images/site/favicon.svg
 
 # Avatar (頭像)
 avatar:
-  img: /images/site/avatar.svg
+  img: /images/site/avatar.jpg
   effect: false
 
 # Disable all banner image
