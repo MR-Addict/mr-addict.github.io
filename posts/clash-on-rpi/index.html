@@ -1,0 +1,427 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>如何在树莓派上使用Clash | MR-Addict的个人主页</title><meta name="author" content="MR-Addict"><meta name="copyright" content="MR-Addict"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="树莓派自己也可以科学上网">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在树莓派上使用Clash">
+<meta property="og:url" content="https://mr-addict.github.io/posts/clash-on-rpi/index.html">
+<meta property="og:site_name" content="MR-Addict的个人主页">
+<meta property="og:description" content="树莓派自己也可以科学上网">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mr-addict.github.io/images/posts/clash-on-rpi/cover.png">
+<meta property="article:published_time" content="2022-06-13T12:16:43.000Z">
+<meta property="article:modified_time" content="2024-09-25T03:13:26.751Z">
+<meta property="article:author" content="MR-Addict">
+<meta property="article:tag" content="树莓派">
+<meta property="article:tag" content="Clash">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mr-addict.github.io/images/posts/clash-on-rpi/cover.png"><link rel="shortcut icon" href="/images/site/favicon.svg"><link rel="canonical" href="https://mr-addict.github.io/posts/clash-on-rpi/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script src="https://us.umami.is/script.js" data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async defer></script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '如何在树莓派上使用Clash',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2024-09-25 11:13:26'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (true) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/site/avatar.jpg" onerror="onerror=null;src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/clash-on-rpi/cover.png')"><nav id="nav"><span id="blog-info"><a href="/" title="MR-Addict的个人主页"><span class="site-name">MR-Addict的个人主页</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">如何在树莓派上使用Clash</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2022-06-13T12:16:43.000Z" title="发表于 2022-06-13 20:16:43">2022-06-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="如何在树莓派上使用Clash"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>本教程可以用于给你的树莓派安装代理软件，同时亲测也使用于其他架构的 Linux 主机，只要 Clash 内核含有你的主机架构即可。</p>
+</blockquote>
+<h1 id="一、前期准备"><a href="#一、前期准备" class="headerlink" title="一、前期准备"></a>一、前期准备</h1><p>在开始之前，我首先认为你已经具备以下基础和条件：</p>
+<ul>
+<li>玩过一点树莓派</li>
+<li>拥有一个支持 Clash 的机场</li>
+</ul>
+<h1 id="二、下载-Clash"><a href="#二、下载-Clash" class="headerlink" title="二、下载 Clash"></a>二、下载 Clash</h1><p>在这里我们使用 Clash 作为科学上网的代理框架，为什么使用 Clash 呢，那是因为 Clash 内核支持各种 Unix 平台的各个架构；还支持各种代理协议，像 Trojan、Vmess、Shadowsocks 等等；以及强大的分流规则，可以非常方便地自定义各种规则。</p>
+<h2 id="1-下载-Clash-内核"><a href="#1-下载-Clash-内核" class="headerlink" title="1. 下载 Clash 内核"></a>1. 下载 Clash 内核</h2><p>你可以到 GitHub 下载<a target="_blank" rel="noopener" href="https://github.com/Dreamacro/clash/releases">Clash 内核</a>。如果你是<strong>树莓派 4B 32 位操作系统</strong>，那么你应该下载对应 armv7 版本的<a target="_blank" rel="noopener" href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz">clash-linux-armv7-v1.11.0.gz</a>，如果是<strong>树莓派 4B 64 位操作系统</strong>，那么你应该下载对应 armv7 版本的<a target="_blank" rel="noopener" href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz">clash-linux-armv8-v1.11.0.gz</a>。</p>
+<p>其他型号的树莓派可以通过以下命令查看树莓派的架构：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">arch</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/posts/clash-on-rpi/clash-release.png" alt="clash-release"></p>
+<h2 id="2-解压移动-Clash-内核"><a href="#2-解压移动-Clash-内核" class="headerlink" title="2. 解压移动 Clash 内核"></a>2. 解压移动 Clash 内核</h2><p>下载完成后解压文件，建议把文件名改为<code>clash</code>， 然后移动到<code>/usr/local/bin/clash</code>位置，同时给该文件以执行的权限：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/Dreamacro/clash/releases/download/v1.10.6/clash-linux-armv7-v1.10.6.gz</span><br><span class="line">gunzip clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">rm</span> -rf clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">mv</span> clash-linux-armv7 clash</span><br><span class="line">sudo <span class="built_in">mv</span> clash /usr/local/bin</span><br><span class="line">sudo <span class="built_in">chmod</span> a+x /usr/local/bin/clash</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、配置-Clash"><a href="#三、配置-Clash" class="headerlink" title="三、配置 Clash"></a>三、配置 Clash</h1><h2 id="1-添加-Clash-配置文件"><a href="#1-添加-Clash-配置文件" class="headerlink" title="1. 添加 Clash 配置文件"></a>1. 添加 Clash 配置文件</h2><p>Clash 配置文件的默认路径是<code>~/.config/clash</code>，如果你的 Home 目录不存在相应文件夹就需要你自己创建，然后把你机场提供的配置文件放到该文件下就可以了，Clash 配置文件的默认名称应该是<code>config.yaml</code>。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ~/.config/clash</span><br><span class="line"><span class="built_in">mv</span> your/clash/config/file config.yaml</span><br><span class="line"><span class="built_in">mv</span> config.yaml ~/.config/clash</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-添加全球-IP-库"><a href="#2-添加全球-IP-库" class="headerlink" title="2. 添加全球 IP 库"></a>2. 添加全球 IP 库</h2><p>另外 Clash 还需要一个 Country.mmdb 文件，Country.mmdb 是全球 IP 库，可以实现各个国家的 IP 信息解析和地理定位，没有这个文件 clash 无法正常启动，你可以前往<a target="_blank" rel="noopener" href="https://github.com/SukkaW/Koolshare-Clash/blob/master/koolclash/koolclash/config/Country.mmdb">GitHub 下载</a>。下载完成后同样放在默认路径下就可以了<code>~/.config/clash</code>。</p>
+<h1 id="四、配置终端代理"><a href="#四、配置终端代理" class="headerlink" title="四、配置终端代理"></a>四、配置终端代理</h1><h2 id="1-设置环境变量"><a href="#1-设置环境变量" class="headerlink" title="1. 设置环境变量"></a>1. 设置环境变量</h2><p>首先我们需要添加几个环境变量：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/environment</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下配置内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy=&quot;http://127.0.0.1:7890&quot;</span><br><span class="line">export https_proxy=&quot;http://127.0.0.1:7890&quot;</span><br><span class="line">export no_proxy=&quot;localhost, 127.0.0.1, *edu.cn&quot;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：系统变量的 https_proxy 的代理地址和 http_proxy 的代理地址是一样的，因为 Clash 使用一个地址同时代理 http 和 https。另外，no_proxy 表示其中的地址不需要代理，这一点很重要，比如我们不需要代理我们的校园网地址，因此加入要<code>*edu.cn</code>。</p>
+</blockquote>
+<h2 id="2-为终端应用配置代理"><a href="#2-为终端应用配置代理" class="headerlink" title="2. 为终端应用配置代理"></a>2. 为终端应用配置代理</h2><p>然后再对相应的终端应用配置代理：</p>
+<div class="tabs" id="tags"><ul class="nav-tabs"><button type="button" class="tab  active" data-href="tags-1"><i class="fab fa-python"></i>为sudo配置代理</button><button type="button" class="tab " data-href="tags-2"><i class="fab fa-python"></i>为apt配置代理</button><button type="button" class="tab " data-href="tags-3"><i class="fab fa-python"></i>为git配置代理</button></ul><div class="tab-contents"><div class="tab-item-content active" id="tags-1"><p>进入 sudo 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo visudo</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Defaults env_keep+=&quot;http_proxy https_proxy no_proxy&quot;</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-2"><p>进入 apt 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/apt/apt.conf.d/10proxy</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Acquire::http::Proxy &quot;http://127.0.0.1:7890/&quot;;</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-3"><p>进入 git 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.gitconfig</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[http]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br><span class="line">[https]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div></div><div class="tab-to-top"><button type="button" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div>
+<div class="tabs" id="tags"><ul class="nav-tabs"><button type="button" class="tab  active" data-href="tags-1"><i class="fab fa-python"></i>为pip配置代理</button><button type="button" class="tab " data-href="tags-2"><i class="fab fa-python"></i>为npm配置代理</button><button type="button" class="tab " data-href="tags-3"><i class="fab fa-python"></i>为cargo配置代理</button></ul><div class="tab-contents"><div class="tab-item-content active" id="tags-1"><p>进入 pip 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.config/pip/pip.conf</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">  proxy = http://127.0.0.1:7890</span><br><span class="line">  http-proxy = http://127.0.0.1:7890</span><br><span class="line">  https-proxy = http://127.0.0.1:7890</span><br><span class="line">  trusted-host = pypi.python.org global.trusted-host pypi.org global.trusted-host files.pythonhosted.org</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-2"><p>进入 npm 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.npmrc</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">proxy=http://127.0.0.1:7890</span><br><span class="line">http-proxy=http://127.0.0.1:7890</span><br><span class="line">https-proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-3"><p>进入 cargo 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.cargo/config</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[http]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br><span class="line">[https]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div></div><div class="tab-to-top"><button type="button" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div>
+
+<h2 id="3-重启电脑"><a href="#3-重启电脑" class="headerlink" title="3. 重启电脑"></a>3. 重启电脑</h2><p>理论上这样一波配置后，大部分终端应用都可以正常使用了，如果你有其他的终端应用可自行参考相关文档进行配置。配置完成后需要重启树莓派让配置生效，这样配置才能生效。</p>
+<h1 id="五、使用-Clash"><a href="#五、使用-Clash" class="headerlink" title="五、使用 Clash"></a>五、使用 Clash</h1><p>重启之后在终端中输入 clash，如果输出类似以下内容那么就说明 Clash 启动成功了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INFO[0000] Start initial compatible provider 手动选择</span><br><span class="line">INFO[0000] Start initial compatible provider 节点选择</span><br><span class="line">INFO[0000] Start initial compatible provider 故障切换</span><br><span class="line">INFO[0000] Start initial compatible provider 自动选择</span><br><span class="line">INFO[0000] HTTP proxy listening at: [::]:7890</span><br><span class="line">INFO[0000] RESTful API listening at: 127.0.0.1:9090</span><br><span class="line">INFO[0000] SOCKS proxy listening at: [::]:7891</span><br></pre></td></tr></table></figure>
+
+<p>你可以更新一下系统或者打开浏览器测试一下 Google，如果可以访问你就可以愉快地玩耍了！</p>
+<blockquote>
+<p>注意：在终端请不要使用<code>ping google.com</code>来测试，因为 ping 使用不同的协议无法被 Clash 代理，不过你可以使用<code>curl google.com</code>。</p>
+</blockquote>
+<h1 id="六、开机自启"><a href="#六、开机自启" class="headerlink" title="六、开机自启"></a>六、开机自启</h1><p>既然我们都已经可以使用 Clash 了，当然要让树莓派能够开机自启 Clash 对吧。在树莓派推荐使用 crontab 作为自动任务管理器。</p>
+<p>输入以下命令可以打开 crontab：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br></pre></td></tr></table></figure>
+
+<p>第一次使用可能需要你选择默认的编辑器，看个人喜好选择就好，然后在打开的文件末尾添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@reboot /usr/local/bin/clash</span><br></pre></td></tr></table></figure>
+
+<h1 id="七、控制面板"><a href="#七、控制面板" class="headerlink" title="七、控制面板"></a>七、控制面板</h1><h2 id="1-下载-Clash-Dashboard"><a href="#1-下载-Clash-Dashboard" class="headerlink" title="1. 下载 Clash-Dashboard"></a>1. 下载 Clash-Dashboard</h2><p>GitHub 上有很多优秀的有关 Clash Dashboard 的项目，这些项目可以非常方便地帮助你查看、设置和管理你的 Clash。</p>
+<p>从 GitHub 上克隆<a target="_blank" rel="noopener" href="https://github.com/Dreamacro/clash-dashboard.git">Clash Dashbaord</a>到 Clash 的默认配置文件夹下。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.config/clash</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Dreamacro/clash-dashboard.git</span><br><span class="line"><span class="built_in">cd</span> ~/.config/clash/clash-dashboard</span><br><span class="line">git checkout -b gh-pages origin/gh-pages</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-修改-Clash-配置文件"><a href="#2-修改-Clash-配置文件" class="headerlink" title="2. 修改 Clash 配置文件"></a>2. 修改 Clash 配置文件</h2><p>下载完成后你需要对 Clash 的配置文件稍作修改才能正常使用控制面板，在 config.yaml 的头部添加或者修改以下两项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">external-ui: clash-dashboard</span><br><span class="line">external-controller: 127.0.0.1:9090</span><br></pre></td></tr></table></figure>
+
+<p>然后在浏览器中输入<a target="_blank" rel="noopener" href="http://127.0.0.1:9090/ui">http://127.0.0.1:9090/ui</a>就可以看到 Clash 的控制面板了。</p>
+<p><img src="/images/posts/clash-on-rpi/clash-dashboard.png" alt="clash-dashboard"></p>
+</article><div class="tag_share"><div class="post_share"></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/site/avatar.jpg" onerror="this.onerror=null;this.src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MR-Addict</div><div class="author-info__description">欢迎来到我的个人主页</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MR-Addict"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E6%9C%9F%E5%87%86%E5%A4%87"><span class="toc-text">一、前期准备</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%B8%8B%E8%BD%BD-Clash"><span class="toc-text">二、下载 Clash</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8B%E8%BD%BD-Clash-%E5%86%85%E6%A0%B8"><span class="toc-text">1. 下载 Clash 内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A7%A3%E5%8E%8B%E7%A7%BB%E5%8A%A8-Clash-%E5%86%85%E6%A0%B8"><span class="toc-text">2. 解压移动 Clash 内核</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%85%8D%E7%BD%AE-Clash"><span class="toc-text">三、配置 Clash</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%B7%BB%E5%8A%A0-Clash-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">1. 添加 Clash 配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%B7%BB%E5%8A%A0%E5%85%A8%E7%90%83-IP-%E5%BA%93"><span class="toc-text">2. 添加全球 IP 库</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%85%8D%E7%BD%AE%E7%BB%88%E7%AB%AF%E4%BB%A3%E7%90%86"><span class="toc-text">四、配置终端代理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AE%BE%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">1. 设置环境变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%B8%BA%E7%BB%88%E7%AB%AF%E5%BA%94%E7%94%A8%E9%85%8D%E7%BD%AE%E4%BB%A3%E7%90%86"><span class="toc-text">2. 为终端应用配置代理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E9%87%8D%E5%90%AF%E7%94%B5%E8%84%91"><span class="toc-text">3. 重启电脑</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%BD%BF%E7%94%A8-Clash"><span class="toc-text">五、使用 Clash</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="toc-text">六、开机自启</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%8E%A7%E5%88%B6%E9%9D%A2%E6%9D%BF"><span class="toc-text">七、控制面板</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8B%E8%BD%BD-Clash-Dashboard"><span class="toc-text">1. 下载 Clash-Dashboard</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BF%AE%E6%94%B9-Clash-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">2. 修改 Clash 配置文件</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由"><img src="/images/posts/install-and-setup-bypass-router-on-pve/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox VE 上安装和设置旁路由"/></a><div class="content"><a class="title" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由">在 Proxmox VE 上安装和设置旁路由</a><time datetime="2024-03-29T07:32:57.000Z" title="发表于 2024-03-29 15:32:57">2024-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本"><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="南工大校园网路由器自动登录脚本"/></a><div class="content"><a class="title" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本">南工大校园网路由器自动登录脚本</a><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS"><img src="/images/posts/install-truenas-on-promox/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox 上安装 TrueNAS"/></a><div class="content"><a class="title" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS">在 Proxmox 上安装 TrueNAS</a><time datetime="2024-01-06T09:10:30.000Z" title="发表于 2024-01-06 17:10:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南"><img src="/images/posts/setup-your-proxmox-server/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="Proxmox 配置指南"/></a><div class="content"><a class="title" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南">Proxmox 配置指南</a><time datetime="2024-01-06T05:58:30.000Z" title="发表于 2024-01-06 13:58:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透"><img src="/images/posts/openwrt-and-wireguard/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="通过Wireguard实现Openwrt内网穿透"/></a><div class="content"><a class="title" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透">通过Wireguard实现Openwrt内网穿透</a><time datetime="2023-10-09T06:37:30.000Z" title="发表于 2023-10-09 14:37:30">2023-10-09</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/posts/clash-on-rpi/cover.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By MR-Addict</div><div class="footer_custom_text"><a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">苏ICP备2022032826号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MR-Addict/mr-addict.github.io',
+      'data-repo-id': 'MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=',
+      'data-category-id': 'DIC_kwDOF-d4784CXLQ-',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

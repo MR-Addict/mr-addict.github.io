@@ -1,0 +1,396 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>南工大校园网路由器自动登录脚本 | MR-Addict的个人主页</title><meta name="author" content="MR-Addict"><meta name="copyright" content="MR-Addict"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="南京工业大学校园网路由器自动登录脚本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="南工大校园网路由器自动登录脚本">
+<meta property="og:url" content="https://mr-addict.github.io/posts/njtech-home-auto-login-script-for-openwrt/index.html">
+<meta property="og:site_name" content="MR-Addict的个人主页">
+<meta property="og:description" content="南京工业大学校园网路由器自动登录脚本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mr-addict.github.io/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png">
+<meta property="article:published_time" content="2024-03-22T16:02:07.000Z">
+<meta property="article:modified_time" content="2024-09-25T03:13:26.751Z">
+<meta property="article:author" content="MR-Addict">
+<meta property="article:tag" content="openwrt">
+<meta property="article:tag" content="南京工业大学">
+<meta property="article:tag" content="自动登录">
+<meta property="article:tag" content="脚本">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mr-addict.github.io/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png"><link rel="shortcut icon" href="/images/site/favicon.svg"><link rel="canonical" href="https://mr-addict.github.io/posts/njtech-home-auto-login-script-for-openwrt/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script src="https://us.umami.is/script.js" data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async defer></script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '南工大校园网路由器自动登录脚本',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2024-09-25 11:13:26'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (true) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/site/avatar.jpg" onerror="onerror=null;src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png')"><nav id="nav"><span id="blog-info"><a href="/" title="MR-Addict的个人主页"><span class="site-name">MR-Addict的个人主页</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">南工大校园网路由器自动登录脚本</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="南工大校园网路由器自动登录脚本"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><p>南京工业大学校园网登录需要输入账号密码，而且登录后会有一段时间的有效期，一般是 <del><strong>10分钟</strong></del>（现在好像是变成<strong>5分钟</strong>了）。虽然你可以在后台发一些心跳包来保持登录状态，但是这样依然有可能会掉线。如果能够保持持续在线状态并且自动登录，那当然是最好的。</p>
+<p>一开始南工的校园网是没有验证码的，脚本就很好写，不过后来加了验证码，就没那么容易了。现在又把验证码取消了，所以登录脚本相对而言就比较简单了。反正校园网就是反反复复地改来改去，说不定哪天登录验证的接口又变了。</p>
+<p>你最好拥有一台刷了 OpenWrt 的路由器，如果没有这个教程可能不太适合你。如果这个教程对你有帮助那当然是最好的，我也就是想写点东西。</p>
+<p>So，let’s go！</p>
+<h2 id="二、抓取登录接口"><a href="#二、抓取登录接口" class="headerlink" title="二、抓取登录接口"></a>二、抓取登录接口</h2><p>我目前使用的脚本是基于下面这个登录页面的：</p>
+<p><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/login.png" alt="login"></p>
+<p>通过观察网络请求可以发现，登录使用的接口中需要知道 <code>运营商</code>，<code>用户名</code>，<code>密码</code>还有一个 <code>IP 地址</code>。这个IP地址就是运营商分配给你的IP地址，一般是动态的，所以需要动态获取。然后还有一堆其他的参数，好像都是固定的，不过我也没仔细研究。</p>
+<p>简单来说下面这行命令就可以实现自动登录：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -s \</span><br><span class="line"><span class="string">&quot;http://10.50.255.11:801/eportal/portal/login?callback=dr1003&amp;login_method=1&amp;user_account=,0,\</span></span><br><span class="line"><span class="string">&quot;</span><span class="variable">$username</span><span class="string">&quot;@&quot;</span><span class="variable">$provider</span><span class="string">&quot;&amp;user_password=&quot;</span><span class="variable">$password</span><span class="string">&quot;&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;\</span></span><br><span class="line"><span class="string">&amp;wlan_user_ipv6=&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=me60&amp;jsVersion=4.1.3&amp;terminal_type=1&amp;lang=zh-cn&amp;v=7804&amp;lang=zh&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，如果你的运营商是电信，那么 <code>provider</code> 就是 <code>telecom</code>，如果是移动，那么 <code>provider</code> 就是 <code>cmcc</code>。<code>username</code> 和 <code>password</code> 就是你的校园网账号和密码，<code>address</code> 就是你的IP地址。</p>
+<h2 id="三、编写脚本"><a href="#三、编写脚本" class="headerlink" title="三、编写脚本"></a>三、编写脚本</h2><p>在路由器上创建一个脚本文件，比如 <code>/root/projects/autologin/login.sh</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#! /bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># check wifi connection</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">check</span></span>() &#123;</span><br><span class="line">  <span class="keyword">if</span> curl -s baidu.com | grep -q html ;<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[WARN] WiFi already connected!&quot;</span></span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">elif</span> ping -w 1 -c 1 njtech.edu.cn &gt; /dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">return</span> 0</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Cannot access Njtech-Home!&quot;</span></span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># login</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">login</span></span>() &#123;</span><br><span class="line">  <span class="comment"># provider=&quot;cmcc&quot;</span></span><br><span class="line">  provider=<span class="string">&quot;telecom&quot;</span></span><br><span class="line">  username=<span class="string">&quot;username&quot;</span></span><br><span class="line">  password=<span class="string">&quot;password&quot;</span></span><br><span class="line">  address=$(ifstatus wan | jsonfilter -e <span class="string">&#x27;@[&quot;ipv4-address&quot;][0].address&#x27;</span>)</span><br><span class="line">  res=$(curl -s <span class="string">&quot;http://10.50.255.11:801/eportal/portal/login?callback=dr1003&amp;login_method=1&amp;user_account=,0,&quot;</span><span class="variable">$username</span><span class="string">&quot;@&quot;</span><span class="variable">$provider</span><span class="string">&quot;&amp;user_password=&quot;</span><span class="variable">$password</span><span class="string">&quot;&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;&amp;wlan_user_ipv6=&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=me60&amp;jsVersion=4.1.3&amp;terminal_type=1&amp;lang=zh-cn&amp;v=7804&amp;lang=zh&quot;</span>)</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$res</span> | awk -F<span class="string">&#x27;[:,]&#x27;</span> <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | grep -q 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[INFO] Login success!&quot;</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Login failed!&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># entry point</span></span><br><span class="line"><span class="keyword">if</span> check; <span class="keyword">then</span></span><br><span class="line">  login</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>provider</code>，<code>username</code> 和 <code>password</code> 为你自己的信息，然后给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /root/projects/autologin/login.sh</span><br></pre></td></tr></table></figure>
+
+<p>这个脚本用的命令行工具有：</p>
+<ul>
+<li><code>curl</code>：用来发送请求</li>
+<li><code>grep</code>：用来匹配字符串</li>
+<li><code>awk</code>：用来处理字符串</li>
+<li><code>jsonfilter</code>：用来解析JSON</li>
+</ul>
+<p>请确保你的路由器上已经安装了这些工具，如果没有，可以通过 <code>opkg</code> 安装：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">opkg update</span><br><span class="line">opkg install curl grep awk jsonfilter</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、开机自启和定时任务"><a href="#四、开机自启和定时任务" class="headerlink" title="四、开机自启和定时任务"></a>四、开机自启和定时任务</h2><p>设置开机自启的好处是，每次重启路由器后都会立即自动登录，减少等待连接的时间。而设置定时任务的目的是每隔一段时间就会自动尝试登录，保持在线状态。</p>
+<h3 id="4-1-开机自启"><a href="#4-1-开机自启" class="headerlink" title="4.1 开机自启"></a>4.1 开机自启</h3><p>在路由器上创建一个启动脚本文件，比如 <code>/etc/init.d/autologin</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh /etc/rc.common</span></span><br><span class="line"></span><br><span class="line">STOP=10</span><br><span class="line">START=99</span><br><span class="line"></span><br><span class="line"><span class="comment"># commands to start application</span></span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;</span><br><span class="line">  /root/projects/autologin/login.sh &amp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># commands to stop application</span></span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;</span><br><span class="line">  /root/projects/autologin/logout.sh</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># start application after boot</span></span><br><span class="line"><span class="function"><span class="title">boot</span></span>() &#123;</span><br><span class="line">  <span class="built_in">sleep</span> 10</span><br><span class="line">  start</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /etc/init.d/autologin</span><br></pre></td></tr></table></figure>
+
+<p>最后启用这个服务：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/autologin <span class="built_in">enable</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-定时任务"><a href="#4-2-定时任务" class="headerlink" title="4.2 定时任务"></a>4.2 定时任务</h3><p>在路由器上创建一个定时任务文件，比如 <code>/etc/crontabs/root</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*/5 * * * * /root/projects/autologin/login.sh</span><br></pre></td></tr></table></figure>
+
+<p>这个任务的意思是每隔5分钟就会执行一次登录脚本。如果你想要修改间隔时间，可以修改 <code>*/5</code> 这个值。</p>
+<p>最后重启路由器，然后就可以看到效果了。</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>这里附上一个退出登录的脚本，方便大家进行测试登录的效果，如 <code>/root/projects/autologin/logout.sh</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#! /bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">logout</span></span>() &#123;</span><br><span class="line">  address=$(ifstatus wan | jsonfilter -e <span class="string">&#x27;@[&quot;ipv4-address&quot;][0].address&#x27;</span>)</span><br><span class="line">  res=$(curl -s <span class="string">&quot;http://10.50.255.11:801/eportal/portal/logout?callback=dr1003&amp;login_method=1&amp;user_account=drcom&amp;user_password=123&amp;ac_logout=1&amp;register_mode=1&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;&amp;wlan_user_ipv6=&amp;wlan_vlan_id=0&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=&amp;jsVersion=4.1.3&amp;v=2706&amp;lang=zh&quot;</span>)</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$res</span> | awk -F<span class="string">&#x27;[:,]&#x27;</span> <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | grep -q 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[INFO] Logout success!&quot;</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Logout failed!&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">logout</span></span><br></pre></td></tr></table></figure>
+
+<p>这个脚本不需要做任何修改，直接就可以使用，不过你需要给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /root/projects/autologin/logout.sh</span><br></pre></td></tr></table></figure>
+
+<p>最后，如果你有什么问题或者建议，欢迎在评论区留言，我会尽快回复的。</p>
+</article><div class="tag_share"><div class="post_share"></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/site/avatar.jpg" onerror="this.onerror=null;this.src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MR-Addict</div><div class="author-info__description">欢迎来到我的个人主页</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MR-Addict"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80"><span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%8A%93%E5%8F%96%E7%99%BB%E5%BD%95%E6%8E%A5%E5%8F%A3"><span class="toc-text">二、抓取登录接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%BC%96%E5%86%99%E8%84%9A%E6%9C%AC"><span class="toc-text">三、编写脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%92%8C%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-text">四、开机自启和定时任务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="toc-text">4.1 开机自启</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1"><span class="toc-text">4.2 定时任务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">五、总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由"><img src="/images/posts/install-and-setup-bypass-router-on-pve/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox VE 上安装和设置旁路由"/></a><div class="content"><a class="title" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由">在 Proxmox VE 上安装和设置旁路由</a><time datetime="2024-03-29T07:32:57.000Z" title="发表于 2024-03-29 15:32:57">2024-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本"><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="南工大校园网路由器自动登录脚本"/></a><div class="content"><a class="title" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本">南工大校园网路由器自动登录脚本</a><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS"><img src="/images/posts/install-truenas-on-promox/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox 上安装 TrueNAS"/></a><div class="content"><a class="title" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS">在 Proxmox 上安装 TrueNAS</a><time datetime="2024-01-06T09:10:30.000Z" title="发表于 2024-01-06 17:10:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南"><img src="/images/posts/setup-your-proxmox-server/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="Proxmox 配置指南"/></a><div class="content"><a class="title" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南">Proxmox 配置指南</a><time datetime="2024-01-06T05:58:30.000Z" title="发表于 2024-01-06 13:58:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透"><img src="/images/posts/openwrt-and-wireguard/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="通过Wireguard实现Openwrt内网穿透"/></a><div class="content"><a class="title" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透">通过Wireguard实现Openwrt内网穿透</a><time datetime="2023-10-09T06:37:30.000Z" title="发表于 2023-10-09 14:37:30">2023-10-09</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By MR-Addict</div><div class="footer_custom_text"><a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">苏ICP备2022032826号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MR-Addict/mr-addict.github.io',
+      'data-repo-id': 'MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=',
+      'data-category-id': 'DIC_kwDOF-d4784CXLQ-',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

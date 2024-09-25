@@ -1,0 +1,429 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>如何在电脑上安装双系统 | MR-Addict的个人主页</title><meta name="author" content="MR-Addict"><meta name="copyright" content="MR-Addict"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="让你的电脑同时拥有Windows和Linux两个系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在电脑上安装双系统">
+<meta property="og:url" content="https://mr-addict.github.io/posts/dual-boot/index.html">
+<meta property="og:site_name" content="MR-Addict的个人主页">
+<meta property="og:description" content="让你的电脑同时拥有Windows和Linux两个系统">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mr-addict.github.io/images/posts/dual-boot/cover.png">
+<meta property="article:published_time" content="2022-07-27T02:38:55.000Z">
+<meta property="article:modified_time" content="2024-09-25T03:13:26.751Z">
+<meta property="article:author" content="MR-Addict">
+<meta property="article:tag" content="双系统">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Mint">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mr-addict.github.io/images/posts/dual-boot/cover.png"><link rel="shortcut icon" href="/images/site/favicon.svg"><link rel="canonical" href="https://mr-addict.github.io/posts/dual-boot/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script src="https://us.umami.is/script.js" data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async defer></script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '如何在电脑上安装双系统',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2024-09-25 11:13:26'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (true) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/site/avatar.jpg" onerror="onerror=null;src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/dual-boot/cover.png')"><nav id="nav"><span id="blog-info"><a href="/" title="MR-Addict的个人主页"><span class="site-name">MR-Addict的个人主页</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">如何在电脑上安装双系统</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2022-07-27T02:38:55.000Z" title="发表于 2022-07-27 10:38:55">2022-07-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="如何在电脑上安装双系统"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>安装双系统是一件非常有风险的事情，如果你对整个流程不是很熟悉，建议你不要随便安装，可以先参考观看阅读大量视频文章，理解了其中原理再动手，不然很有可能连 Windows 都用不了！！！</p>
+</blockquote>
+<h1 id="一、准备硬盘和分区"><a href="#一、准备硬盘和分区" class="headerlink" title="一、准备硬盘和分区"></a>一、准备硬盘和分区</h1><h2 id="1-准备硬盘"><a href="#1-准备硬盘" class="headerlink" title="1. 准备硬盘"></a>1. 准备硬盘</h2><p>我装这个双系统的时候，特地买了一块 500G 的机械硬盘，这样我就可以让 Mint 系统使用整个硬盘了。不过如果你的固态硬盘足够大的话，你也可以把你的固态硬盘重新分区，腾出 30-100G 的空间给你的 Linux 系统。甚至于你也可以把系统装在 U 盘或者其他移动硬盘上。</p>
+<p><img src="/images/posts/dual-boot/hdd.png" alt="HDD"></p>
+<h2 id="2-分区"><a href="#2-分区" class="headerlink" title="2. 分区"></a>2. 分区</h2><p>分区的目的是让已有的硬盘最终留出 30-100G 的<code>Unallocated</code>空间以方便安装，只有未分区的空间才可以拿来安装系统。</p>
+<p>使用整块硬盘的分区方法很简单，只要直接将整个硬盘删除就可以了。比如我要把系统安装在 U 盘上，具体分区方法是，在 Windows 的搜索栏中搜索<code>Create and Format Hard Disk</code>这个应用然后打开。那么只要选中 E 盘符，然后右键选择<code>Delete-Volume</code>就可以了，操作完成后会显示<code>Unallocated</code>。</p>
+<p><img src="/images/posts/dual-boot/delete-volume.png" alt="Delete-Volume"></p>
+<blockquote>
+<p>注意：已经使用的硬盘也可以分区，比如你本来装有 Windows 的固态硬盘，但是安装双系统有风险，不建议大家这么做。</p>
+</blockquote>
+<h1 id="二、制作系统启动盘"><a href="#二、制作系统启动盘" class="headerlink" title="二、制作系统启动盘"></a>二、制作系统启动盘</h1><p>制作 USB 系统启动盘的目的是为了后面安装 Linux 系统用的，这个过程和树莓派烧录系统类似。</p>
+<h2 id="1-准备系统"><a href="#1-准备系统" class="headerlink" title="1. 准备系统"></a>1. 准备系统</h2><p>烧录当然少不了系统，这边我以<a target="_blank" rel="noopener" href="https://linuxmint.com/">Linux Mint</a>为例，你也可以选择你喜欢的 Linux 发行版。</p>
+<p><img src="/images/posts/dual-boot/linux-mint.png" alt="Linux-Mint"></p>
+<h2 id="2-安装烧录软件"><a href="#2-安装烧录软件" class="headerlink" title="2. 安装烧录软件"></a>2. 安装烧录软件</h2><p>烧录系统可以使用的软件很多，推荐使用以下三个软件：</p>
+<table>
+<thead>
+<tr>
+<th align="center"><a target="_blank" rel="noopener" href="https://rufus.ie/">Rufus</a></th>
+<th align="center"><a target="_blank" rel="noopener" href="https://www.balena.io/etcher/">Etcher</a></th>
+<th align="center"><a target="_blank" rel="noopener" href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/images/posts/dual-boot/rufus.png" alt="Rufus"></td>
+<td align="center"><img src="/images/posts/dual-boot/etcher.png" alt="Etcher"></td>
+<td align="center"><img src="/images/posts/dual-boot/rpi-imager.png" alt="RPI-Imager"></td>
+</tr>
+</tbody></table>
+<h2 id="3-烧录系统"><a href="#3-烧录系统" class="headerlink" title="3. 烧录系统"></a>3. 烧录系统</h2><p>下面就是插入一个 16GB 以上的 U 盘，然后根据你安装的烧录软件烧录你喜欢的 Linux 系统。</p>
+<p>以树莓派 Imager 为例，一般的流程就是选择系统，选择需要烧录的硬盘，最后烧录就可以了。</p>
+<p><img src="/images/posts/dual-boot/burn-os.png" alt="Burn-OS"></p>
+<p>这个过程我就不做详细介绍了，可以参考相应的软件文档或者相关视频。</p>
+<h1 id="三、进入-BIOS"><a href="#三、进入-BIOS" class="headerlink" title="三、进入 BIOS"></a>三、进入 BIOS</h1><p>这个步骤根据不同的电脑而定，如果你把你制作好的启动盘插入电脑重启后自动进入了安装界面，那么你可以跳过这个步骤。</p>
+<p>如果你的电脑没有自动进入安装界面，那么你可能就要手动进入 BIOS 后选择对应的 U 盘。具体方法是电脑在刚刚启动时，按电脑上的<code>F1~F12</code>中的一个，具体是哪一个不同品牌的电脑进入 BIOS 的方法也不同，可以自行上网查找一下。</p>
+<p>进入 BIOS 后到<code>Boot Override</code>选项，选择你烧录的 U 盘回车就可以进入安装界面了。</p>
+<p><img src="/images/posts/dual-boot/bootoverride.png" alt="Boot-Override"></p>
+<h1 id="四、安装系统"><a href="#四、安装系统" class="headerlink" title="四、安装系统"></a>四、安装系统</h1><p>这边我以 Mint 的安装过程为例进行介绍，由于 Mint 是基于 Ubuntu 的发行版，所以安装过程和 Ubuntu 非常相似，如果你是安装 Ubuntu 的话可以参考的。</p>
+<h2 id="1-选择语言"><a href="#1-选择语言" class="headerlink" title="1. 选择语言"></a>1. 选择语言</h2><p>首先是选择语言，这边我选择英文：</p>
+<p><img src="/images/posts/dual-boot/language.png" alt="Language"></p>
+<h2 id="2-键盘布局"><a href="#2-键盘布局" class="headerlink" title="2. 键盘布局"></a>2. 键盘布局</h2><p>然后会让你选择键盘布局，一般都是美式布局：</p>
+<p><img src="/images/posts/dual-boot/keyboard.png" alt="Keyboard-Layout"></p>
+<h2 id="3-WiFi"><a href="#3-WiFi" class="headerlink" title="3. WiFi"></a>3. WiFi</h2><p>然后会问你是否需要连接 WiFi，非常不建议连接 WiFi，不然使用国外源的时候安装会非常慢，建议跳过：</p>
+<p><img src="/images/posts/dual-boot/wifi.png" alt="WiFi"></p>
+<h2 id="4-多媒体解码器"><a href="#4-多媒体解码器" class="headerlink" title="4. 多媒体解码器"></a>4. 多媒体解码器</h2><p>然后会询问你是否安装多媒体编解码器，因为没有网络，所以不安装，你可以在后面装好系统换了源后在安装：</p>
+<p><img src="/images/posts/dual-boot/multidedia-codecs.png" alt="Multimedia-Codecs"></p>
+<h2 id="5-安装类型"><a href="#5-安装类型" class="headerlink" title="5. 安装类型"></a>5. 安装类型</h2><p>然后是安装类型，这边我们选择其他类型，也就是自定义类型：</p>
+<p><img src="/images/posts/dual-boot/install-type.png" alt="Install-Type"></p>
+<h2 id="6-系统分区"><a href="#6-系统分区" class="headerlink" title="6. 系统分区"></a>6. 系统分区</h2><p>后面重点就来了，也就是对系统进行分区。</p>
+<p>其实目前的电脑配置和个人使用条件来说，分区不需要特别详细，不过你可以参考网上的分区方案。这里最重要还是不能把盘弄错，比如这边的<code>sda</code>就是我的机械硬盘，也就是 500G 的那个。所以我们所有的操作都要在<code>sda</code>下操作，其他已有分区不要做任何改动。</p>
+<p>因为我们在前面已经对硬盘做了处理，让硬盘处于未分区状态下，也就是<code>Unallocated</code>，这时候会显示为<code>free space</code>。因为只有<code>free space</code>才可以用来分区，所以要分区的话就选中<code>sda</code>的<code>free space</code>后点击左下角的<code>+</code>就可以了。如果你的硬盘没有显示 free space，那么你可以选中对应的分区，点击<code>-</code>号就可以了。然后就会变成 free space 了。</p>
+<blockquote>
+<p>注意：请确保点击<code>-</code>的时候分区没有重要数据，并且是在你刚刚安装的硬盘下，比我的<code>sda</code>。</p>
+</blockquote>
+<p>这里我就直接将机械硬盘只分一个根目录，不做其他分区。大家可以参考下面图片进行分区：</p>
+<p><img src="/images/posts/dual-boot/create-partition.png" alt="Create-Partition"></p>
+<h2 id="7-Bootloader"><a href="#7-Bootloader" class="headerlink" title="7. Bootloader"></a>7. Bootloader</h2><p>分区结束后要选择 Bootloader 的位置，这一点也一定不能错，记得安装在我们分好的根目录下，或者对应的硬盘下面就可以了，这样即使系统安装失败或者删除系统也不会影响我们的固态硬盘。</p>
+<p><img src="/images/posts/dual-boot/bootloader-location.png" alt="Bootloader-Location"></p>
+<p>最后点击 Install Now 直接安装就可以了，应该会弹出其他警示弹窗，选择 Continue 就好了。</p>
+<h2 id="8-时区"><a href="#8-时区" class="headerlink" title="8. 时区"></a>8. 时区</h2><p>下面会让你选择时区，我们就直接选择上海：</p>
+<p><img src="/images/posts/dual-boot/timezone.png" alt="Timezone"></p>
+<h2 id="9-主机名和用户名"><a href="#9-主机名和用户名" class="headerlink" title="9. 主机名和用户名"></a>9. 主机名和用户名</h2><p>紧接着会让你配置一下主机名和用户名，配置完就可以安装系统了。</p>
+<p><img src="/images/posts/dual-boot/user.png" alt="User"></p>
+<h2 id="10-完成安装重启电脑"><a href="#10-完成安装重启电脑" class="headerlink" title="10. 完成安装重启电脑"></a>10. 完成安装重启电脑</h2><p>安装完会提示你重启电脑，重启后输入你设置的用户密码就可以看见 Mint 的欢迎界面了。</p>
+<p><img src="/images/posts/dual-boot/welcome.png" alt="Welcome"></p>
+<h1 id="五、使用双系统"><a href="#五、使用双系统" class="headerlink" title="五、使用双系统"></a>五、使用双系统</h1><h2 id="1-修改-Grub"><a href="#1-修改-Grub" class="headerlink" title="1. 修改 Grub"></a>1. 修改 Grub</h2><p>安装好 Linux 重启后你可能会注意到每次登录都有 10s 的登录选项等待，这样开机时间会大大延长，手动选择又会很麻烦。解决办法是修改 grub 配置文件。</p>
+<p>首先进入 grub 的配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/default/grub</span><br></pre></td></tr></table></figure>
+
+<p>找到<strong>GRUB_TIMEOUT&#x3D;10</strong>这一选项，将其改为<strong>GRUB_TIMEOUT&#x3D;0</strong>：</p>
+<p><img src="/images/posts/dual-boot/grub.png" alt="Edit-Grub"></p>
+<p>然后再禁止系统修改 TIMROUT。</p>
+<p>首先进入配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/grub.d/30_os-prober</span><br></pre></td></tr></table></figure>
+
+<p>然后找到最后一行，注释掉<strong>adjust_timeout</strong>：</p>
+<p><img src="/images/posts/dual-boot/adjust-timeout.png" alt="Adjust-Timeout"></p>
+<p>最后更新一下 gurb，重启之后就可以生效了：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo update-grub</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-修改系统启动项"><a href="#2-修改系统启动项" class="headerlink" title="2. 修改系统启动项"></a>2. 修改系统启动项</h2><p>如果我们想要切换不同的系统，需要修改系统的启动项，进入 BIOS 找到 BOOT 将你常用的系统放在第一个就好了。</p>
+<p><img src="/images/posts/dual-boot/boot-options.png" alt="Boot-Options"></p>
+<p>如果只是临时使用，可以进入 BIOS 后选择对应的 BootOverride 进入，这和前面进入 USB 启动盘是一样的。</p>
+</article><div class="tag_share"><div class="post_share"></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/site/avatar.jpg" onerror="this.onerror=null;this.src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MR-Addict</div><div class="author-info__description">欢迎来到我的个人主页</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MR-Addict"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%87%86%E5%A4%87%E7%A1%AC%E7%9B%98%E5%92%8C%E5%88%86%E5%8C%BA"><span class="toc-text">一、准备硬盘和分区</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%87%86%E5%A4%87%E7%A1%AC%E7%9B%98"><span class="toc-text">1. 准备硬盘</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%86%E5%8C%BA"><span class="toc-text">2. 分区</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%88%B6%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E7%9B%98"><span class="toc-text">二、制作系统启动盘</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%87%86%E5%A4%87%E7%B3%BB%E7%BB%9F"><span class="toc-text">1. 准备系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85%E7%83%A7%E5%BD%95%E8%BD%AF%E4%BB%B6"><span class="toc-text">2. 安装烧录软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%83%A7%E5%BD%95%E7%B3%BB%E7%BB%9F"><span class="toc-text">3. 烧录系统</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%9B%E5%85%A5-BIOS"><span class="toc-text">三、进入 BIOS</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F"><span class="toc-text">四、安装系统</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%80%89%E6%8B%A9%E8%AF%AD%E8%A8%80"><span class="toc-text">1. 选择语言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E9%94%AE%E7%9B%98%E5%B8%83%E5%B1%80"><span class="toc-text">2. 键盘布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-WiFi"><span class="toc-text">3. WiFi</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A4%9A%E5%AA%92%E4%BD%93%E8%A7%A3%E7%A0%81%E5%99%A8"><span class="toc-text">4. 多媒体解码器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%AE%89%E8%A3%85%E7%B1%BB%E5%9E%8B"><span class="toc-text">5. 安装类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%B3%BB%E7%BB%9F%E5%88%86%E5%8C%BA"><span class="toc-text">6. 系统分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Bootloader"><span class="toc-text">7. Bootloader</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E6%97%B6%E5%8C%BA"><span class="toc-text">8. 时区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E4%B8%BB%E6%9C%BA%E5%90%8D%E5%92%8C%E7%94%A8%E6%88%B7%E5%90%8D"><span class="toc-text">9. 主机名和用户名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E5%AE%8C%E6%88%90%E5%AE%89%E8%A3%85%E9%87%8D%E5%90%AF%E7%94%B5%E8%84%91"><span class="toc-text">10. 完成安装重启电脑</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%BD%BF%E7%94%A8%E5%8F%8C%E7%B3%BB%E7%BB%9F"><span class="toc-text">五、使用双系统</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BF%AE%E6%94%B9-Grub"><span class="toc-text">1. 修改 Grub</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BF%AE%E6%94%B9%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E9%A1%B9"><span class="toc-text">2. 修改系统启动项</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由"><img src="/images/posts/install-and-setup-bypass-router-on-pve/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox VE 上安装和设置旁路由"/></a><div class="content"><a class="title" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由">在 Proxmox VE 上安装和设置旁路由</a><time datetime="2024-03-29T07:32:57.000Z" title="发表于 2024-03-29 15:32:57">2024-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本"><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="南工大校园网路由器自动登录脚本"/></a><div class="content"><a class="title" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本">南工大校园网路由器自动登录脚本</a><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS"><img src="/images/posts/install-truenas-on-promox/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox 上安装 TrueNAS"/></a><div class="content"><a class="title" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS">在 Proxmox 上安装 TrueNAS</a><time datetime="2024-01-06T09:10:30.000Z" title="发表于 2024-01-06 17:10:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南"><img src="/images/posts/setup-your-proxmox-server/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="Proxmox 配置指南"/></a><div class="content"><a class="title" href="/posts/setup-your-proxmox-server/" title="Proxmox 配置指南">Proxmox 配置指南</a><time datetime="2024-01-06T05:58:30.000Z" title="发表于 2024-01-06 13:58:30">2024-01-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透"><img src="/images/posts/openwrt-and-wireguard/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="通过Wireguard实现Openwrt内网穿透"/></a><div class="content"><a class="title" href="/posts/openwrt-and-wireguard/" title="通过Wireguard实现Openwrt内网穿透">通过Wireguard实现Openwrt内网穿透</a><time datetime="2023-10-09T06:37:30.000Z" title="发表于 2023-10-09 14:37:30">2023-10-09</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/posts/dual-boot/cover.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By MR-Addict</div><div class="footer_custom_text"><a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">苏ICP备2022032826号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MR-Addict/mr-addict.github.io',
+      'data-repo-id': 'MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=',
+      'data-category-id': 'DIC_kwDOF-d4784CXLQ-',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Butterfly主题下添加ICP备案信息</title>
+    <url>/posts/add-ICP-certificate/</url>
+    <content><![CDATA[<p>提到 Butterfly 主题添加 ICP 备案信息，如果你用过 Butterfly 一段时间，好像它的配置文件没有提到添加备案信息。其实不然，你可以通过添加自定义网页页脚的方式添加 ICP 备案信息。</p>
+<p>在 Butterfly 主题的配置文件中找到以下配置，然后将内容更改为你自己的备案信息就可以了：</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Footer Settings</span></span><br><span class="line"><span class="comment"># --------------------------------------</span></span><br><span class="line"><span class="attr">footer:</span></span><br><span class="line">  <span class="attr">owner:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">since:</span> <span class="number">2022</span></span><br><span class="line">  <span class="attr">custom_text:</span> <span class="string">&lt;a</span> <span class="string">href=&quot;https://beian.miit.gov.cn/&quot;&gt;苏ICP备2022032826号&lt;/a&gt;</span></span><br><span class="line">  <span class="attr">copyright:</span> <span class="literal">true</span> <span class="comment"># Copyright of theme and framework</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>小品</category>
+      </categories>
+      <tags>
+        <tag>网站备案</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在树莓派上使用Clash</title>
+    <url>/posts/clash-on-rpi/</url>
+    <content><![CDATA[<blockquote>
+<p>本教程可以用于给你的树莓派安装代理软件，同时亲测也使用于其他架构的 Linux 主机，只要 Clash 内核含有你的主机架构即可。</p>
+</blockquote>
+<h1 id="一、前期准备"><a href="#一、前期准备" class="headerlink" title="一、前期准备"></a>一、前期准备</h1><p>在开始之前，我首先认为你已经具备以下基础和条件：</p>
+<ul>
+<li>玩过一点树莓派</li>
+<li>拥有一个支持 Clash 的机场</li>
+</ul>
+<h1 id="二、下载-Clash"><a href="#二、下载-Clash" class="headerlink" title="二、下载 Clash"></a>二、下载 Clash</h1><p>在这里我们使用 Clash 作为科学上网的代理框架，为什么使用 Clash 呢，那是因为 Clash 内核支持各种 Unix 平台的各个架构；还支持各种代理协议，像 Trojan、Vmess、Shadowsocks 等等；以及强大的分流规则，可以非常方便地自定义各种规则。</p>
+<h2 id="1-下载-Clash-内核"><a href="#1-下载-Clash-内核" class="headerlink" title="1. 下载 Clash 内核"></a>1. 下载 Clash 内核</h2><p>你可以到 GitHub 下载<a href="https://github.com/Dreamacro/clash/releases">Clash 内核</a>。如果你是<strong>树莓派 4B 32 位操作系统</strong>，那么你应该下载对应 armv7 版本的<a href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv7-v1.11.0.gz">clash-linux-armv7-v1.11.0.gz</a>，如果是<strong>树莓派 4B 64 位操作系统</strong>，那么你应该下载对应 armv7 版本的<a href="https://github.com/Dreamacro/clash/releases/download/v1.11.0/clash-linux-armv8-v1.11.0.gz">clash-linux-armv8-v1.11.0.gz</a>。</p>
+<p>其他型号的树莓派可以通过以下命令查看树莓派的架构：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">arch</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/posts/clash-on-rpi/clash-release.png" alt="clash-release"></p>
+<h2 id="2-解压移动-Clash-内核"><a href="#2-解压移动-Clash-内核" class="headerlink" title="2. 解压移动 Clash 内核"></a>2. 解压移动 Clash 内核</h2><p>下载完成后解压文件，建议把文件名改为<code>clash</code>， 然后移动到<code>/usr/local/bin/clash</code>位置，同时给该文件以执行的权限：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">wget https://github.com/Dreamacro/clash/releases/download/v1.10.6/clash-linux-armv7-v1.10.6.gz</span><br><span class="line">gunzip clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">rm</span> -rf clash-linux-armv7-v1.10.6.gz</span><br><span class="line"><span class="built_in">mv</span> clash-linux-armv7 clash</span><br><span class="line">sudo <span class="built_in">mv</span> clash /usr/local/bin</span><br><span class="line">sudo <span class="built_in">chmod</span> a+x /usr/local/bin/clash</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、配置-Clash"><a href="#三、配置-Clash" class="headerlink" title="三、配置 Clash"></a>三、配置 Clash</h1><h2 id="1-添加-Clash-配置文件"><a href="#1-添加-Clash-配置文件" class="headerlink" title="1. 添加 Clash 配置文件"></a>1. 添加 Clash 配置文件</h2><p>Clash 配置文件的默认路径是<code>~/.config/clash</code>，如果你的 Home 目录不存在相应文件夹就需要你自己创建，然后把你机场提供的配置文件放到该文件下就可以了，Clash 配置文件的默认名称应该是<code>config.yaml</code>。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ~/.config/clash</span><br><span class="line"><span class="built_in">mv</span> your/clash/config/file config.yaml</span><br><span class="line"><span class="built_in">mv</span> config.yaml ~/.config/clash</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-添加全球-IP-库"><a href="#2-添加全球-IP-库" class="headerlink" title="2. 添加全球 IP 库"></a>2. 添加全球 IP 库</h2><p>另外 Clash 还需要一个 Country.mmdb 文件，Country.mmdb 是全球 IP 库，可以实现各个国家的 IP 信息解析和地理定位，没有这个文件 clash 无法正常启动，你可以前往<a href="https://github.com/SukkaW/Koolshare-Clash/blob/master/koolclash/koolclash/config/Country.mmdb">GitHub 下载</a>。下载完成后同样放在默认路径下就可以了<code>~/.config/clash</code>。</p>
+<h1 id="四、配置终端代理"><a href="#四、配置终端代理" class="headerlink" title="四、配置终端代理"></a>四、配置终端代理</h1><h2 id="1-设置环境变量"><a href="#1-设置环境变量" class="headerlink" title="1. 设置环境变量"></a>1. 设置环境变量</h2><p>首先我们需要添加几个环境变量：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/environment</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下配置内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export http_proxy=&quot;http://127.0.0.1:7890&quot;</span><br><span class="line">export https_proxy=&quot;http://127.0.0.1:7890&quot;</span><br><span class="line">export no_proxy=&quot;localhost, 127.0.0.1, *edu.cn&quot;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：系统变量的 https_proxy 的代理地址和 http_proxy 的代理地址是一样的，因为 Clash 使用一个地址同时代理 http 和 https。另外，no_proxy 表示其中的地址不需要代理，这一点很重要，比如我们不需要代理我们的校园网地址，因此加入要<code>*edu.cn</code>。</p>
+</blockquote>
+<h2 id="2-为终端应用配置代理"><a href="#2-为终端应用配置代理" class="headerlink" title="2. 为终端应用配置代理"></a>2. 为终端应用配置代理</h2><p>然后再对相应的终端应用配置代理：</p>
+<div class="tabs" id="tags"><ul class="nav-tabs"><button type="button" class="tab  active" data-href="tags-1"><i class="fab fa-python"></i>为sudo配置代理</button><button type="button" class="tab " data-href="tags-2"><i class="fab fa-python"></i>为apt配置代理</button><button type="button" class="tab " data-href="tags-3"><i class="fab fa-python"></i>为git配置代理</button></ul><div class="tab-contents"><div class="tab-item-content active" id="tags-1"><p>进入 sudo 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo visudo</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Defaults env_keep+=&quot;http_proxy https_proxy no_proxy&quot;</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-2"><p>进入 apt 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/apt/apt.conf.d/10proxy</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Acquire::http::Proxy &quot;http://127.0.0.1:7890/&quot;;</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-3"><p>进入 git 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.gitconfig</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">[http]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br><span class="line">[https]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div></div><div class="tab-to-top"><button type="button" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div>
+<div class="tabs" id="tags"><ul class="nav-tabs"><button type="button" class="tab  active" data-href="tags-1"><i class="fab fa-python"></i>为pip配置代理</button><button type="button" class="tab " data-href="tags-2"><i class="fab fa-python"></i>为npm配置代理</button><button type="button" class="tab " data-href="tags-3"><i class="fab fa-python"></i>为cargo配置代理</button></ul><div class="tab-contents"><div class="tab-item-content active" id="tags-1"><p>进入 pip 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.config/pip/pip.conf</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[global]</span><br><span class="line">  proxy = http://127.0.0.1:7890</span><br><span class="line">  http-proxy = http://127.0.0.1:7890</span><br><span class="line">  https-proxy = http://127.0.0.1:7890</span><br><span class="line">  trusted-host = pypi.python.org global.trusted-host pypi.org global.trusted-host files.pythonhosted.org</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-2"><p>进入 npm 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.npmrc</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">proxy=http://127.0.0.1:7890</span><br><span class="line">http-proxy=http://127.0.0.1:7890</span><br><span class="line">https-proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div><div class="tab-item-content" id="tags-3"><p>进入 cargo 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.cargo/config</span><br></pre></td></tr></table></figure>
+
+<p>然后添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[http]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br><span class="line">[https]</span><br><span class="line">  proxy=http://127.0.0.1:7890</span><br></pre></td></tr></table></figure></div></div><div class="tab-to-top"><button type="button" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div>
+
+<h2 id="3-重启电脑"><a href="#3-重启电脑" class="headerlink" title="3. 重启电脑"></a>3. 重启电脑</h2><p>理论上这样一波配置后，大部分终端应用都可以正常使用了，如果你有其他的终端应用可自行参考相关文档进行配置。配置完成后需要重启树莓派让配置生效，这样配置才能生效。</p>
+<h1 id="五、使用-Clash"><a href="#五、使用-Clash" class="headerlink" title="五、使用 Clash"></a>五、使用 Clash</h1><p>重启之后在终端中输入 clash，如果输出类似以下内容那么就说明 Clash 启动成功了。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">INFO[0000] Start initial compatible provider 手动选择</span><br><span class="line">INFO[0000] Start initial compatible provider 节点选择</span><br><span class="line">INFO[0000] Start initial compatible provider 故障切换</span><br><span class="line">INFO[0000] Start initial compatible provider 自动选择</span><br><span class="line">INFO[0000] HTTP proxy listening at: [::]:7890</span><br><span class="line">INFO[0000] RESTful API listening at: 127.0.0.1:9090</span><br><span class="line">INFO[0000] SOCKS proxy listening at: [::]:7891</span><br></pre></td></tr></table></figure>
+
+<p>你可以更新一下系统或者打开浏览器测试一下 Google，如果可以访问你就可以愉快地玩耍了！</p>
+<blockquote>
+<p>注意：在终端请不要使用<code>ping google.com</code>来测试，因为 ping 使用不同的协议无法被 Clash 代理，不过你可以使用<code>curl google.com</code>。</p>
+</blockquote>
+<h1 id="六、开机自启"><a href="#六、开机自启" class="headerlink" title="六、开机自启"></a>六、开机自启</h1><p>既然我们都已经可以使用 Clash 了，当然要让树莓派能够开机自启 Clash 对吧。在树莓派推荐使用 crontab 作为自动任务管理器。</p>
+<p>输入以下命令可以打开 crontab：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">crontab -e</span><br></pre></td></tr></table></figure>
+
+<p>第一次使用可能需要你选择默认的编辑器，看个人喜好选择就好，然后在打开的文件末尾添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">@reboot /usr/local/bin/clash</span><br></pre></td></tr></table></figure>
+
+<h1 id="七、控制面板"><a href="#七、控制面板" class="headerlink" title="七、控制面板"></a>七、控制面板</h1><h2 id="1-下载-Clash-Dashboard"><a href="#1-下载-Clash-Dashboard" class="headerlink" title="1. 下载 Clash-Dashboard"></a>1. 下载 Clash-Dashboard</h2><p>GitHub 上有很多优秀的有关 Clash Dashboard 的项目，这些项目可以非常方便地帮助你查看、设置和管理你的 Clash。</p>
+<p>从 GitHub 上克隆<a href="https://github.com/Dreamacro/clash-dashboard.git">Clash Dashbaord</a>到 Clash 的默认配置文件夹下。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.config/clash</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Dreamacro/clash-dashboard.git</span><br><span class="line"><span class="built_in">cd</span> ~/.config/clash/clash-dashboard</span><br><span class="line">git checkout -b gh-pages origin/gh-pages</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-修改-Clash-配置文件"><a href="#2-修改-Clash-配置文件" class="headerlink" title="2. 修改 Clash 配置文件"></a>2. 修改 Clash 配置文件</h2><p>下载完成后你需要对 Clash 的配置文件稍作修改才能正常使用控制面板，在 config.yaml 的头部添加或者修改以下两项：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">external-ui: clash-dashboard</span><br><span class="line">external-controller: 127.0.0.1:9090</span><br></pre></td></tr></table></figure>
+
+<p>然后在浏览器中输入<a href="http://127.0.0.1:9090/ui">http://127.0.0.1:9090/ui</a>就可以看到 Clash 的控制面板了。</p>
+<p><img src="/images/posts/clash-on-rpi/clash-dashboard.png" alt="clash-dashboard"></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>树莓派</tag>
+        <tag>Clash</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在电脑上安装双系统</title>
+    <url>/posts/dual-boot/</url>
+    <content><![CDATA[<blockquote>
+<p>安装双系统是一件非常有风险的事情，如果你对整个流程不是很熟悉，建议你不要随便安装，可以先参考观看阅读大量视频文章，理解了其中原理再动手，不然很有可能连 Windows 都用不了！！！</p>
+</blockquote>
+<h1 id="一、准备硬盘和分区"><a href="#一、准备硬盘和分区" class="headerlink" title="一、准备硬盘和分区"></a>一、准备硬盘和分区</h1><h2 id="1-准备硬盘"><a href="#1-准备硬盘" class="headerlink" title="1. 准备硬盘"></a>1. 准备硬盘</h2><p>我装这个双系统的时候，特地买了一块 500G 的机械硬盘，这样我就可以让 Mint 系统使用整个硬盘了。不过如果你的固态硬盘足够大的话，你也可以把你的固态硬盘重新分区，腾出 30-100G 的空间给你的 Linux 系统。甚至于你也可以把系统装在 U 盘或者其他移动硬盘上。</p>
+<p><img src="/images/posts/dual-boot/hdd.png" alt="HDD"></p>
+<h2 id="2-分区"><a href="#2-分区" class="headerlink" title="2. 分区"></a>2. 分区</h2><p>分区的目的是让已有的硬盘最终留出 30-100G 的<code>Unallocated</code>空间以方便安装，只有未分区的空间才可以拿来安装系统。</p>
+<p>使用整块硬盘的分区方法很简单，只要直接将整个硬盘删除就可以了。比如我要把系统安装在 U 盘上，具体分区方法是，在 Windows 的搜索栏中搜索<code>Create and Format Hard Disk</code>这个应用然后打开。那么只要选中 E 盘符，然后右键选择<code>Delete-Volume</code>就可以了，操作完成后会显示<code>Unallocated</code>。</p>
+<p><img src="/images/posts/dual-boot/delete-volume.png" alt="Delete-Volume"></p>
+<blockquote>
+<p>注意：已经使用的硬盘也可以分区，比如你本来装有 Windows 的固态硬盘，但是安装双系统有风险，不建议大家这么做。</p>
+</blockquote>
+<h1 id="二、制作系统启动盘"><a href="#二、制作系统启动盘" class="headerlink" title="二、制作系统启动盘"></a>二、制作系统启动盘</h1><p>制作 USB 系统启动盘的目的是为了后面安装 Linux 系统用的，这个过程和树莓派烧录系统类似。</p>
+<h2 id="1-准备系统"><a href="#1-准备系统" class="headerlink" title="1. 准备系统"></a>1. 准备系统</h2><p>烧录当然少不了系统，这边我以<a href="https://linuxmint.com/">Linux Mint</a>为例，你也可以选择你喜欢的 Linux 发行版。</p>
+<p><img src="/images/posts/dual-boot/linux-mint.png" alt="Linux-Mint"></p>
+<h2 id="2-安装烧录软件"><a href="#2-安装烧录软件" class="headerlink" title="2. 安装烧录软件"></a>2. 安装烧录软件</h2><p>烧录系统可以使用的软件很多，推荐使用以下三个软件：</p>
+<table>
+<thead>
+<tr>
+<th align="center"><a href="https://rufus.ie/">Rufus</a></th>
+<th align="center"><a href="https://www.balena.io/etcher/">Etcher</a></th>
+<th align="center"><a href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/images/posts/dual-boot/rufus.png" alt="Rufus"></td>
+<td align="center"><img src="/images/posts/dual-boot/etcher.png" alt="Etcher"></td>
+<td align="center"><img src="/images/posts/dual-boot/rpi-imager.png" alt="RPI-Imager"></td>
+</tr>
+</tbody></table>
+<h2 id="3-烧录系统"><a href="#3-烧录系统" class="headerlink" title="3. 烧录系统"></a>3. 烧录系统</h2><p>下面就是插入一个 16GB 以上的 U 盘，然后根据你安装的烧录软件烧录你喜欢的 Linux 系统。</p>
+<p>以树莓派 Imager 为例，一般的流程就是选择系统，选择需要烧录的硬盘，最后烧录就可以了。</p>
+<p><img src="/images/posts/dual-boot/burn-os.png" alt="Burn-OS"></p>
+<p>这个过程我就不做详细介绍了，可以参考相应的软件文档或者相关视频。</p>
+<h1 id="三、进入-BIOS"><a href="#三、进入-BIOS" class="headerlink" title="三、进入 BIOS"></a>三、进入 BIOS</h1><p>这个步骤根据不同的电脑而定，如果你把你制作好的启动盘插入电脑重启后自动进入了安装界面，那么你可以跳过这个步骤。</p>
+<p>如果你的电脑没有自动进入安装界面，那么你可能就要手动进入 BIOS 后选择对应的 U 盘。具体方法是电脑在刚刚启动时，按电脑上的<code>F1~F12</code>中的一个，具体是哪一个不同品牌的电脑进入 BIOS 的方法也不同，可以自行上网查找一下。</p>
+<p>进入 BIOS 后到<code>Boot Override</code>选项，选择你烧录的 U 盘回车就可以进入安装界面了。</p>
+<p><img src="/images/posts/dual-boot/bootoverride.png" alt="Boot-Override"></p>
+<h1 id="四、安装系统"><a href="#四、安装系统" class="headerlink" title="四、安装系统"></a>四、安装系统</h1><p>这边我以 Mint 的安装过程为例进行介绍，由于 Mint 是基于 Ubuntu 的发行版，所以安装过程和 Ubuntu 非常相似，如果你是安装 Ubuntu 的话可以参考的。</p>
+<h2 id="1-选择语言"><a href="#1-选择语言" class="headerlink" title="1. 选择语言"></a>1. 选择语言</h2><p>首先是选择语言，这边我选择英文：</p>
+<p><img src="/images/posts/dual-boot/language.png" alt="Language"></p>
+<h2 id="2-键盘布局"><a href="#2-键盘布局" class="headerlink" title="2. 键盘布局"></a>2. 键盘布局</h2><p>然后会让你选择键盘布局，一般都是美式布局：</p>
+<p><img src="/images/posts/dual-boot/keyboard.png" alt="Keyboard-Layout"></p>
+<h2 id="3-WiFi"><a href="#3-WiFi" class="headerlink" title="3. WiFi"></a>3. WiFi</h2><p>然后会问你是否需要连接 WiFi，非常不建议连接 WiFi，不然使用国外源的时候安装会非常慢，建议跳过：</p>
+<p><img src="/images/posts/dual-boot/wifi.png" alt="WiFi"></p>
+<h2 id="4-多媒体解码器"><a href="#4-多媒体解码器" class="headerlink" title="4. 多媒体解码器"></a>4. 多媒体解码器</h2><p>然后会询问你是否安装多媒体编解码器，因为没有网络，所以不安装，你可以在后面装好系统换了源后在安装：</p>
+<p><img src="/images/posts/dual-boot/multidedia-codecs.png" alt="Multimedia-Codecs"></p>
+<h2 id="5-安装类型"><a href="#5-安装类型" class="headerlink" title="5. 安装类型"></a>5. 安装类型</h2><p>然后是安装类型，这边我们选择其他类型，也就是自定义类型：</p>
+<p><img src="/images/posts/dual-boot/install-type.png" alt="Install-Type"></p>
+<h2 id="6-系统分区"><a href="#6-系统分区" class="headerlink" title="6. 系统分区"></a>6. 系统分区</h2><p>后面重点就来了，也就是对系统进行分区。</p>
+<p>其实目前的电脑配置和个人使用条件来说，分区不需要特别详细，不过你可以参考网上的分区方案。这里最重要还是不能把盘弄错，比如这边的<code>sda</code>就是我的机械硬盘，也就是 500G 的那个。所以我们所有的操作都要在<code>sda</code>下操作，其他已有分区不要做任何改动。</p>
+<p>因为我们在前面已经对硬盘做了处理，让硬盘处于未分区状态下，也就是<code>Unallocated</code>，这时候会显示为<code>free space</code>。因为只有<code>free space</code>才可以用来分区，所以要分区的话就选中<code>sda</code>的<code>free space</code>后点击左下角的<code>+</code>就可以了。如果你的硬盘没有显示 free space，那么你可以选中对应的分区，点击<code>-</code>号就可以了。然后就会变成 free space 了。</p>
+<blockquote>
+<p>注意：请确保点击<code>-</code>的时候分区没有重要数据，并且是在你刚刚安装的硬盘下，比我的<code>sda</code>。</p>
+</blockquote>
+<p>这里我就直接将机械硬盘只分一个根目录，不做其他分区。大家可以参考下面图片进行分区：</p>
+<p><img src="/images/posts/dual-boot/create-partition.png" alt="Create-Partition"></p>
+<h2 id="7-Bootloader"><a href="#7-Bootloader" class="headerlink" title="7. Bootloader"></a>7. Bootloader</h2><p>分区结束后要选择 Bootloader 的位置，这一点也一定不能错，记得安装在我们分好的根目录下，或者对应的硬盘下面就可以了，这样即使系统安装失败或者删除系统也不会影响我们的固态硬盘。</p>
+<p><img src="/images/posts/dual-boot/bootloader-location.png" alt="Bootloader-Location"></p>
+<p>最后点击 Install Now 直接安装就可以了，应该会弹出其他警示弹窗，选择 Continue 就好了。</p>
+<h2 id="8-时区"><a href="#8-时区" class="headerlink" title="8. 时区"></a>8. 时区</h2><p>下面会让你选择时区，我们就直接选择上海：</p>
+<p><img src="/images/posts/dual-boot/timezone.png" alt="Timezone"></p>
+<h2 id="9-主机名和用户名"><a href="#9-主机名和用户名" class="headerlink" title="9. 主机名和用户名"></a>9. 主机名和用户名</h2><p>紧接着会让你配置一下主机名和用户名，配置完就可以安装系统了。</p>
+<p><img src="/images/posts/dual-boot/user.png" alt="User"></p>
+<h2 id="10-完成安装重启电脑"><a href="#10-完成安装重启电脑" class="headerlink" title="10. 完成安装重启电脑"></a>10. 完成安装重启电脑</h2><p>安装完会提示你重启电脑，重启后输入你设置的用户密码就可以看见 Mint 的欢迎界面了。</p>
+<p><img src="/images/posts/dual-boot/welcome.png" alt="Welcome"></p>
+<h1 id="五、使用双系统"><a href="#五、使用双系统" class="headerlink" title="五、使用双系统"></a>五、使用双系统</h1><h2 id="1-修改-Grub"><a href="#1-修改-Grub" class="headerlink" title="1. 修改 Grub"></a>1. 修改 Grub</h2><p>安装好 Linux 重启后你可能会注意到每次登录都有 10s 的登录选项等待，这样开机时间会大大延长，手动选择又会很麻烦。解决办法是修改 grub 配置文件。</p>
+<p>首先进入 grub 的配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/default/grub</span><br></pre></td></tr></table></figure>
+
+<p>找到<strong>GRUB_TIMEOUT&#x3D;10</strong>这一选项，将其改为<strong>GRUB_TIMEOUT&#x3D;0</strong>：</p>
+<p><img src="/images/posts/dual-boot/grub.png" alt="Edit-Grub"></p>
+<p>然后再禁止系统修改 TIMROUT。</p>
+<p>首先进入配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/grub.d/30_os-prober</span><br></pre></td></tr></table></figure>
+
+<p>然后找到最后一行，注释掉<strong>adjust_timeout</strong>：</p>
+<p><img src="/images/posts/dual-boot/adjust-timeout.png" alt="Adjust-Timeout"></p>
+<p>最后更新一下 gurb，重启之后就可以生效了：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo update-grub</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-修改系统启动项"><a href="#2-修改系统启动项" class="headerlink" title="2. 修改系统启动项"></a>2. 修改系统启动项</h2><p>如果我们想要切换不同的系统，需要修改系统的启动项，进入 BIOS 找到 BOOT 将你常用的系统放在第一个就好了。</p>
+<p><img src="/images/posts/dual-boot/boot-options.png" alt="Boot-Options"></p>
+<p>如果只是临时使用，可以进入 BIOS 后选择对应的 BootOverride 进入，这和前面进入 USB 启动盘是一样的。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>双系统</tag>
+        <tag>Linux</tag>
+        <tag>Mint</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 Proxmox 上安装 TrueNAS</title>
+    <url>/posts/install-truenas-on-promox/</url>
+    <content><![CDATA[<p>TrueNAS 是一款基于 FreeBSD 的 NAS 操作系统，它的前身是 FreeNAS，后来被 iXsystems 收购，改名为 TrueNAS。TrueNAS 有两个版本，一个是免费的 Community Edition，一个是收费的 Enterprise Edition。Community Edition 的功能已经足够强大，而且免费，所以我们这里就用 Community Edition。</p>
+<p>后来 TrueNAS 衍生出了 TrueNAS SCALE，它是基于 Linux 的，但是目前还处于 Beta 阶段，所以我们这里还是使用 TrueNAS Core。</p>
+<h1 id="一、下载镜像"><a href="#一、下载镜像" class="headerlink" title="一、下载镜像"></a>一、下载镜像</h1><p>首先我们需要下载 TrueNAS 的安装镜像，下载地址在这里：</p>
+<ul>
+<li><a href="https://www.truenas.com/download-truenas-core">TrueNAS Core</a></li>
+</ul>
+<p>下载完之后上传到Proxmox然后开始安装。</p>
+<h1 id="二、安装镜像"><a href="#二、安装镜像" class="headerlink" title="二、安装镜像"></a>二、安装镜像</h1><p>在 Proxmox 的控制台中，选择我们的服务器，然后点击 <code>Create VM</code>，创建一个新的虚拟机。</p>
+<p>Gerneral 中，我们可以设置虚拟机的名称：</p>
+<p><img src="/images/posts/install-truenas-on-promox/general.png" alt="general"></p>
+<p>OS 选择我们刚刚上传的镜像：</p>
+<p><img src="/images/posts/install-truenas-on-promox/os.png" alt="os"></p>
+<p>System 中，我们选择默认即可。</p>
+<p>Disk 中，我们可以设置虚拟机的磁盘大小，最小设置 16G：</p>
+<p><img src="/images/posts/install-truenas-on-promox/disk.png" alt="disk"></p>
+<p>CPU 中，我们可以设置虚拟机的 CPU 核心数，最小设置 2：</p>
+<p><img src="/images/posts/install-truenas-on-promox/cpu.png" alt="cpu"></p>
+<p>Memory 中，我们可以设置虚拟机的内存大小，最小设置 8G：</p>
+<p><img src="/images/posts/install-truenas-on-promox/memory.png" alt="memory"></p>
+<p>Network选择默认即可。</p>
+<p>最后点击 <code>Create</code>，创建虚拟机，注意不要勾选 <code>Start after created</code>。</p>
+<p><img src="/images/posts/install-truenas-on-promox/create.png" alt="create"></p>
+<h1 id="三、挂载硬盘"><a href="#三、挂载硬盘" class="headerlink" title="三、挂载硬盘"></a>三、挂载硬盘</h1><p>在 Proxmox 的控制台中，进入Shell，或者通过SSH进入Proxmox后台也可以。</p>
+<p>首先我们需要找到我们硬盘的Serial编号：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lsblk -o +MODEL,SERIAL</span><br></pre></td></tr></table></figure>
+
+<p>比如我的硬盘是sda，它的Serial编号就是 <code>2023092202777</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME                         MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS MODEL               SERIAL</span><br><span class="line">sda                            8:0    0 953.9G  0 disk             Kingchuxing 1TB     2023092202777</span><br><span class="line">nvme0n1                      259:0    0 476.9G  0 disk             QUANXING N301 512GB AC20230527A0101010</span><br><span class="line">├─nvme0n1p1                  259:1    0  1007K  0 part</span><br><span class="line">├─nvme0n1p2                  259:2    0     1G  0 part /boot/efi</span><br><span class="line">└─nvme0n1p3                  259:3    0 475.9G  0 part</span><br><span class="line">  ├─pve-swap                 252:0    0     8G  0 lvm  [SWAP]</span><br><span class="line">  ├─pve-root                 252:1    0    96G  0 lvm  /</span><br><span class="line">  ├─pve-data_tmeta           252:2    0   3.6G  0 lvm</span><br><span class="line">  │ └─pve-data-tpool         252:4    0 348.8G  0 lvm</span><br><span class="line">  │   ├─pve-data             252:5    0 348.8G  1 lvm</span><br><span class="line">  │   └─pve-vm--101--disk--0 252:6    0    16G  0 lvm</span><br><span class="line">  └─pve-data_tdata           252:3    0 348.8G  0 lvm</span><br><span class="line">    └─pve-data-tpool         252:4    0 348.8G  0 lvm</span><br><span class="line">      ├─pve-data             252:5    0 348.8G  1 lvm</span><br><span class="line">      └─pve-vm--101--disk--0 252:6    0    16G  0 lvm</span><br></pre></td></tr></table></figure>
+
+<p>然后我们需要找到我们硬盘的id：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> -l /dev/disk/by-id</span><br></pre></td></tr></table></figure>
+
+<p>比如我的硬盘是sda，它的id就是 <code>ata-Kingchuxing_1TB_2023092202777</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lrwxrwxrwx 1 root root  9 Jan  6 17:10 ata-Kingchuxing_1TB_2023092202777 -&gt; ../../sda</span><br></pre></td></tr></table></figure>
+
+<p>然后把硬盘挂载到对应的虚拟机上：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qm <span class="built_in">set</span> 101 -scsi1 /dev/disk/by-id/ata-Kingchuxing_1TB_2023092202777</span><br></pre></td></tr></table></figure>
+
+<p>注意这里的101是虚拟机的ID，如果你的虚拟机ID不是101，需要把101改成你的虚拟机ID。</p>
+<p>最后我们还需要手动把Serial编号添加到虚拟机的配置文件中：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/pve/qemu-server/101.conf</span><br></pre></td></tr></table></figure>
+
+<p>将 <code>serial=2023092202777</code> 添加到scsi1的末尾：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">scsi1: /dev/disk/by-id/ata-Kingchuxing_1TB_2023092202777,size=1000204632K,serial=2023092202777</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>提醒：</p>
+<p>类似地，如果你有多个硬盘，也可以把它们都挂载到虚拟机上，只需要把上面的命令中的 <code>scsi1</code> 改成 <code>scsi2</code>、<code>scsi3</code> 等等，然后把 <code>serial=2023092202777</code> 改成对应的硬盘的Serial编号即可。</p>
+</blockquote>
+<h1 id="四、启动虚拟机"><a href="#四、启动虚拟机" class="headerlink" title="四、启动虚拟机"></a>四、启动虚拟机</h1><p>最后启动虚拟机，进入 TrueNAS 的安装界面就可以正常安装了，这里就不做介绍了，你也可以参考下面的视频进行配置。</p>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/WjLaK8yQAag" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>proxmox</tag>
+        <tag>truenas</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 Proxmox VE 上安装和设置旁路由</title>
+    <url>/posts/install-and-setup-bypass-router-on-pve/</url>
+    <content><![CDATA[<p>本文介绍如何在 Proxmox VE 上安装和设置旁路由，以实现在 Proxmox VE 上运行 OpenWrt 虚拟机，从而实现旁路由功能。</p>
+<h2 id="一、构建固件"><a href="#一、构建固件" class="headerlink" title="一、构建固件"></a>一、构建固件</h2><p>首先你需要准备一台 Proxmox VE 服务器，如果你还没有安装 Proxmox VE，可以参考<a href="https://pve.proxmox.com/wiki/Installation">官方文档</a>进行安装。</p>
+<p>另外你需要下载一个 OpenWrt 的镜像文件，这里我已 <a href="https://openwrt.ai/">OpenWrt-AI</a>为例，这个网站支持自定义编译 OpenWrt 镜像。当你选择 X86-64 平台后，可以直接配置好你需要的插件和设置成旁路由，使用起来很方便。</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/openwrt-ai.jpeg" alt="openwrt-ai"></p>
+<p>构建完成后将镜像下载下来，我建议再改个名字。</p>
+<p>然后我们可以将解压好的 OpenWrt 镜像上传到 Proxmox VE 服务器上，你可以使用PVE自带的ISO上传功能：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/upload-image.png" alt="upload-image"></p>
+<p>上传完成后，我们可以在 Proxmox VE 的 Web 界面上看到上传的镜像文件：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/uploaded-image.png" alt="uploaded-image"></p>
+<p><code>/var/lib/vz/template/iso/openwrt.img</code> 就是镜像文件的位置了，这在后面导入磁盘的时候会用到。</p>
+<h2 id="二、创建-OpenWrt-虚拟机"><a href="#二、创建-OpenWrt-虚拟机" class="headerlink" title="二、创建 OpenWrt 虚拟机"></a>二、创建 OpenWrt 虚拟机</h2><p>我们创建一个新的虚拟机，<strong>OS</strong> 选择不使用任何介质：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-os.png" alt="pve-os"></p>
+<p><strong>system</strong> 保持默认：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-system.png" alt="pve-system"></p>
+<p>点击删除符号删除硬盘：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-delete-disk.png" alt="pve-delete-disk"></p>
+<p><strong>CPU</strong>，<strong>Memory</strong> 和 <strong>Network</strong> 保持默认或者根据自己的需求调整：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-cpu.png" alt="pve-cpu"></p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-memory.png" alt="pve-memory"></p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-network.png" alt="pve-network"></p>
+<p>最后确认一下配置，点击 <strong>Finish</strong> 完成创建，注意不要勾选 <strong>Start after created</strong>：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/pve-finish.png" alt="pve-finish"></p>
+<h2 id="三、导入-OpenWrt-镜像"><a href="#三、导入-OpenWrt-镜像" class="headerlink" title="三、导入 OpenWrt 镜像"></a>三、导入 OpenWrt 镜像</h2><p>首先打开创建好的虚拟机，点击 <strong>Hardware</strong>，将 <strong>CD&#x2F;DVD Drive</strong> 和 <strong>Hard Disk</strong> 删除：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/delete-dvd-drive-and-hard-disk.png" alt="delete-dvd-drive-and-hard-disk"></p>
+<p>然后通过 SSH 登录到 Proxmox VE 服务器，执行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qm importdisk 100 /var/lib/vz/template/iso/openwrt.img local-lvm</span><br></pre></td></tr></table></figure>
+
+<p>你需要将<strong>100</strong>修改为你创建的虚拟机的 ID，<code>/var/lib/vz/template/iso/openwrt.img</code> 是你上传的 OpenWrt 镜像文件的位置，<code>local-lvm</code> 是你的存储名称，默认<code>local-lvm</code>就可以。</p>
+<p>执行完会有这么一段输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Successfully imported disk as &#x27;unused0:local-lvm:vm-100-disk-0&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>然后回到 Proxmox VE 的 Web 界面上，点击 <strong>Hardware</strong>，找到 <strong>Unused Disk</strong>，点击 <strong>Add</strong>：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/add-unused-disk.png" alt="add-unused-disk"></p>
+<p>然后再回到 Proxmox VE 的 Web 界面上，点击 <strong>Options</strong>，找到 <strong>Boot Order</strong>，将 <strong>scsi0</strong> 打勾并移动到第一位：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/change-boot-order.png" alt="change-boot-order"></p>
+<p>然后我们回到 Proxmox VE 的 Web 界面上，点击启动虚拟机就开始安装了。</p>
+<h2 id="四、安装-OpenWrt"><a href="#四、安装-OpenWrt" class="headerlink" title="四、安装 OpenWrt"></a>四、安装 OpenWrt</h2><p>启动之后，你会看到 OpenWrt 的安装界面，按照提示进行安装即可，一般是直接就可以进入系统的。</p>
+<p>IP地址是你编译时设置的IP地址，你可以通过浏览器访问旁路由的管理界面进行设置。默认的用户名是 <code>root</code>，密码是你编译时设置的密码。</p>
+<p>由于编译时我们已经设置好了旁路由的功能，所以你可以直接使用旁路由了。</p>
+<p>安装完成后，你需要在防火墙中关掉的lan口的 <code>IP动态伪装</code>，以保证你能在非局域网中访问旁路由下的设备：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/configure-firewall.png" alt="configure-firewall"></p>
+<h2 id="五、使用旁路由"><a href="#五、使用旁路由" class="headerlink" title="五、使用旁路由"></a>五、使用旁路由</h2><p>这里我只介绍如何在单个设备上使用旁路由，如果你想在整个局域网上使用旁路由，你需要在主路由上设置静态路由，将旁路由的流量转发到旁路由上。</p>
+<p>下面默认主路由的IP地址是 <code>192.168.10.1</code>，旁路由的IP地址是 <code>192.168.10.10</code>。</p>
+<h3 id="1-在手机上使用旁路由"><a href="#1-在手机上使用旁路由" class="headerlink" title="1. 在手机上使用旁路由"></a>1. 在手机上使用旁路由</h3><p>参考下面的截图：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-phone.png" alt="bypass-router-on-phone"></p>
+<h3 id="2-在电脑上使用旁路由"><a href="#2-在电脑上使用旁路由" class="headerlink" title="2. 在电脑上使用旁路由"></a>2. 在电脑上使用旁路由</h3><p>参考下面的截图：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/bypass-router-on-computer.png" alt="bypass-router-on-computer"></p>
+<h3 id="3-在Ubuntu上使用旁路由"><a href="#3-在Ubuntu上使用旁路由" class="headerlink" title="3. 在Ubuntu上使用旁路由"></a>3. 在Ubuntu上使用旁路由</h3><p>修改 <code>/etc/netplan/*.yaml</code> 的内容，参考修改为下面的网络配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">network:</span><br><span class="line">  ethernets:</span><br><span class="line">    ens18:</span><br><span class="line">      addresses:</span><br><span class="line">      - 192.168.10.20/24</span><br><span class="line">      nameservers:</span><br><span class="line">        addresses:</span><br><span class="line">        - 223.5.5.5</span><br><span class="line">        search: []</span><br><span class="line">      routes:</span><br><span class="line">      - to: default</span><br><span class="line">        via: 192.168.10.10</span><br><span class="line">  version: 2</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-在-Home-Assistant-上使用旁路由"><a href="#4-在-Home-Assistant-上使用旁路由" class="headerlink" title="4. 在 Home Assistant 上使用旁路由"></a>4. 在 Home Assistant 上使用旁路由</h3><p>打开HA的终端，输入下面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">net update eth0 --ipv4-method static</span><br><span class="line">net update eth0 --ipv4-address 192.168.10.12</span><br><span class="line">net update eth0 --ipv4-gateway 192.168.10.10</span><br><span class="line">net update eth0 --ipv4-nameservers 223.5.5.5</span><br><span class="line"></span><br><span class="line">net update eth0 --ipv6-method disabled</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-在TrueNAS上使用旁路由"><a href="#5-在TrueNAS上使用旁路由" class="headerlink" title="5. 在TrueNAS上使用旁路由"></a>5. 在TrueNAS上使用旁路由</h3><p>进入 TrueNAS 的 Web 界面，点击 <strong>Network</strong>，找到 <strong>Global Configuration</strong>，修改为下面的内容：</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/truenas-global-configuration.png" alt="truenas-global-configuration"></p>
+<p>然后进入 TrueNAS 的控制台，输入1按照提示修改网络配置。</p>
+<p><img src="/images/posts/install-and-setup-bypass-router-on-pve/truenas-shell-configuration.png" alt="truenas-shell-configuration"></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>proxmox</tag>
+        <tag>openwrt</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在Ubuntu服务器上安装WiFi驱动</title>
+    <url>/posts/install-wifi-driver-for-ubuntu-server/</url>
+    <content><![CDATA[<p>我的手上有一块 mini 主机，我用来做 Ubuntu 服务器的，它有一块 WiFi6 的 <strong>RTL8852BE</strong> 的网卡。但是 Ubuntu 服务器默认在安装时不会安装 WiFi 驱动，需要我们自己安装。</p>
+<p>于是我就想着给小主机装一个驱动，这样有的时候就不需要拿到路由器旁边，接一堆线了。<br>下面是我在网上查阅资料后总结的安装 WiFi 驱动的步骤。</p>
+<h1 id="一、查看设备信息"><a href="#一、查看设备信息" class="headerlink" title="一、查看设备信息"></a>一、查看设备信息</h1><p>安装驱动前，我们需要先确定 Ubuntu 的内核版本，以及 WiFi 网卡的型号。</p>
+<h2 id="1-查看内核版本"><a href="#1-查看内核版本" class="headerlink" title="1. 查看内核版本"></a>1. 查看内核版本</h2><p>使用以下命令查看你 Ubuntu 的内核版本：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">uname</span> -r</span><br></pre></td></tr></table></figure>
+
+<p>会有类似以下的输出：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">5.15.0-86-generic</span><br></pre></td></tr></table></figure>
+
+<p>一般内核都是小于 5.18 的稳定版本，这在后面安装驱动会用到。</p>
+<h2 id="2-查看网卡型号"><a href="#2-查看网卡型号" class="headerlink" title="2. 查看网卡型号"></a>2. 查看网卡型号</h2><p>我们还要安装对应 WiFi 型号的驱动。</p>
+<p>使用以下命令查看你的网络设备：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo lshw -C network</span><br></pre></td></tr></table></figure>
+
+<p>找到描述是 <code>Wireless interface</code> 的设备，里面就有你网卡的具体信息：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">*-network</span><br><span class="line">      description: `Wireless interface`</span><br><span class="line">      product: Realtek Semiconductor Co., Ltd.</span><br><span class="line">      vendor: Realtek Semiconductor Co., Ltd.</span><br><span class="line">      physical id: 0</span><br><span class="line">      bus info: pci@0000:03:00.0</span><br><span class="line">      logical name: wlp3s0</span><br><span class="line">      version: 00</span><br><span class="line">      serial: a8:43:a4:28:cb:4c</span><br><span class="line">      width: 64 bits</span><br><span class="line">      clock: 33MHz</span><br><span class="line">      capabilities: pm msi pciexpress bus_master cap_list ethernet physical wireless</span><br><span class="line">      configuration: broadcast=yes driver=rtl8852be driverversion=v1.15.6.0.2-0-gac110bf5.2021102 firmware=N/A ip=192.168.6.100 latency=0 link=yes multicast=yes wireless=IEEE 802.11AX</span><br><span class="line">      resources: irq:144 ioport:3000(size=256) memory:50600000-506fffff</span><br></pre></td></tr></table></figure>
+
+<p>不过我这边只显示网卡是 Realtek 的，并没有具体的型号，于是我就在购买信息上找到了网卡的具体型号是 <strong>RTL8852BE</strong>。</p>
+<h1 id="二、下载、编译、安装驱动"><a href="#二、下载、编译、安装驱动" class="headerlink" title="二、下载、编译、安装驱动"></a>二、下载、编译、安装驱动</h1><p>这边的驱动都需要我们下载后手动编译，根据前面的内核版本和网卡信号，你可以前往这位大佬的 <a href="https://github.com/lwfinger">GitHub 主页</a> 下载对应的驱动。但是我没有找到我的型号，但是我找到了另个一 <a href="https://github.com/HRex39/rtl8852be">Github 仓库</a>，正好是我需要的驱动。</p>
+<p>如果你也找不到的话，可能就需要自己上网找找了。</p>
+<p>然后下载该驱动：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 内核&lt; 5.18</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/HRex39/rtl8852be.git</span><br><span class="line"><span class="comment"># 内核&gt;= 5.18</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/HRex39/rtl8852be.git -b dev</span><br></pre></td></tr></table></figure>
+
+<p>下载完后编译安装：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> rtl8852be</span><br><span class="line">make -j8</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+
+<p>编译结束后就可以使用了：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 安装驱动</span></span><br><span class="line">sudo modprobe 8852be</span><br><span class="line"><span class="comment"># 卸载驱动</span></span><br><span class="line">sudo modprobe -r 8852be</span><br></pre></td></tr></table></figure>
+
+<p>这样的话，你使用下面的命令就可以发现你的 WiFi 驱动信息了，可能是 <code>wlan</code> 或者是 <code>wlp3s0</code> 这样的名称：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">iwconfig</span><br></pre></td></tr></table></figure>
+
+<p>下面是配置好 WiFi 后的输出：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">lo        no wireless extensions.</span><br><span class="line"></span><br><span class="line">enp2s0    no wireless extensions.</span><br><span class="line"></span><br><span class="line">wlp3s0    IEEE 802.11AX  ESSID:&quot;OpenWrt&quot;  Nickname:&quot;&lt;WIFI@REALTEK&gt;&quot;</span><br><span class="line">          Mode:Managed  Frequency:5.22 GHz  Access Point: D4:35:38:92:9A:E6</span><br><span class="line">          Bit Rate:1.201 Gb/s   Sensitivity:0/0</span><br><span class="line">          Retry:off   RTS thr:off   Fragment thr:off</span><br><span class="line">          Power Management:off</span><br><span class="line">          Link Quality=72/100  Signal level=72/100  Noise level=0/100</span><br><span class="line">          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0</span><br><span class="line">          Tx excessive retries:0  Invalid misc:0   Missed beacon:0</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、配置-WiFi"><a href="#三、配置-WiFi" class="headerlink" title="三、配置 WiFi"></a>三、配置 WiFi</h1><p>驱动安装上之后，我们就可以配置 WiFi 了。</p>
+<p>打开配置网络的配置文件，一般在 &#x2F;etc&#x2F;netplan 位置下：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> /etc/netplan</span><br></pre></td></tr></table></figure>
+
+<p>可能是以下输出</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">00-installer-config.yaml</span><br></pre></td></tr></table></figure>
+
+<p>如果是多个文件，就看一下里面的内容，那一个是正在用的，我这边就一个：</p>
+<p>然后在里面添加有关 WiFi 的信息，修改<code>wifi-interface</code>，<code>wifi-ssid</code>，<code>wifi-password</code> 三项就可以了,其他的不需要修改：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">wifis:</span></span><br><span class="line">    <span class="attr">wifi-interface:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">access-points:</span></span><br><span class="line">        <span class="attr">wifi-ssid:</span></span><br><span class="line">          <span class="attr">password:</span> <span class="string">wifi-password</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到里面有线网口的名称是 <code>enp2s0</code>，这和我们使用 <code>iwconfig</code> 看到的信息是一致的，这也印证了这个配置文件就是系统在使用的配置文件，你的 <code>wifi-interface</code> 也可以对应改成 <code>iwconfig</code> 里面网卡的名称，我这里就是 <code>wlp3s0</code>。</p>
+<p>然后使用下面的命令检查配置文件有没有格式错误：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo netplan try</span><br></pre></td></tr></table></figure>
+
+<p>如果没有错误可以按回车确认：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">Do you want to keep these settings?</span><br><span class="line"></span><br><span class="line">Press ENTER before the timeout to accept the new configuration</span><br><span class="line"></span><br><span class="line">Changes will revert in 106 seconds</span><br><span class="line">Configuration accepted.</span><br></pre></td></tr></table></figure>
+
+<p>最后应用就可以了：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo netplan apply</span><br></pre></td></tr></table></figure>
+
+<p>成功连接上之后，使用 <code>ifconfig</code> 查看看口有没有分配到 IP 地址，如果有就表明 WiFi 配置成功了。</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">wlp3s0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.6.100  netmask 255.255.255.0  broadcast 192.168.6.255</span><br><span class="line">        inet6 fd1d:e932:293a:0:aa43:a4ff:fe28:cb4c  prefixlen 64  scopeid 0x0&lt;global&gt;</span><br><span class="line">        inet6 fe80::aa43:a4ff:fe28:cb4c  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        inet6 fd1d:e932:293a::924  prefixlen 128  scopeid 0x0&lt;global&gt;</span><br><span class="line">        ether a8:43:a4:28:cb:4c  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 2279554 (2.2 MB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 2257  bytes 282259 (282.2 KB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>ubuntu</tag>
+        <tag>驱动</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>南工大校园网路由器自动登录脚本</title>
+    <url>/posts/njtech-home-auto-login-script-for-openwrt/</url>
+    <content><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><p>南京工业大学校园网登录需要输入账号密码，而且登录后会有一段时间的有效期，一般是 <del><strong>10分钟</strong></del>（现在好像是变成<strong>5分钟</strong>了）。虽然你可以在后台发一些心跳包来保持登录状态，但是这样依然有可能会掉线。如果能够保持持续在线状态并且自动登录，那当然是最好的。</p>
+<p>一开始南工的校园网是没有验证码的，脚本就很好写，不过后来加了验证码，就没那么容易了。现在又把验证码取消了，所以登录脚本相对而言就比较简单了。反正校园网就是反反复复地改来改去，说不定哪天登录验证的接口又变了。</p>
+<p>你最好拥有一台刷了 OpenWrt 的路由器，如果没有这个教程可能不太适合你。如果这个教程对你有帮助那当然是最好的，我也就是想写点东西。</p>
+<p>So，let’s go！</p>
+<h2 id="二、抓取登录接口"><a href="#二、抓取登录接口" class="headerlink" title="二、抓取登录接口"></a>二、抓取登录接口</h2><p>我目前使用的脚本是基于下面这个登录页面的：</p>
+<p><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/login.png" alt="login"></p>
+<p>通过观察网络请求可以发现，登录使用的接口中需要知道 <code>运营商</code>，<code>用户名</code>，<code>密码</code>还有一个 <code>IP 地址</code>。这个IP地址就是运营商分配给你的IP地址，一般是动态的，所以需要动态获取。然后还有一堆其他的参数，好像都是固定的，不过我也没仔细研究。</p>
+<p>简单来说下面这行命令就可以实现自动登录：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -s \</span><br><span class="line"><span class="string">&quot;http://10.50.255.11:801/eportal/portal/login?callback=dr1003&amp;login_method=1&amp;user_account=,0,\</span></span><br><span class="line"><span class="string">&quot;</span><span class="variable">$username</span><span class="string">&quot;@&quot;</span><span class="variable">$provider</span><span class="string">&quot;&amp;user_password=&quot;</span><span class="variable">$password</span><span class="string">&quot;&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;\</span></span><br><span class="line"><span class="string">&amp;wlan_user_ipv6=&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=me60&amp;jsVersion=4.1.3&amp;terminal_type=1&amp;lang=zh-cn&amp;v=7804&amp;lang=zh&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，如果你的运营商是电信，那么 <code>provider</code> 就是 <code>telecom</code>，如果是移动，那么 <code>provider</code> 就是 <code>cmcc</code>。<code>username</code> 和 <code>password</code> 就是你的校园网账号和密码，<code>address</code> 就是你的IP地址。</p>
+<h2 id="三、编写脚本"><a href="#三、编写脚本" class="headerlink" title="三、编写脚本"></a>三、编写脚本</h2><p>在路由器上创建一个脚本文件，比如 <code>/root/projects/autologin/login.sh</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#! /bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># check wifi connection</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">check</span></span>() &#123;</span><br><span class="line">  <span class="keyword">if</span> curl -s baidu.com | grep -q html ;<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[WARN] WiFi already connected!&quot;</span></span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">elif</span> ping -w 1 -c 1 njtech.edu.cn &gt; /dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">return</span> 0</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Cannot access Njtech-Home!&quot;</span></span><br><span class="line">    <span class="built_in">return</span> 1</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># login</span></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">login</span></span>() &#123;</span><br><span class="line">  <span class="comment"># provider=&quot;cmcc&quot;</span></span><br><span class="line">  provider=<span class="string">&quot;telecom&quot;</span></span><br><span class="line">  username=<span class="string">&quot;username&quot;</span></span><br><span class="line">  password=<span class="string">&quot;password&quot;</span></span><br><span class="line">  address=$(ifstatus wan | jsonfilter -e <span class="string">&#x27;@[&quot;ipv4-address&quot;][0].address&#x27;</span>)</span><br><span class="line">  res=$(curl -s <span class="string">&quot;http://10.50.255.11:801/eportal/portal/login?callback=dr1003&amp;login_method=1&amp;user_account=,0,&quot;</span><span class="variable">$username</span><span class="string">&quot;@&quot;</span><span class="variable">$provider</span><span class="string">&quot;&amp;user_password=&quot;</span><span class="variable">$password</span><span class="string">&quot;&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;&amp;wlan_user_ipv6=&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=me60&amp;jsVersion=4.1.3&amp;terminal_type=1&amp;lang=zh-cn&amp;v=7804&amp;lang=zh&quot;</span>)</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$res</span> | awk -F<span class="string">&#x27;[:,]&#x27;</span> <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | grep -q 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[INFO] Login success!&quot;</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Login failed!&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># entry point</span></span><br><span class="line"><span class="keyword">if</span> check; <span class="keyword">then</span></span><br><span class="line">  login</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>provider</code>，<code>username</code> 和 <code>password</code> 为你自己的信息，然后给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /root/projects/autologin/login.sh</span><br></pre></td></tr></table></figure>
+
+<p>这个脚本用的命令行工具有：</p>
+<ul>
+<li><code>curl</code>：用来发送请求</li>
+<li><code>grep</code>：用来匹配字符串</li>
+<li><code>awk</code>：用来处理字符串</li>
+<li><code>jsonfilter</code>：用来解析JSON</li>
+</ul>
+<p>请确保你的路由器上已经安装了这些工具，如果没有，可以通过 <code>opkg</code> 安装：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">opkg update</span><br><span class="line">opkg install curl grep awk jsonfilter</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、开机自启和定时任务"><a href="#四、开机自启和定时任务" class="headerlink" title="四、开机自启和定时任务"></a>四、开机自启和定时任务</h2><p>设置开机自启的好处是，每次重启路由器后都会立即自动登录，减少等待连接的时间。而设置定时任务的目的是每隔一段时间就会自动尝试登录，保持在线状态。</p>
+<h3 id="4-1-开机自启"><a href="#4-1-开机自启" class="headerlink" title="4.1 开机自启"></a>4.1 开机自启</h3><p>在路由器上创建一个启动脚本文件，比如 <code>/etc/init.d/autologin</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh /etc/rc.common</span></span><br><span class="line"></span><br><span class="line">STOP=10</span><br><span class="line">START=99</span><br><span class="line"></span><br><span class="line"><span class="comment"># commands to start application</span></span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;</span><br><span class="line">  /root/projects/autologin/login.sh &amp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># commands to stop application</span></span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;</span><br><span class="line">  /root/projects/autologin/logout.sh</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># start application after boot</span></span><br><span class="line"><span class="function"><span class="title">boot</span></span>() &#123;</span><br><span class="line">  <span class="built_in">sleep</span> 10</span><br><span class="line">  start</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /etc/init.d/autologin</span><br></pre></td></tr></table></figure>
+
+<p>最后启用这个服务：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/autologin <span class="built_in">enable</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-定时任务"><a href="#4-2-定时任务" class="headerlink" title="4.2 定时任务"></a>4.2 定时任务</h3><p>在路由器上创建一个定时任务文件，比如 <code>/etc/crontabs/root</code>，然后复制下面的内容：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">*/5 * * * * /root/projects/autologin/login.sh</span><br></pre></td></tr></table></figure>
+
+<p>这个任务的意思是每隔5分钟就会执行一次登录脚本。如果你想要修改间隔时间，可以修改 <code>*/5</code> 这个值。</p>
+<p>最后重启路由器，然后就可以看到效果了。</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>这里附上一个退出登录的脚本，方便大家进行测试登录的效果，如 <code>/root/projects/autologin/logout.sh</code>：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#! /bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">logout</span></span>() &#123;</span><br><span class="line">  address=$(ifstatus wan | jsonfilter -e <span class="string">&#x27;@[&quot;ipv4-address&quot;][0].address&#x27;</span>)</span><br><span class="line">  res=$(curl -s <span class="string">&quot;http://10.50.255.11:801/eportal/portal/logout?callback=dr1003&amp;login_method=1&amp;user_account=drcom&amp;user_password=123&amp;ac_logout=1&amp;register_mode=1&amp;wlan_user_ip=&quot;</span><span class="variable">$address</span><span class="string">&quot;&amp;wlan_user_ipv6=&amp;wlan_vlan_id=0&amp;wlan_user_mac=000000000000&amp;wlan_ac_ip=&amp;wlan_ac_name=&amp;jsVersion=4.1.3&amp;v=2706&amp;lang=zh&quot;</span>)</span><br><span class="line">  <span class="keyword">if</span> <span class="built_in">echo</span> <span class="variable">$res</span> | awk -F<span class="string">&#x27;[:,]&#x27;</span> <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | grep -q 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[INFO] Logout success!&quot;</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[ERROR] Logout failed!&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">logout</span></span><br></pre></td></tr></table></figure>
+
+<p>这个脚本不需要做任何修改，直接就可以使用，不过你需要给这个脚本添加可执行权限：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x /root/projects/autologin/logout.sh</span><br></pre></td></tr></table></figure>
+
+<p>最后，如果你有什么问题或者建议，欢迎在评论区留言，我会尽快回复的。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>openwrt</tag>
+        <tag>南京工业大学</tag>
+        <tag>自动登录</tag>
+        <tag>脚本</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>通过Wireguard实现Openwrt内网穿透</title>
+    <url>/posts/openwrt-and-wireguard/</url>
+    <content><![CDATA[<p>虽然说 Wireguard 是一个艺术品(work of art)，但是只要和网络相关的都很难搞，经常是调试一整天网路还是不通，试了很多方法还是无济于事。</p>
+<p>Wireguard 我已经接触很久了，中间断断续续用过很多回，总是各种网路不通搞到头大，然后就不弄了。</p>
+<p>不过最近总算是搞通了，实现了 Wireguard 和 Openwrt 网段之间的互通，下面是我的折腾笔记。</p>
+<blockquote>
+<p>这里我只提供 Wireguard 和 Openwrt 网段之间的互通的应用场景，更多的场景比如 Openwrt 通过 Wireguard 上网可以参考这篇文章，写的非常优秀，包含各种 Wireguard 应用场景，这篇文章我在配置的时候读了很多遍，受到的启发很多。</p>
+<ul>
+<li><a href="https://www.procustodibus.com/blog/2022/06/multi-hop-wireguard/">MULTI-HOP WIREGUARD</a></li>
+</ul>
+</blockquote>
+<h1 id="一、网络结构"><a href="#一、网络结构" class="headerlink" title="一、网络结构"></a>一、网络结构</h1><p>在部署前，我们先认识一下网络结构：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-diagram.png" alt="openwert-wireguard"></p>
+<p>我们在公网服务器上部署一个 Wireguard 服务器，然后让 Openwrt 通过 Wireguard 连接到公网服务器，然后客户端可以通过 Wireguard 访问 Openwrt 的内网设备。</p>
+<p>Wireguard VPN 的内网网段是 <code>172.22.192.0/24</code>，Openwrt 的内网网段是 <code>192.168.6.0/24</code>。</p>
+<p>我们希望客户端通过 Wireguard 连接到公网服务器后，可以访问 Openwrt 的内网网段 <code>192.168.6.0/24</code>；同时 Openwrt 的内网设备也可以访问到 Wireguard 的内网网段 <code>172.22.192.0/24</code>。即实现 Openwrt 和 Wireguard 之间的互通。</p>
+<h1 id="二、部署服务端"><a href="#二、部署服务端" class="headerlink" title="二、部署服务端"></a>二、部署服务端</h1><p>我们需要一台有公网的服务器，然后在上面安装 Wireguard 服务器，这里我用的是 Ubuntu 22.04，其他系统也是类似的。</p>
+<h2 id="1-安装-Wireguard"><a href="#1-安装-Wireguard" class="headerlink" title="1. 安装 Wireguard"></a>1. 安装 Wireguard</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install wireguard -y</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-配置-Wireguard"><a href="#2-配置-Wireguard" class="headerlink" title="2. 配置 Wireguard"></a>2. 配置 Wireguard</h2><p>使用以下命令分别为<code>服务器</code>，<code>openwrt</code>和<code>客户端</code>生成三对公钥和私钥，后面的配置我就直接使用公钥和私钥：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">wg genkey | <span class="built_in">tee</span> private.key | wg pubkey &gt; public.key</span><br></pre></td></tr></table></figure>
+
+<p>新建一个 <code>wg0</code> Wireguard 配置文件：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/wireguard/wg0.txt</span><br></pre></td></tr></table></figure>
+
+<p>添加类似以下内容：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">[Interface]</span><br><span class="line">PrivateKey = server_private_key</span><br><span class="line">Address = 172.22.192.1/32</span><br><span class="line">ListenPort = 51820</span><br><span class="line">SaveConfig = false</span><br><span class="line"></span><br><span class="line">PostUp = iptables -A FORWARD -i wg0 -j ACCEPT &amp;&amp; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span><br><span class="line">PostDown = iptables -D FORWARD -i wg0 -j ACCEPT &amp;&amp; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span><br><span class="line"></span><br><span class="line"># openwrt</span><br><span class="line">[Peer]</span><br><span class="line">PublicKey = openwrt_public_key</span><br><span class="line">AllowedIPs = 172.22.192.110/32, 192.168.6.0/24</span><br><span class="line"></span><br><span class="line"># client</span><br><span class="line">[Peer]</span><br><span class="line">PublicKey = client_public_key</span><br><span class="line">AllowedIPs = 172.22.192.111/32</span><br></pre></td></tr></table></figure>
+
+<p>将其中的 key 换成上面生成的对应设备的公钥和私钥。</p>
+<p>需要注意的是，<code>PostUp</code>和<code>PostDown</code>这两个配置，这里的<code>eth0</code>是服务器的网卡，如果你的服务器网卡不是<code>eth0</code>，需要将其换成你的网卡名称。</p>
+<p>你可以使用下面的命令查看你的服务器网卡名称：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ip route list table main default</span><br></pre></td></tr></table></figure>
+
+<p>例如，如果返回的是 <code>default via 10.0.4.1 dev enp2s0 proto dhcp src 10.0.4.14 metric 100</code>，那么你的网卡名称就是 <code>enp2s0</code>。</p>
+<p>另外你会发现，在 Openwrt 这个 Peer 的 AllowedIPs 中，是 <code>172.22.192.110/32</code> 和 <code>192.168.6.0/24</code>，前一个是 Openwrt 的 Wireguard 内网地址，后一个是 Openwrt 的内网网段。换句话说，如果有请求的目标地址是 172.22.192.110&#x2F;32 和 192.168.6.0&#x2F;24 时，Wireguard 就会将其转发给 Openwrt 对端。</p>
+<p>这就是我们能够访问 Openwrt 内网网段的关键！</p>
+<h2 id="3-配置防火墙"><a href="#3-配置防火墙" class="headerlink" title="3. 配置防火墙"></a>3. 配置防火墙</h2><p>首先我们需要打开 Ubuntu 的防火墙，如果你的 ufw 防火墙没有打开，那么你就不需要打开：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo ufw allow 51820/udp</span><br></pre></td></tr></table></figure>
+
+<p>然后我们需要允许转发，编辑 <code>/etc/sysctl.conf</code> 文件，将 <code>net.ipv4.ip_forward=1</code> 的注释去掉，然后执行 <code>sudo sysctl -p</code> 命令使其生效：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-启动-Wireguard"><a href="#3-启动-Wireguard" class="headerlink" title="3. 启动 Wireguard"></a>3. 启动 Wireguard</h2><p>最后启动 Wireguard 就可以了：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">wg-quick up wg0</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、配置-Openwrt"><a href="#三、配置-Openwrt" class="headerlink" title="三、配置 Openwrt"></a>三、配置 Openwrt</h1><p>你的 Openwrt 需要安装 Wireguard 插件，这里我就跳过这一步骤了。</p>
+<h2 id="1-配置-Wireguard"><a href="#1-配置-Wireguard" class="headerlink" title="1. 配置 Wireguard"></a>1. 配置 Wireguard</h2><h3 id="1-1-添加接口"><a href="#1-1-添加接口" class="headerlink" title="1.1 添加接口"></a>1.1 添加接口</h3><p>在 Openwrt 的网络配置中，添加一个 Wireguard 接口：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-new.png" alt="openwrt-wireguard"></p>
+<h3 id="1-2-修改常规设置"><a href="#1-2-修改常规设置" class="headerlink" title="1.2 修改常规设置"></a>1.2 修改常规设置</h3><p>然后在常规设置中添加必要的的配置，如私钥，公钥和 IP 地址：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-general.png" alt="openwrt-wireguard"></p>
+<h3 id="1-3-创建防火墙"><a href="#1-3-创建防火墙" class="headerlink" title="1.3 创建防火墙"></a>1.3 创建防火墙</h3><p>在防火墙设置中，创建一个新的防火墙区域 wg：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-firewall.png" alt="openwrt-wireguard"></p>
+<h3 id="1-4-添加对端"><a href="#1-4-添加对端" class="headerlink" title="1.4 添加对端"></a>1.4 添加对端</h3><p>最后新建一个 Peer 对端，也就是配置公网服务的信息，允许的 IP 应该是 <code>172.22.192.0/24</code>，勾选路由允许的 IP，可以给一个持续 Keep-Alive 让 Openwrt 主动保持连接服务器：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-interface-peer.png" alt="openwrt-wireguard"></p>
+<h3 id="1-5-检查-Wireguard-连接"><a href="#1-5-检查-Wireguard-连接" class="headerlink" title="1.5 检查 Wireguard 连接"></a>1.5 检查 Wireguard 连接</h3><p>最后保存并应用就可以了，如果一切正常，你就可以在 Openwrt 的网络状态中看到 Wireguard 的状态了：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-status.png" alt="openwrt-wireguard"></p>
+<h2 id="2-配置防火墙"><a href="#2-配置防火墙" class="headerlink" title="2. 配置防火墙"></a>2. 配置防火墙</h2><p>Openwrt 的防火墙配置很重要，是一切的关键，这里我就不多说了，直接上图：</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-firewall.png" alt="openwrt-wireguard"></p>
+<p>我们要允许 lan 口的流量转发到 wg 口，这样 lan 口的设备才能访问到 wg 口的设备。类似的我们还要允许 wg 口的流量转发到 lan 口。</p>
+<p>需要特别注意的是我们要勾选 wg 的 IP <code>动态伪装</code>和 <code>MSS 钳制</code>，这样才能让 Openwrt 把来自 lan 口的请求正常地发送到 wg 口。这是个大坑，我搞了好久才发现这个问题。</p>
+<p><img src="/images/posts/openwrt-and-wireguard/openwrt-wireguard-firewall-mss.png" alt="openwrt-wireguard"></p>
+<p>至此我们就完成了 Openwrt 和 Wireguard 的配置。如果一切正常，我们就可以在 Wireguard 的客户端访问到 Openwrt 的内网网段了。</p>
+<p>最后让我们简单配置一下客户端的 Wireguard。</p>
+<h1 id="四、配置客户端"><a href="#四、配置客户端" class="headerlink" title="四、配置客户端"></a>四、配置客户端</h1><p>客户端的话，你可以使用 Wireguard 官方的客户端，Linux，Windows，MacOS，Android，iOS 都有，这里是下载地址<a href="https://www.wireguard.com/install">https://www.wireguard.com/install</a>。</p>
+<p>下面我以 Windows 为例，下面是我的配置文件样例：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">[Interface]</span><br><span class="line">PrivateKey = client_private_key</span><br><span class="line">Address = 172.22.192.210/32</span><br><span class="line"></span><br><span class="line">[Peer]</span><br><span class="line">PublicKey = server_public_key</span><br><span class="line">AllowedIPs = 172.22.192.0/24, 192.168.6.0/24</span><br><span class="line">Endpoint = server_pubic_ip:51820</span><br></pre></td></tr></table></figure>
+
+<p>这里尤其要注意添加 <code>172.22.192.0/24</code> 和 <code>192.168.6.0/24</code>，这样 Wireguard 才会转发这些请求。</p>
+<p>然后你就可以试试，是不是可以访问到 Openwrt 的内网网段，以及在 Openwrt 下访问 Wireguard 的内网网段。</p>
+<h1 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h1><p>这篇文章主要是记录了我在配置 Wireguard 和 Openwrt 之间的互通的过程，希望对你能有帮助。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>openwrt</tag>
+        <tag>wireguard</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Proxmox 配置指南</title>
+    <url>/posts/setup-your-proxmox-server/</url>
+    <content><![CDATA[<p>我每次重装 Promox 系统都要重新把一些常用的配置再配置一遍，所以干脆写个教程，以后就不用再去找了，大家也可以做个借鉴。</p>
+<h1 id="一、更换国内源"><a href="#一、更换国内源" class="headerlink" title="一、更换国内源"></a>一、更换国内源</h1><p>Proxmox 默认的源是国外的，速度很慢，比较好的做法是换成国内的源。同时我们也可以关掉企业源，因为企业源是收费的，我们用不到。</p>
+<h2 id="1-换成清华源"><a href="#1-换成清华源" class="headerlink" title="1. 换成清华源"></a>1. 换成清华源</h2><p>编辑 <code>/etc/apt/sources.list</code> 文件，将其替换成以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># deb http://ftp.debian.org/debian bookworm main contrib</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware</span><br><span class="line"></span><br><span class="line"># deb http://ftp.debian.org/debian bookworm-updates main contrib</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware</span><br><span class="line"></span><br><span class="line"># deb http://security.debian.org bookworm-security main contrib</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware</span><br><span class="line"></span><br><span class="line"># PVE pve-no-subscription repository</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian/pve bookworm pve-no-subscription</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-关闭企业源"><a href="#2-关闭企业源" class="headerlink" title="2. 关闭企业源"></a>2. 关闭企业源</h2><p>编辑 <code>/etc/apt/sources.list.d/pve-enterprise.list</code> 文件，将其内容注释掉：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># deb https://enterprise.proxmox.com/debian/pve bookworm pve-enterprise</span><br></pre></td></tr></table></figure>
+
+<p>编辑 <code>/etc/apt/sources.list.d/ ceph.list</code> 文件，将其内容注释掉：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># deb https://enterprise.proxmox.com/debian/ceph-quincy bookworm enterprise</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-更新源"><a href="#3-更新源" class="headerlink" title="3. 更新源"></a>3. 更新源</h2><p>最后别忘了更新一下源：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">apt update &amp;&amp; apt dist-upgrade</span><br></pre></td></tr></table></figure>
+
+<h1 id="二、关闭订阅提醒"><a href="#二、关闭订阅提醒" class="headerlink" title="二、关闭订阅提醒"></a>二、关闭订阅提醒</h1><p>Proxmox 会在登录的时候弹出订阅提醒，我们可以通过修改 <code>/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js</code> 文件来关闭这个提醒。</p>
+<p>在该文件中找到以下内容：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (</span><br><span class="line">  res === <span class="literal">null</span> ||</span><br><span class="line">  res === <span class="literal">undefined</span> ||</span><br><span class="line">  !res ||</span><br><span class="line">  res.<span class="property">data</span>.<span class="property">status</span>.<span class="title function_">toLowerCase</span>() !== <span class="string">&quot;active&quot;</span></span><br><span class="line">) &#123;</span><br><span class="line">  <span class="title class_">Ext</span>.<span class="property">Msg</span>.<span class="title function_">show</span>(&#123;</span><br><span class="line">    <span class="attr">title</span>: <span class="title function_">gettext</span>(<span class="string">&quot;No valid subscription&quot;</span>),</span><br><span class="line">    <span class="attr">icon</span>: <span class="title class_">Ext</span>.<span class="property">Msg</span>.<span class="property">WARNING</span>,</span><br><span class="line">    <span class="attr">message</span>: <span class="title class_">Proxmox</span>.<span class="property">Utils</span>.<span class="title function_">getNoSubKeyHtml</span>(res.<span class="property">data</span>.<span class="property">url</span>),</span><br><span class="line">    <span class="attr">buttons</span>: <span class="title class_">Ext</span>.<span class="property">Msg</span>.<span class="property">OK</span>,</span><br><span class="line">    <span class="attr">callback</span>: <span class="keyword">function</span> (<span class="params">btn</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (btn !== <span class="string">&quot;ok&quot;</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="title function_">orig_cmd</span>();</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="title function_">orig_cmd</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要我们将第一个判断条件永远不成立，这样就不会弹出提醒了，你可以直接删除判断条件或者像我一样添加一个判断条：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 直接不成立</span></span><br><span class="line"><span class="keyword">if</span>(<span class="literal">false</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 或者添加一个判断条件，这样也不会弹出提醒还保留了原来的内容</span></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">false</span> &amp;&amp; (res === <span class="literal">null</span> || res === <span class="literal">undefined</span> || !res || res.<span class="property">data</span>.<span class="property">status</span>.<span class="title function_">toLowerCase</span>() !== <span class="string">&quot;active&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>最后重启一下 Proxmox：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">systemctl restart pveproxy</span><br></pre></td></tr></table></figure>
+
+<p>清除浏览器缓存之后重新登录，你就会发现订阅提醒不见了。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>proxmox</tag>
+        <tag>homelab</tag>
+      </tags>
+  </entry>
+</search>
