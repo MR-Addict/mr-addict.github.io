@@ -352,7 +352,52 @@ sudo systemctl disable --now hysteria-realm-server.service
 
 回滚过程中不重启 ycy Xray、不同时重启全部 reverse lane，也不自动恢复公共 Realm。若要回到公共 PoC，必须重新核验当时的地址后再生成 ACL。
 
-# 十一、这次迁移真正教会我的三件事
+# 十一、VLESS/REALITY 与 Hysteria 2 实际测速对比
+
+上一篇完成 reverse 多 lane 隔离后，VLESS/REALITY 方案从真实客户端测得下载 74.9 Mbit/s、上传 242.8 Mbit/s、Ping 88ms、Jitter 0.3ms。迁移到 Hysteria 2 后，在实际客户端重新运行 OpenSpeedTest，得到下载 110.7 Mbit/s、上传 223.0 Mbit/s、Ping 89ms、Jitter 0.6ms。
+
+两张截图均裁去无关留白，并按相同结构并列展示：
+
+| VLESS/REALITY | Hysteria 2 |
+| :---: | :---: |
+| ![VLESS/REALITY：下载 74.9 Mbps，上传 242.8 Mbps，Ping 88 ms](/images/posts/xray-reverse-to-hysteria2/speedtest-vless-reality-cropped.png) | ![Hysteria 2：下载 110.7 Mbps，上传 223.0 Mbps，Ping 89 ms](/images/posts/xray-reverse-to-hysteria2/speedtest-hysteria2-cropped.png) |
+
+| 指标   | VLESS/REALITY 多 lane |   Hysteria 2 |                     变化 |
+| ------ | --------------------: | -----------: | -----------------------: |
+| 下载   |           74.9 Mbit/s | 110.7 Mbit/s |         **提升约 47.8%** |
+| 上传   |          242.8 Mbit/s | 223.0 Mbit/s |              下降约 8.2% |
+| Ping   |                  88ms |         89ms |       增加 1ms，基本持平 |
+| Jitter |                 0.3ms |        0.6ms | 增加 0.3ms，绝对值仍很低 |
+
+两代方案的端到端延迟几乎相同，说明 Hysteria 2 的主要收益不是把两段公网距离“变短”，而是把下载从约 75 Mbit/s 提高到约 111 Mbit/s，并消除旧 reverse TCP 在持续负载后固化到 180–200ms 的状态。上传略有下降，但仍超过 200 Mbit/s，不是当前使用场景的瓶颈。
+
+和上一篇的现场截图一样，这仍不是同一时刻、同一网络背景流量下的实验室 A/B。测速服务器负载、运营商时段和无线环境都可能影响数值；它适合说明迁移前后的实际体验，不应被解释成协议本身必然带来精确的 47.8% 提升。
+
+## NAS 文件复制
+
+合成测速能说明链路具备足够的瞬时吞吐，但家庭入口最终还是要服务真实文件。因此我又从 macOS 已挂载的 NAS 目录复制一个 622,302,285B 的视频到本机：
+
+```bash
+time rsync -ah --progress --partial \
+  "/Volumes/nas/vr/videos/欧洲野牛全景视频/欧洲野牛.mp4" \
+  "$HOME/Downloads/欧洲野牛-hysteria-test.mp4"
+```
+
+```text
+欧洲野牛.mp4
+      622302285 100%    4.85MB/s   00:02:02 (xfer#1, to-check=0/1)
+rsync -ah --progress --partial  2.26s user 2.67s system 4% cpu 2:02.62 total
+```
+
+按文件字节数和总耗时计算：
+
+```text
+622,302,285 B ÷ 122.62 s ≈ 4.84 MiB/s ≈ 40.6 Mbit/s
+```
+
+这组约 40.6 Mbit/s 是更贴近使用体验的**端到端有效吞吐**。它不应与 OpenSpeedTest 的 110.7 Mbit/s 下载结果直接比较：文件位于 macOS 挂载的 NAS 卷上，实际过程同时包含 NAS 磁盘、文件共享协议、macOS 客户端、单文件读写和 Hysteria 隧道的开销。它证明的是一个 622MB 真实文件能在约两分钟内稳定完成，而不是 Hysteria 本身的吞吐上限。
+
+# 十二、这次迁移真正教会我的三件事
 
 ## 1. 限速必须发生在发送源
 
@@ -366,10 +411,10 @@ sudo systemctl disable --now hysteria-realm-server.service
 
 应用层 `reject(all)` 是第一道门，UID-scoped nftables 是第二道门。防火墙缺失时 Server 必须停机，这才叫 fail-closed；自动放宽地址直到服务恢复，只是把可用性问题变成安全问题。
 
-# 十二、结论
+# 十三、结论
 
 这次迁移并不能证明 QUIC 在所有网络上都优于 TCP，也不能把 3–4 Mbit/s 当成普遍的劣化阈值。它只证明了一个更有限、也更可靠的结论：在我的这条路径上，Xray reverse 的长寿命 TCP 会在持续负载后进入 179–193ms 的持久状态，而标准 Hysteria 2/QUIC 在 2–5 Mbit/s 阶梯、1 GiB 单流和 30 分钟持续流中没有复现这种跃迁。
 
-选择 Hysteria 2 不是因为一张吞吐图，而是因为它同时满足了四件事：避开原来的长 TCP 故障模式、管理面在负载下保持可用、负向 ACL 能严格拒绝未授权目标、断电后能按 fail-closed 顺序恢复。
+选择 Hysteria 2 不是因为一张吞吐图，而是因为它同时满足了四件事：避开原来的长 TCP 故障模式、管理面在负载下保持可用、负向 ACL 能严格拒绝未授权目标、断电后能按 fail-closed 顺序恢复。相比 VLESS/REALITY 多 lane 的 74.9 Mbit/s，迁移后的下载现场值达到 110.7 Mbit/s；真实 NAS 文件复制也稳定得到约 40.6 Mbit/s 的端到端有效吞吐。
 
 真正可上线的网络方案，从来不只是“跑得快”，还要能解释失败、限制失败，并且从失败里安全地回来。

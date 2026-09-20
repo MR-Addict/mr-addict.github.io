@@ -290,13 +290,11 @@ flowchart LR
 
 ## 3. 实际端到端测速结果
 
-完成反向通道重建和多 lane 隔离后，我又从真实客户端做了两次端到端测速。优化前的现场截图如下：
+完成反向通道重建和多 lane 隔离后，我又从真实客户端做了两次端到端测速。为了方便直接比较，下面只保留两次截图中相同的下载和上传区域：
 
-![优化前端到端测速：下载 25.4 Mbps，上传 208.9 Mbps](/images/posts/xray-reverse-tcp-latency/speedtest-before.png)
-
-优化后，在同一套访问链路上重新测试：
-
-![优化后端到端测速：下载 74.9 Mbps，上传 242.8 Mbps，Ping 88 ms](/images/posts/xray-reverse-tcp-latency/speedtest-after.png)
+| 优化前 | 优化后 |
+| :---: | :---: |
+| ![优化前端到端测速：下载 25.4 Mbps，上传 208.9 Mbps](/images/posts/xray-reverse-tcp-latency/speedtest-before-cropped.png) | ![优化后端到端测速：下载 74.9 Mbps，上传 242.8 Mbps](/images/posts/xray-reverse-tcp-latency/speedtest-after-cropped.png) |
 
 | 指标 | 优化前 | 优化后 | 变化 |
 | --- | ---: | ---: | ---: |
