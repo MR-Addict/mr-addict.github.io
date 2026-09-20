@@ -1,0 +1,633 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？ | MR-Addict的个人主页</title><meta name="author" content="MR-Addict"><meta name="copyright" content="MR-Addict"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="一条长寿命 TCP 如何拖慢整条 Xray 反向通道，以及如何用 TCP_INFO、受控复现、健康检测和多 lane 隔离解决它。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次 4 Mbit&#x2F;s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？">
+<meta property="og:url" content="https://mr-addict.github.io/posts/xray-reverse-tcp-latency/index.html">
+<meta property="og:site_name" content="MR-Addict的个人主页">
+<meta property="og:description" content="一条长寿命 TCP 如何拖慢整条 Xray 反向通道，以及如何用 TCP_INFO、受控复现、健康检测和多 lane 隔离解决它。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mr-addict.github.io/images/posts/xray-reverse-tcp-latency/cover.png">
+<meta property="article:published_time" content="2026-09-18T10:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-20T07:16:44.675Z">
+<meta property="article:author" content="MR-Addict">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="xray">
+<meta property="article:tag" content="network">
+<meta property="article:tag" content="tcp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mr-addict.github.io/images/posts/xray-reverse-tcp-latency/cover.png"><link rel="shortcut icon" href="/images/site/favicon.svg"><link rel="canonical" href="https://mr-addict.github.io/posts/xray-reverse-tcp-latency/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script src="https://us.umami.is/script.js" data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async defer></script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2026-09-20 15:16:44'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (true) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/site/avatar.jpg" onerror="onerror=null;src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/xray-reverse-tcp-latency/cover.png')"><nav id="nav"><span id="blog-info"><a href="/" title="MR-Addict的个人主页"><span class="site-name">MR-Addict的个人主页</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2026-09-18T10:30:00.000Z" title="发表于 2026-09-18 18:30:00">2026-09-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>13分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>这次问题最迷惑的地方，是<strong>线路明明有几十甚至上百兆带宽，SSH 却像隔着半个地球敲字</strong>。</p>
+<p>我的访问路径是两段公网连接：Mac 先通过 VLESS&#x2F;RAW&#x2F;REALITY 到一台公网中继，再由 Xray 反向通道回到没有公网入口的 PVE 内网。平时反向段 RTT 大约 40ms，端到端交互尚可；某次下载后，SSH、PVE Web 和内网网页却一起变慢，而且停止下载几分钟仍然没有恢复。</p>
+<p>最后发现，问题既不是 PVE 性能不足，也不是 REALITY 握手慢，而是承载 reverse mux 的那条<strong>长寿命 TCP 连接从约 40ms 固化到了 180ms</strong>。更麻烦的是，多种业务共享同一个外层连接，一条下载就能把管理面一起拖下水。</p>
+<p>本文记录完整的排查、复现和改造过程。文中的域名、地址和主机名均已替换，测试数值保留自真实现场。</p>
+<h1 id="一、问题拓扑与现象"><a href="#一、问题拓扑与现象" class="headerlink" title="一、问题拓扑与现象"></a>一、问题拓扑与现象</h1><div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart LR
+    client[&quot;Mac &#x2F; 手机&quot;]
+    relay[&quot;公网中继&lt;br&#x2F;&gt;203.0.113.10:443&quot;]
+    bridge[&quot;内网 Bridge VM&quot;]
+    pve[&quot;PVE &#x2F; SSH &#x2F; Web&quot;]
+
+    client --&gt;|&quot;VLESS + RAW + REALITY&lt;br&#x2F;&gt;约 36–48 ms&quot;| relay
+    relay --&gt;|&quot;Reverse mux 长寿命 TCP&lt;br&#x2F;&gt;正常约 40 ms，异常约 180 ms&quot;| bridge
+    bridge --&gt;|&quot;局域网 &lt; 1 ms&quot;| pve
+  </pre></div>
+
+<p>客户端到公网中继的新连接一直在 36–48ms 左右，内网虚拟交换也只有 0.3–0.6ms。只有中继与 Bridge VM 之间那条已经存在很久的 reverse socket，RTT 高得离谱。</p>
+<p>当时的体感和数据大致如下：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th align="right">异常时结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bridge VM → 中继，新建 TCP</td>
+<td align="right">41–44ms</td>
+</tr>
+<tr>
+<td>生产 reverse socket</td>
+<td align="right">约 180ms</td>
+</tr>
+<tr>
+<td>reverse socket <code>minrtt</code></td>
+<td align="right">约 177.5ms</td>
+</tr>
+<tr>
+<td>reverse socket 累计重传</td>
+<td align="right">约 787KB &#x2F; 569 次</td>
+</tr>
+<tr>
+<td>全新 SSH 建连</td>
+<td align="right">约 2.3–2.8 秒</td>
+</tr>
+<tr>
+<td>PVE 内网 RTT</td>
+<td align="right">约 0.3ms</td>
+</tr>
+</tbody></table>
+<p>同一台机器、同一个目的地址，新连接健康，旧连接却慢了 4 倍。这是整次排查里最重要的信号。</p>
+<h1 id="二、先排除几个很像答案的答案"><a href="#二、先排除几个很像答案的答案" class="headerlink" title="二、先排除几个很像答案的答案"></a>二、先排除几个很像答案的答案</h1><h2 id="1-不要先相信客户端的-Ping"><a href="#1-不要先相信客户端的-Ping" class="headerlink" title="1. 不要先相信客户端的 Ping"></a>1. 不要先相信客户端的 Ping</h2><p>代理软件的 TUN 模式可能在本地代答 ICMP，甚至代做一部分 TCP 握手。此时 <code>ping</code> 显示 0.2ms，并不代表请求真的走完了公网往返。</p>
+<p>比起只看客户端 Ping，我分别检查了每一段：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Bridge VM 到公网中继的 ICMP 基线</span></span><br><span class="line">ping -c 10 relay.example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># PVE 内部网络</span></span><br><span class="line">ping -c 10 192.168.50.2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 新建 TCP 的 connect 时间，不下载响应正文</span></span><br><span class="line">curl -o /dev/null -sS \</span><br><span class="line">  -w <span class="string">&#x27;connect=%&#123;time_connect&#125;s total=%&#123;time_total&#125;s\n&#x27;</span> \</span><br><span class="line">  https://relay.example.com/</span><br></pre></td></tr></table></figure>
+
+<p>结果是公网基础路径约 39–44ms，内网亚毫秒，说明“所有连接天然都是 180ms”这个假设不成立。</p>
+<h2 id="2-检查宿主资源与虚拟交换"><a href="#2-检查宿主资源与虚拟交换" class="headerlink" title="2. 检查宿主资源与虚拟交换"></a>2. 检查宿主资源与虚拟交换</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uptime</span></span><br><span class="line">free -h</span><br><span class="line">vmstat 1 5</span><br><span class="line">ip -s <span class="built_in">link</span> show vmbr1</span><br></pre></td></tr></table></figure>
+
+<p>现场 CPU 基本空闲，IO wait 为 0，可用内存约 29.5GB；<code>vmbr1</code> 没有 error、drop 或 backlog。PVE 和目标虚拟机也不是分别变慢，因为它们共享同一条反向路径。</p>
+<h2 id="3-BBR-不是万能修复"><a href="#3-BBR-不是万能修复" class="headerlink" title="3. BBR 不是万能修复"></a>3. BBR 不是万能修复</h2><p>两端都已经启用 BBR + fq：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysctl net.ipv4.tcp_congestion_control</span><br><span class="line">sysctl net.core.default_qdisc</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.tcp_congestion_control = bbr</span><br><span class="line">net.core.default_qdisc = fq</span><br></pre></td></tr></table></figure>
+
+<p>BBR 可以改善拥塞控制，但不能让一个已经被中间路径区别对待的五元组自动换路，也不能消除 TCP 可靠有序交付带来的队头阻塞。</p>
+<h2 id="4-REALITY-也不是路由器"><a href="#4-REALITY-也不是路由器" class="headerlink" title="4. REALITY 也不是路由器"></a>4. REALITY 也不是路由器</h2><p>REALITY 负责认证和流量外观，不负责选择运营商路径。修改 SNI、fingerprint、short ID 或 UUID，不会改变已经建立的 TCP 五元组。因此，在没有证据前反复换这些参数，只会引入新变量。</p>
+<h1 id="三、用-TCP-INFO-找到真正的慢连接"><a href="#三、用-TCP-INFO-找到真正的慢连接" class="headerlink" title="三、用 TCP_INFO 找到真正的慢连接"></a>三、用 TCP_INFO 找到真正的慢连接</h1><p>Linux 的 <code>ss -ti</code> 可以读取内核维护的 <code>TCP_INFO</code>。关键是找到 Xray 进程连接公网 443 的那个 socket，而不是随便测一次新的 HTTPS。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找到服务 PID</span></span><br><span class="line">pid=$(systemctl show xray-bridge --property=MainPID --value)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只读查看该进程的已建立 443 连接及 TCP_INFO</span></span><br><span class="line">sudo ss -Htinp state established <span class="string">&#x27;( dport = :443 )&#x27;</span> \</span><br><span class="line">  | grep -A1 <span class="string">&quot;pid=<span class="variable">$pid</span>,&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>脱敏后的关键输出是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">192.168.50.13:45126  203.0.113.10:443 users:((&quot;xray&quot;,pid=2418,fd=9))</span><br><span class="line"> rtt:180.015/1.284 minrtt:177.527 bytes_retrans:786914 retrans:0/569 reord_seen:116</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>rtt</code> 是内核对<strong>这条真实生产连接</strong>的估计；<code>minrtt</code> 表示它从建立以来见过的最小 RTT。旧连接的 <code>minrtt</code> 都接近 178ms，而同机新建 TCP 只需 41–44ms，说明它从建立之初就没有采到当前健康路径。</p>
+<p>为了避免单侧统计误差，我又在公网中继查看相同连接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ss -Htinp state established <span class="string">&#x27;( sport = :443 )&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>中继侧约 182.7ms，两端结果一致。至此可以确认，慢点就在生产 reverse TCP，而不是浏览器、SSH 或内网目标机。</p>
+<h1 id="四、重建连接：有效，但只是止血"><a href="#四、重建连接：有效，但只是止血" class="headerlink" title="四、重建连接：有效，但只是止血"></a>四、重建连接：有效，但只是止血</h1><p>在维护窗口中，我只重启 Bridge VM 上负责反向连接的 Xray 实例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart xray-bridge</span><br><span class="line">sudo systemctl is-active xray-bridge</span><br><span class="line">sudo ss -Htinp state established <span class="string">&#x27;( dport = :443 )&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>配置、公网中继、PVE 和其他虚拟机都没有重启。新 socket 建立后，结果立刻变化：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">重连前</th>
+<th align="right">重连后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reverse socket RTT</td>
+<td align="right">180.9ms</td>
+<td align="right">43.7ms</td>
+</tr>
+<tr>
+<td>Reverse <code>minrtt</code></td>
+<td align="right">177.9ms</td>
+<td align="right">41.6ms</td>
+</tr>
+<tr>
+<td>中继侧 RTT</td>
+<td align="right">179.1ms</td>
+<td align="right">42.6ms</td>
+</tr>
+<tr>
+<td>新 socket 累计重传</td>
+<td align="right">—</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>全新 PVE SSH</td>
+<td align="right">2.36–2.82s</td>
+<td align="right">1.10–1.34s</td>
+</tr>
+<tr>
+<td>全新 Ubuntu SSH</td>
+<td align="right">2.25–2.61s</td>
+<td align="right">1.22–1.38s</td>
+</tr>
+</tbody></table>
+<p><img src="/images/posts/xray-reverse-tcp-latency/rtt-before-after.png" alt="重连前后 RTT 与 SSH 建连时间"></p>
+<p>这次重连证明了“旧连接状态劣化”的判断，但它没有回答另一个问题：<strong>是什么让健康连接再次进入 180ms？</strong></p>
+<h1 id="五、如何稳定复现：真正的坑在限速方法"><a href="#五、如何稳定复现：真正的坑在限速方法" class="headerlink" title="五、如何稳定复现：真正的坑在限速方法"></a>五、如何稳定复现：真正的坑在限速方法</h1><p>最初我在 Mac 上使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --limit-rate 2M https://internal.example/download.bin -o /dev/null</span><br></pre></td></tr></table></figure>
+
+<p>这个方法不适合测反向隧道的触发阈值。客户端虽然慢慢读取，多层 TCP 接收窗口和中间缓冲仍允许源端提前发送几十 MB。客户端看到的 2M，不等于 reverse 外层只有 2M。</p>
+<p>正确做法是从内网响应源头控制发送速率。测试时我临时启动了一个只绑定内网地址的 HTTP 服务，按固定大小分块发送，并且每档只持续约 25 秒。下面是等价的最小示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> http.server <span class="keyword">import</span> BaseHTTPRequestHandler, HTTPServer</span><br><span class="line"></span><br><span class="line">RATE_MBIT = <span class="number">4</span></span><br><span class="line">CHUNK = <span class="string">b&quot;0&quot;</span> * <span class="number">16_384</span></span><br><span class="line">INTERVAL = <span class="built_in">len</span>(CHUNK) * <span class="number">8</span> / (RATE_MBIT * <span class="number">1_000_000</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Handler</span>(<span class="title class_ inherited__">BaseHTTPRequestHandler</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">do_GET</span>(<span class="params">self</span>):</span><br><span class="line">        self.send_response(<span class="number">200</span>)</span><br><span class="line">        self.send_header(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/octet-stream&quot;</span>)</span><br><span class="line">        self.end_headers()</span><br><span class="line">        deadline = time.monotonic() + <span class="number">25</span></span><br><span class="line">        <span class="keyword">while</span> time.monotonic() &lt; deadline:</span><br><span class="line">            self.wfile.write(CHUNK)</span><br><span class="line">            self.wfile.flush()</span><br><span class="line">            time.sleep(INTERVAL)</span><br><span class="line"></span><br><span class="line">HTTPServer((<span class="string">&quot;192.168.50.20&quot;</span>, <span class="number">18080</span>), Handler).serve_forever()</span><br></pre></td></tr></table></figure>
+
+<p>测试期间持续读取唯一的 Xray→中继 socket，得到下面的结果：</p>
+<table>
+<thead>
+<tr>
+<th align="right">源端持续速率</th>
+<th align="right">Reverse RTT</th>
+<th>停止后状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">2 Mbit&#x2F;s，25 秒</td>
+<td align="right">39.7–40.5ms</td>
+<td>恢复到 44–45ms</td>
+</tr>
+<tr>
+<td align="right">3 Mbit&#x2F;s，25 秒</td>
+<td align="right">多数 41–44ms，短暂 48.7ms</td>
+<td>约 42ms</td>
+</tr>
+<tr>
+<td align="right">4 Mbit&#x2F;s</td>
+<td align="right">约 8 秒后升至 186.6–188.0ms</td>
+<td>持续劣化</td>
+</tr>
+<tr>
+<td align="right">5 Mbit&#x2F;s</td>
+<td align="right">约 4–12 秒后升至 180.7ms</td>
+<td>持续劣化</td>
+</tr>
+</tbody></table>
+<p><img src="/images/posts/xray-reverse-tcp-latency/rate-threshold.png" alt="源端分档限速测试"></p>
+<p>另一次 4 流、合计约 79Mbit&#x2F;s 的有界下载，让生产 reverse RTT 从 42ms 升到 126ms，随后固定在 177–183ms；与此同时，同机新建 TCP 仍保持在 41–52ms。停止负载两分钟后，旧流也没有自行恢复，重建 socket 后则再次回到约 42ms。</p>
+<p>这些证据能说明某个中间环节对<strong>单条持续流或其状态</strong>进行了区别处理，却不能仅凭端点数据断定是某家运营商的哪台设备、某种固定 QoS 算法或一次路径切换。3–4Mbit&#x2F;s 也只是这个时段、这条路径的观察阈值，绝不是通用结论。</p>
+<h1 id="六、为什么一条下载会拖慢-SSH"><a href="#六、为什么一条下载会拖慢-SSH" class="headerlink" title="六、为什么一条下载会拖慢 SSH"></a>六、为什么一条下载会拖慢 SSH</h1><p>旧版 Xray reverse 底层反向使用 Mux.Cool，把多个逻辑连接装进一条可靠字节流。Xray 官方也明确说明，Mux 的主要目标是减少握手延迟，不是提高下载或测速吞吐；大流量通常反而受到负面影响。</p>
+<p>当外层 TCP 出现排队、重传或被固定到高延迟状态时，内层 SSH、Web 和下载都必须等待同一条外层字节流按序交付。这就是典型的共享故障域和队头阻塞：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SSH ───────┐</span><br><span class="line">PVE Web ───┼─&gt; reverse mux ─&gt; 一条长寿命 TCP ─&gt; 公网中继</span><br><span class="line">下载 ──────┘                         ↑</span><br><span class="line">                               此处一慢，全体变慢</span><br></pre></td></tr></table></figure>
+
+<p>单纯增大 TCP 缓冲、切换 BBR、打开客户端 Mux 或修改 REALITY 参数，都没有改变“所有业务共用一条外层 TCP”这个事实。</p>
+<h1 id="七、先自动恢复，再拆分故障域"><a href="#七、先自动恢复，再拆分故障域" class="headerlink" title="七、先自动恢复，再拆分故障域"></a>七、先自动恢复，再拆分故障域</h1><h2 id="1-保守的健康检测"><a href="#1-保守的健康检测" class="headerlink" title="1. 保守的健康检测"></a>1. 保守的健康检测</h2><p>只检查 <code>systemctl is-active</code> 没用：进程活着、socket 也存在，不代表这条 socket 健康。最终监控每分钟读取真实 reverse socket，并同时建立三个全新 TCP 探针。</p>
+<p>自动重连必须同时满足：</p>
+<ol>
+<li>同一组生产 socket 连续三次 RTT 全部超过 100ms；</li>
+<li>每轮三个新 TCP connect 全部低于 70ms；</li>
+<li>采样连续，期间 socket 没有自然更换；</li>
+<li>距上次重启至少 10 分钟；</li>
+<li>每个实例一小时最多自动重启两次。</li>
+</ol>
+<p>伪代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">bad_socket = <span class="built_in">all</span>(item.rtt_ms &gt; <span class="number">100</span> <span class="keyword">for</span> item <span class="keyword">in</span> reverse_sockets)</span><br><span class="line">healthy_path = <span class="built_in">max</span>(run_three_tcp_probes()) &lt; <span class="number">70</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> bad_socket <span class="keyword">and</span> healthy_path:</span><br><span class="line">    streak += <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    streak = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> streak &gt;= <span class="number">3</span> <span class="keyword">and</span> cooldown_ok <span class="keyword">and</span> hourly_budget_ok:</span><br><span class="line">    restart_only_this_lane()</span><br></pre></td></tr></table></figure>
+
+<p>这套逻辑的重要之处，是区分“整个网络坏了”和“只有旧流坏了”。探针失败、socket 变化、采样中断或代码异常时一律不自动重启。</p>
+<p>连续约 9.5 小时的观察中，共得到 566 个一分钟样本，RTT 范围 42.117–220.489ms，出现 6 个超过 100ms 的样本并触发两次受控重连，两次都在 5 秒内恢复到约 42ms。但自动重连仍是恢复措施：检测需要几分钟，而且会中断这条 lane 上的现有会话。</p>
+<h2 id="2-从一条长流改为-management-bulk-lanes"><a href="#2-从一条长流改为-management-bulk-lanes" class="headerlink" title="2. 从一条长流改为 management + bulk lanes"></a>2. 从一条长流改为 management + bulk lanes</h2><p>真正的工程解法，是不再让管理流量和大文件共用同一个故障域：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart LR
+    user[&quot;客户端&quot;] --&gt; relay[&quot;VLESS &#x2F; REALITY 公网入口&quot;]
+    relay --&gt; mgmt[&quot;management lane&lt;br&#x2F;&gt;SSH &#x2F; PVE &#x2F; LuCI&quot;]
+    relay --&gt; bulk1[&quot;bulk-1&quot;]
+    relay --&gt; bulk2[&quot;bulk-2&quot;]
+    relay --&gt; bulk3[&quot;bulk-3&quot;]
+    relay --&gt; bulk4[&quot;bulk-4&quot;]
+    mgmt --&gt; lan[&quot;内网&quot;]
+    bulk1 --&gt; lan
+    bulk2 --&gt; lan
+    bulk3 --&gt; lan
+    bulk4 --&gt; lan
+  </pre></div>
+
+<p>我把 legacy reverse 迁到了 Xray 26 的 VLESS simplified reverse：</p>
+<ul>
+<li>1 个独立进程只承载 SSH、PVE 8006 和路由管理页面；</li>
+<li>4 个独立进程承载 HTTP、其他 TCP 和 UDP；</li>
+<li>每条 lane 使用独立身份、PID 和 TCP 五元组；</li>
+<li>健康检测只重启异常实例，不重启整个 Bridge VM；</li>
+<li>路由层再次执行目标地址和端口白名单，默认拒绝。</li>
+</ul>
+<p>灰度测试中，5 条连接的初始 RTT 都在 39–48ms。100 个短 HTTP 请求在 4 条 bulk lane 上分布为 <code>27/22/22/29</code>；停止其中一个实例后，20 个请求仍全部成功，恢复实例后会自动重新加入连接池。</p>
+<p>最关键的一次验证是：30MiB 下载命中的 <code>bulk-4</code> 升到了约 199ms，但 management lane 同期仍为 49.7ms，SSH 没有被拖慢。健康检测随后只把 <code>bulk-4</code> 从 199.3ms 恢复到 44.7ms，其他 PID 没有变化。</p>
+<p>这才是拆 lane 的价值：它不能保证某条 bulk TCP 永不劣化，但能把影响控制在一条可替换的连接内。</p>
+<h2 id="3-实际端到端测速结果"><a href="#3-实际端到端测速结果" class="headerlink" title="3. 实际端到端测速结果"></a>3. 实际端到端测速结果</h2><p>完成反向通道重建和多 lane 隔离后，我又从真实客户端做了两次端到端测速。为了方便直接比较，下面只保留两次截图中相同的下载和上传区域：</p>
+<table>
+<thead>
+<tr>
+<th align="center">优化前</th>
+<th align="center">优化后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/images/posts/xray-reverse-tcp-latency/speedtest-before-cropped.png" alt="优化前端到端测速：下载 25.4 Mbps，上传 208.9 Mbps"></td>
+<td align="center"><img src="/images/posts/xray-reverse-tcp-latency/speedtest-after-cropped.png" alt="优化后端到端测速：下载 74.9 Mbps，上传 242.8 Mbps"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">优化前</th>
+<th align="right">优化后</th>
+<th align="right">变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>下载</td>
+<td align="right">25.4 Mbps</td>
+<td align="right">74.9 Mbps</td>
+<td align="right"><strong>约 2.95 倍，提升 194.9%</strong></td>
+</tr>
+<tr>
+<td>上传</td>
+<td align="right">208.9 Mbps</td>
+<td align="right">242.8 Mbps</td>
+<td align="right"><strong>提升 16.2%</strong></td>
+</tr>
+<tr>
+<td>Ping</td>
+<td align="right">截图未记录</td>
+<td align="right">88 ms</td>
+<td align="right">不做百分比比较</td>
+</tr>
+<tr>
+<td>Jitter</td>
+<td align="right">截图未记录</td>
+<td align="right">0.3 ms</td>
+<td align="right">优化后现场值</td>
+</tr>
+</tbody></table>
+<p>下载提升最明显：从只能跑到约 25 Mbps，提高到接近 75 Mbps。优化后的 88 ms Ping 也落在前文估算的双段公网健康下限 80–100 ms 内，说明交互路径已经回到合理区间。上传原本就没有被同样程度地限制，因此增幅相对较小。</p>
+<p>需要注意，这两张图是生产环境的现场快照，不是实验室中的严格 A&#x2F;B 基准：测速服务器负载、运营商时段和并发流数量都可能影响结果。它们能证明改造后的真实使用体验和端到端吞吐明显改善，但多 lane 方案更重要的收益，仍然是前面已经单独验证过的<strong>故障隔离</strong>——即使一条 bulk lane 再次升到约 199 ms，management lane 仍可保持约 50 ms。</p>
+<h1 id="八、部署、验证与回滚"><a href="#八、部署、验证与回滚" class="headerlink" title="八、部署、验证与回滚"></a>八、部署、验证与回滚</h1><p>生产切换前，两端配置都应先离线检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo xray run -<span class="built_in">test</span> -config /etc/xray/config.json</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl start xray-bridges.target</span><br><span class="line">sudo systemctl --no-pager --full status <span class="string">&#x27;xray-bridge@*&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>至少验证这些场景：</p>
+<ul>
+<li>SSH、PVE UI、路由管理页面只进入 management；</li>
+<li>普通 HTTP 和 UDP 进入 bulk；</li>
+<li>私网白名单外的目标被拒绝；</li>
+<li>停止任一 bulk 实例后，新请求仍能完成；</li>
+<li>人为劣化一条 bulk lane 时，management RTT 保持正常；</li>
+<li>健康监控只重启目标实例；</li>
+<li>普通 HTTPS fallback 不受影响。</li>
+</ul>
+<p>迁移开关应保留 <code>legacy</code> 与 <code>simplified</code> 两种模式。观察期发现异常时，只需把服务端路由切回 legacy、重新生成配置并重启公网入口；旧 Bridge 服务在 72 小时内保留运行，客户端节点和入口地址无需修改。观察期结束后再删除旧 portal、凭据和 unit。</p>
+<h1 id="九、结论与边界"><a href="#九、结论与边界" class="headerlink" title="九、结论与边界"></a>九、结论与边界</h1><p>这次事故最有价值的经验，不是“重启 Xray 就好了”，而是下面四点：</p>
+<ol>
+<li>测新连接不能代表长寿命生产连接，必须直接观察真实 socket 的 <code>TCP_INFO</code>；</li>
+<li>多条逻辑业务复用一条外层 TCP，会把单流问题放大成系统性故障；</li>
+<li>自动重连需要用健康新探针对照，避免在全网故障时制造重启风暴；</li>
+<li>管理面和数据面应该拥有独立的连接、进程与恢复边界。</li>
+</ol>
+<p>在两段公网中转的物理拓扑下，健康目标仍是约 80–100ms，不可能靠修改 Xray 参数变成局域网延迟。如果要求低于 50ms，必须减少中转距离或更换更近、更稳定的落点。</p>
+<p>最后再次强调：本文能证明的是“一条生产长流进入持续高 RTT，重建后恢复，多 lane 能隔离影响”；不能证明某个运营商存在固定的 4Mbit&#x2F;s 限速策略。做网络排障时，保留这条证据边界，比给现象找一个听起来确定的故事更重要。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://xtls.github.io/en/config/reverse.html">Xray Legacy Reverse Proxy：已标记 deprecated，底层为反向 Mux.Cool</a></li>
+<li><a target="_blank" rel="noopener" href="https://xtls.github.io/en/config/outbound.html">Xray Outbound Mux：用于减少握手延迟，不以提升吞吐为目标</a></li>
+<li><a target="_blank" rel="noopener" href="https://xtls.github.io/en/config/inbounds/vless.html">Xray VLESS simplified reverse：多个连接按请求选择</a></li>
+<li><a target="_blank" rel="noopener" href="https://xtls.github.io/en/document/level-2/vless_reverse.html">Xray VLESS Reverse Proxy Examples</a></li>
+</ul>
+</article><div class="tag_share"><div class="post_share"></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/site/avatar.jpg" onerror="this.onerror=null;this.src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MR-Addict</div><div class="author-info__description">欢迎来到我的个人主页</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MR-Addict"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%97%AE%E9%A2%98%E6%8B%93%E6%89%91%E4%B8%8E%E7%8E%B0%E8%B1%A1"><span class="toc-text">一、问题拓扑与现象</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%85%88%E6%8E%92%E9%99%A4%E5%87%A0%E4%B8%AA%E5%BE%88%E5%83%8F%E7%AD%94%E6%A1%88%E7%9A%84%E7%AD%94%E6%A1%88"><span class="toc-text">二、先排除几个很像答案的答案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%8D%E8%A6%81%E5%85%88%E7%9B%B8%E4%BF%A1%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84-Ping"><span class="toc-text">1. 不要先相信客户端的 Ping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%A3%80%E6%9F%A5%E5%AE%BF%E4%B8%BB%E8%B5%84%E6%BA%90%E4%B8%8E%E8%99%9A%E6%8B%9F%E4%BA%A4%E6%8D%A2"><span class="toc-text">2. 检查宿主资源与虚拟交换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-BBR-%E4%B8%8D%E6%98%AF%E4%B8%87%E8%83%BD%E4%BF%AE%E5%A4%8D"><span class="toc-text">3. BBR 不是万能修复</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-REALITY-%E4%B9%9F%E4%B8%8D%E6%98%AF%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="toc-text">4. REALITY 也不是路由器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%94%A8-TCP-INFO-%E6%89%BE%E5%88%B0%E7%9C%9F%E6%AD%A3%E7%9A%84%E6%85%A2%E8%BF%9E%E6%8E%A5"><span class="toc-text">三、用 TCP_INFO 找到真正的慢连接</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%87%8D%E5%BB%BA%E8%BF%9E%E6%8E%A5%EF%BC%9A%E6%9C%89%E6%95%88%EF%BC%8C%E4%BD%86%E5%8F%AA%E6%98%AF%E6%AD%A2%E8%A1%80"><span class="toc-text">四、重建连接：有效，但只是止血</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%A6%82%E4%BD%95%E7%A8%B3%E5%AE%9A%E5%A4%8D%E7%8E%B0%EF%BC%9A%E7%9C%9F%E6%AD%A3%E7%9A%84%E5%9D%91%E5%9C%A8%E9%99%90%E9%80%9F%E6%96%B9%E6%B3%95"><span class="toc-text">五、如何稳定复现：真正的坑在限速方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%80%E6%9D%A1%E4%B8%8B%E8%BD%BD%E4%BC%9A%E6%8B%96%E6%85%A2-SSH"><span class="toc-text">六、为什么一条下载会拖慢 SSH</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%85%88%E8%87%AA%E5%8A%A8%E6%81%A2%E5%A4%8D%EF%BC%8C%E5%86%8D%E6%8B%86%E5%88%86%E6%95%85%E9%9A%9C%E5%9F%9F"><span class="toc-text">七、先自动恢复，再拆分故障域</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BF%9D%E5%AE%88%E7%9A%84%E5%81%A5%E5%BA%B7%E6%A3%80%E6%B5%8B"><span class="toc-text">1. 保守的健康检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%8E%E4%B8%80%E6%9D%A1%E9%95%BF%E6%B5%81%E6%94%B9%E4%B8%BA-management-bulk-lanes"><span class="toc-text">2. 从一条长流改为 management + bulk lanes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%AE%9E%E9%99%85%E7%AB%AF%E5%88%B0%E7%AB%AF%E6%B5%8B%E9%80%9F%E7%BB%93%E6%9E%9C"><span class="toc-text">3. 实际端到端测速结果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E9%83%A8%E7%BD%B2%E3%80%81%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%9B%9E%E6%BB%9A"><span class="toc-text">八、部署、验证与回滚</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E7%BB%93%E8%AE%BA%E4%B8%8E%E8%BE%B9%E7%95%8C"><span class="toc-text">九、结论与边界</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/xray-reverse-to-hysteria2/" title="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2"><img src="/images/posts/xray-reverse-to-hysteria2/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2"/></a><div class="content"><a class="title" href="/posts/xray-reverse-to-hysteria2/" title="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2">从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2</a><time datetime="2026-09-20T10:30:00.000Z" title="发表于 2026-09-20 18:30:00">2026-09-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/xray-reverse-tcp-latency/" title="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？"><img src="/images/posts/xray-reverse-tcp-latency/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？"/></a><div class="content"><a class="title" href="/posts/xray-reverse-tcp-latency/" title="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？">一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？</a><time datetime="2026-09-18T10:30:00.000Z" title="发表于 2026-09-18 18:30:00">2026-09-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由"><img src="/images/posts/install-and-setup-bypass-router-on-pve/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox VE 上安装和设置旁路由"/></a><div class="content"><a class="title" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由">在 Proxmox VE 上安装和设置旁路由</a><time datetime="2024-03-29T07:32:57.000Z" title="发表于 2024-03-29 15:32:57">2024-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本"><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="南工大校园网路由器自动登录脚本"/></a><div class="content"><a class="title" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本">南工大校园网路由器自动登录脚本</a><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS"><img src="/images/posts/install-truenas-on-promox/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox 上安装 TrueNAS"/></a><div class="content"><a class="title" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS">在 Proxmox 上安装 TrueNAS</a><time datetime="2024-01-06T09:10:30.000Z" title="发表于 2024-01-06 17:10:30">2024-01-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/posts/xray-reverse-tcp-latency/cover.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2026 By MR-Addict</div><div class="footer_custom_text"><a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">苏ICP备2022032826号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MR-Addict/mr-addict.github.io',
+      'data-repo-id': 'MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=',
+      'data-category-id': 'DIC_kwDOF-d4784CXLQ-',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

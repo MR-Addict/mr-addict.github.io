@@ -1,0 +1,596 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2 | MR-Addict的个人主页</title><meta name="author" content="MR-Addict"><meta name="copyright" content="MR-Addict"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="从 Xray reverse 长 TCP 的持久高延迟出发，用分阶段实验验证 Hysteria 2、修复 Realm 与 Fake-IP 陷阱，并构建断电后仍然 fail-closed 的家庭内网入口。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2">
+<meta property="og:url" content="https://mr-addict.github.io/posts/xray-reverse-to-hysteria2/index.html">
+<meta property="og:site_name" content="MR-Addict的个人主页">
+<meta property="og:description" content="从 Xray reverse 长 TCP 的持久高延迟出发，用分阶段实验验证 Hysteria 2、修复 Realm 与 Fake-IP 陷阱，并构建断电后仍然 fail-closed 的家庭内网入口。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mr-addict.github.io/images/posts/xray-reverse-to-hysteria2/cover.png">
+<meta property="article:published_time" content="2026-09-20T10:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-20T07:16:44.675Z">
+<meta property="article:author" content="MR-Addict">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="network">
+<meta property="article:tag" content="hysteria2">
+<meta property="article:tag" content="quic">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mr-addict.github.io/images/posts/xray-reverse-to-hysteria2/cover.png"><link rel="shortcut icon" href="/images/site/favicon.svg"><link rel="canonical" href="https://mr-addict.github.io/posts/xray-reverse-to-hysteria2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script src="https://us.umami.is/script.js" data-website-id="6cd4449c-54ab-4fc5-b479-5c0875f7233a" async defer></script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2026-09-20 15:16:44'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (true) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/site/avatar.jpg" onerror="onerror=null;src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/xray-reverse-to-hysteria2/cover.png')"><nav id="nav"><span id="blog-info"><a href="/" title="MR-Addict的个人主页"><span class="site-name">MR-Addict的个人主页</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-user"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-circle-info"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2026-09-20T10:30:00.000Z" title="发表于 2026-09-20 18:30:00">2026-09-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>上一篇<a href="/posts/xray-reverse-tcp-latency/">《一次 4 Mbit&#x2F;s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？》</a>里，我把一条 Xray reverse 长寿命 TCP 的问题拆了出来：新连接仍是 40 多毫秒，承载 reverse mux 的旧连接却会在持续传输后固定到 180–200ms，而且停止下载也不恢复。</p>
+<p>后来我把一条 reverse 拆成 management 和 bulk lanes，再加上只重建异常 lane 的健康协调器。这确实保护了 SSH 和 PVE Web，但本质没有改变：大文件仍然跑在长寿命 TCP 上，监控只能在劣化后把连接切断重建。</p>
+<p>所以这次不再继续给 TCP 打补丁，而是问一个更直接的问题：<strong>如果把家庭内网的数据路径换成 QUIC&#x2F;UDP，能否避免那种与旧 TCP 五元组绑定的持久高延迟？</strong></p>
+<p>最终我把生产入口迁移到了 Hysteria 2。真正费时间的并不是写两份 YAML，而是如何证明新路径确实更稳、如何限制它不能变成公网代理，以及如何让防火墙丢失或机器断电后保持 fail-closed。</p>
+<p>本文中的域名、地址、Realm 名称、证书信息和身份凭据均已替换；性能数字来自真实测试记录。</p>
+<h1 id="一、最终拓扑：公网代理和家庭入口只保留一种客户端协议"><a href="#一、最终拓扑：公网代理和家庭入口只保留一种客户端协议" class="headerlink" title="一、最终拓扑：公网代理和家庭入口只保留一种客户端协议"></a>一、最终拓扑：公网代理和家庭入口只保留一种客户端协议</h1><p>旧结构中，客户端先连接公网中继，再由中继通过 Xray reverse TCP 回家：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart LR
+client[&quot;Mac &#x2F; iPhone&quot;]
+relay[&quot;公网中继 ycy&quot;]
+mux[&quot;Xray reverse mux&lt;br&#x2F;&gt;长寿命 TCP&quot;]
+home[&quot;VM103 &#x2F; 家庭网段&quot;]
+
+    client --&gt;|&quot;代理协议&quot;| relay
+    relay --&gt; mux
+    mux --&gt; home
+
+  </pre></div>
+
+<p>新结构仍保留公网中继，但客户端只需导入一个 Hysteria 2 节点。普通公网流量直接从 ycy 出站；只有家庭网段才转入 ycy 本机的 SOCKS5，再经私有 Realm 建立的 Hysteria 2 连接进入 VM103：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart LR
+client[&quot;Shadowrocket &#x2F; PassWall2&quot;]
+relay[&quot;ycy&lt;br&#x2F;&gt;Hysteria 2 UDP&#x2F;443&quot;]
+internet[&quot;Internet&quot;]
+socks[&quot;SOCKS5&lt;br&#x2F;&gt;127.0.0.1:18007&quot;]
+realm[&quot;私有 Realm&lt;br&#x2F;&gt;仅做 rendezvous&quot;]
+vm[&quot;VM103&lt;br&#x2F;&gt;Hysteria Server&quot;]
+lan[&quot;192.168.22.0&#x2F;24&quot;]
+
+    client --&gt; relay
+    relay --&gt;|&quot;普通目标&quot;| internet
+    relay --&gt;|&quot;家庭网段&quot;| socks
+    socks -. &quot;交换地址&quot; .-&gt; realm
+    realm -. &quot;交换地址&quot; .-&gt; vm
+    socks &#x3D;&#x3D; &quot;打洞后的直接 QUIC&#x2F;UDP&quot; &#x3D;&#x3D;&gt; vm
+    vm --&gt; lan
+
+  </pre></div>
+
+<p>Realm 只负责让两端找到彼此，不转发业务数据。实际抓包看到的是 ycy 与家庭公网出口之间的双向 UDP，而不是流量绕经 Realm 服务。</p>
+<h1 id="二、先写停止条件，而不是先装软件"><a href="#二、先写停止条件，而不是先装软件" class="headerlink" title="二、先写停止条件，而不是先装软件"></a>二、先写停止条件，而不是先装软件</h1><p>这套链路承载真实的家庭管理面，我不希望一次 PoC 把已有入口一起打掉。因此验证被拆成三个阶段：</p>
+<div class="mermaid-wrap"><pre class="mermaid-src" hidden>
+  flowchart TD
+s0[&quot;阶段 0：只读基线&lt;br&#x2F;&gt;端口、服务、STUN、回滚&quot;]
+s1[&quot;阶段 1：独立连通性 PoC&lt;br&#x2F;&gt;只允许 VM200:80&quot;]
+s2[&quot;阶段 2：TCP &#x2F; UDP 对照&lt;br&#x2F;&gt;阶梯、大文件、持续流&quot;]
+harden[&quot;持久化与安全加固&lt;br&#x2F;&gt;私有 Realm + fail-closed ACL&quot;]
+prod[&quot;生产迁移&quot;]
+
+    s0 --&gt;|&quot;基线健康&quot;| s1
+    s1 --&gt;|&quot;正向与负向检查通过&quot;| s2
+    s2 --&gt;|&quot;性能证据通过，但恢复设计有缺口&quot;| harden
+    harden --&gt;|&quot;断电恢复与短复验通过&quot;| prod
+
+  </pre></div>
+
+<p>开始前就确定几个硬停止条件：management lane 异常、可用 bulk lane 低于安全下限、Hysteria ACL 负向测试失败、无法确认实际 UDP 路径，或者回滚方式不明确时，都不开始压力测试。</p>
+<p>阶段 0 只采集状态。例如用 <code>ss -ti</code> 记录六条现有 reverse TCP 的 RTT、<code>minrtt</code>、拥塞窗口和重传：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pid=$(systemctl show xray-pve-bridge@bulk-1 \</span><br><span class="line">  --property=MainPID --value)</span><br><span class="line"></span><br><span class="line">sudo ss -Htinp state established <span class="string">&#x27;( dport = :443 )&#x27;</span> \</span><br><span class="line">  | grep -A1 <span class="string">&quot;pid=<span class="variable">$pid</span>,&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>再检查 UDP 监听、系统 drop 和服务状态，但不修改配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo ss -Hlunp</span><br><span class="line">nstat -az UdpInErrors UdpRcvbufErrors</span><br><span class="line">systemctl --no-pager --full status xray-pve-health.timer</span><br></pre></td></tr></table></figure>
+
+<p>这样后续每个结果都有变更前的对照，也能证明 PoC 没有偷偷重启 Xray 或六条生产 lane。</p>
+<h1 id="三、第一个坑：连得上-Realm，不代表-STUN-走对了"><a href="#三、第一个坑：连得上-Realm，不代表-STUN-走对了" class="headerlink" title="三、第一个坑：连得上 Realm，不代表 STUN 走对了"></a>三、第一个坑：连得上 Realm，不代表 STUN 走对了</h1><p>PoC 中 VM103 位于 NAT 后，ycy 有公网地址。两端先向 Realm 注册，再通过 STUN 观察自己的公网映射并同时发 UDP 包，理论上正适合这种场景。</p>
+<p>第一次尝试却失败了。VM103 能解析 Realm、能访问 HTTPS，也能收到 STUN 响应，但抓包发现 STUN 被 OpenWrt 的 PassWall2&#x2F;Fake-IP 透明代理接管，STUN 看到的是错误出口。<strong>“有响应”与“响应能用于打洞”是两回事。</strong></p>
+<p>我没有粗暴放行整个 UDP&#x2F;3478，也没有把 <code>198.18.0.0/15</code> 全部加入白名单，而是只加入一个三维匹配的临时例外：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 仅示意；地址均为文档保留地址</span></span><br><span class="line">nft --check <span class="string">&#x27;insert rule inet passwall2 PSW2_MANGLE \</span></span><br><span class="line"><span class="string">  ip saddr 192.0.2.13 \</span></span><br><span class="line"><span class="string">  ip daddr &#123; 203.0.113.40, 203.0.113.41, 203.0.113.42 &#125; \</span></span><br><span class="line"><span class="string">  udp dport 3478 counter return \</span></span><br><span class="line"><span class="string">  comment &quot;hysteria-stage1-stun-bypass&quot;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>范围同时绑定：</p>
+<ul>
+<li>VM103 的源地址；</li>
+<li>三个预先核验的 STUN IPv4；</li>
+<li>UDP 目标端口 3478。</li>
+</ul>
+<p>规则加载后，一次 48B Binding Request 收到 68B 响应，随后抓包确认业务阶段是 ycy 和家庭公网出口直连。PoC 的 SOCKS 只监听回环地址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ss -Hltnp <span class="string">&#x27;sport = :18007&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LISTEN 0 4096 127.0.0.1:18007 0.0.0.0:* users:((&quot;hysteria&quot;,pid=...,fd=...))</span><br></pre></td></tr></table></figure>
+
+<p>应用 ACL 当时只允许一个隔离测试目标 <code>192.0.2.20:80</code>，其他全部拒绝。PVE、OpenWrt、SSH、NAS、普通公网地址分别做一次短连接负向检查，全部返回 SOCKS5 拒绝。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl --socks5-hostname 127.0.0.1:18007 \</span><br><span class="line">  --connect-timeout 4 -o /dev/null \</span><br><span class="line">  -w <span class="string">&#x27;http=%&#123;http_code&#125; rc=%&#123;exitcode&#125;\n&#x27;</span> \</span><br><span class="line">  http://192.0.2.2:8006/</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl: (97) cannot complete SOCKS5 connection</span><br><span class="line">http=000 rc=97</span><br></pre></td></tr></table></figure>
+
+<h1 id="四、第二个坑：客户端限速不是链路限速"><a href="#四、第二个坑：客户端限速不是链路限速" class="headerlink" title="四、第二个坑：客户端限速不是链路限速"></a>四、第二个坑：客户端限速不是链路限速</h1><p>上一篇已经踩过一次：在下载端运行 <code>curl --limit-rate</code>，只能限制应用读取速度。多层 TCP 接收窗口与缓存仍可能让内网源端提前发送大量数据，无法证明 reverse 外层实际只跑在指定档位。</p>
+<p>这次直接在 VM200 的源端出口用 HTB 整形，并且只匹配临时 HTTP 服务的源端口：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dev=ens18</span><br><span class="line">test_port=18080</span><br><span class="line">rate=4mbit</span><br><span class="line"></span><br><span class="line">sudo tc qdisc replace dev <span class="string">&quot;<span class="variable">$dev</span>&quot;</span> root handle 1: htb default 20</span><br><span class="line">sudo tc class replace dev <span class="string">&quot;<span class="variable">$dev</span>&quot;</span> parent 1: classid 1:10 \</span><br><span class="line">  htb rate <span class="string">&quot;<span class="variable">$rate</span>&quot;</span> ceil <span class="string">&quot;<span class="variable">$rate</span>&quot;</span></span><br><span class="line">sudo tc class replace dev <span class="string">&quot;<span class="variable">$dev</span>&quot;</span> parent 1: classid 1:20 \</span><br><span class="line">  htb rate 900mbit ceil 900mbit</span><br><span class="line">sudo tc qdisc replace dev <span class="string">&quot;<span class="variable">$dev</span>&quot;</span> parent 1:10 fq</span><br><span class="line">sudo tc filter replace dev <span class="string">&quot;<span class="variable">$dev</span>&quot;</span> protocol ip parent 1: prio 10 \</span><br><span class="line">  u32 match ip sport <span class="string">&quot;<span class="variable">$test_port</span>&quot;</span> 0xffff flowid 1:10</span><br></pre></td></tr></table></figure>
+
+<p>每轮都读取整形类的累计字节，而不是相信 <code>curl</code> 显示的瞬时速度：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tc -s class show dev ens18 classid 1:10</span><br></pre></td></tr></table></figure>
+
+<p>测试脚本用 <code>trap</code> 删除 HTB 并恢复原来的 <code>fq</code>，避免一次中断把 VM200 永久留在限速状态：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">cleanup</span></span>() &#123;</span><br><span class="line">  sudo tc qdisc del dev ens18 root 2&gt;/dev/null || <span class="literal">true</span></span><br><span class="line">  sudo tc qdisc replace dev ens18 root fq</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">trap</span> cleanup EXIT INT TERM</span><br></pre></td></tr></table></figure>
+
+<h1 id="五、对照结果：TCP-在最低档复现，QUIC-没有状态跃迁"><a href="#五、对照结果：TCP-在最低档复现，QUIC-没有状态跃迁" class="headerlink" title="五、对照结果：TCP 在最低档复现，QUIC 没有状态跃迁"></a>五、对照结果：TCP 在最低档复现，QUIC 没有状态跃迁</h1><p>Hysteria 依次完成 2、3、4、5 Mbit&#x2F;s 的五分钟轮次。源端实测分别为 1.997、2.993、4.017、4.982 Mbit&#x2F;s，UDP <code>InErrors</code> 和 <code>RcvbufErrors</code> 增量均为 0，management HTTP 全部返回 200。</p>
+<p>TCP reverse 刚跑到最低的 2 Mbit&#x2F;s 就复现了问题：bulk-1 从约 44ms 跃迁至 179–193ms，新建 TCP 仍约 47ms。健康协调器连续三次确认后只重建这一条 lane，PID 从 489 变为 6202，RTT 回到 46.942ms。为了不继续消耗其他 bulk lane 和恢复预算，TCP 的 3&#x2F;4&#x2F;5 Mbit&#x2F;s 轮次没有再执行。</p>
+<p><img src="/images/posts/xray-reverse-to-hysteria2/tcp-vs-hysteria.png" alt="Xray Reverse TCP 与 Hysteria 2 实测对比"></p>
+<p>完整的大文件与持续流结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>测试</th>
+<th>结果</th>
+<th align="right">吞吐 &#x2F; 时长</th>
+<th>完整性与影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hysteria 2 单 HTTP&#x2F;1.1，1 GiB</td>
+<td>HTTP 200</td>
+<td align="right">80.738s，106.4 Mbit&#x2F;s</td>
+<td>SHA-256 匹配；UDP drop 0</td>
+</tr>
+<tr>
+<td>Hysteria 2 四路 Range，1 GiB</td>
+<td>4×206</td>
+<td align="right">最慢 81.291s，约 105.7 Mbit&#x2F;s</td>
+<td>四段重组 SHA-256 匹配</td>
+</tr>
+<tr>
+<td>Hysteria 2 持续流</td>
+<td>HTTP 200</td>
+<td align="right">4 Mbit&#x2F;s，1800s</td>
+<td>management 全部 200</td>
+</tr>
+<tr>
+<td>历史 TCP 单流</td>
+<td>历史记录</td>
+<td align="right">约 64.9 Mbit&#x2F;s</td>
+<td>非同时间、同文件 A&#x2F;B</td>
+</tr>
+</tbody></table>
+<p>1 GiB 文件下载后用哈希验证，不以 HTTP 200 代替完整性：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sha256sum</span> /tmp/hysteria-stage2.bin</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">49bc20df15e412a64472421e13fe86ff1c5165e18b2afccf160d4dc19fe68a14  /tmp/hysteria-stage2.bin</span><br></pre></td></tr></table></figure>
+
+<p>四路 Range 每段都是 268,435,456B，重组哈希一致，但总耗时比单流慢约 0.7%。这说明在本次链路里，四个业务 stream 仍共享同一 QUIC connection 和总拥塞状态；拆流没有免费带来额外带宽。</p>
+<p>Hysteria 的 106.4 Mbit&#x2F;s 相比历史 TCP 的 64.9 Mbit&#x2F;s 约高 64%，但这只是<strong>历史归一化对比</strong>。因为 TCP 在最低档已经触发生产恢复，我没有为凑结果再用当前 TCP 下载同一个 1 GiB 文件。因此这组吞吐不能被包装成严格同步 A&#x2F;B，也不能单独作为迁移依据。</p>
+<h1 id="六、最有价值的一次失败：PVE-断电"><a href="#六、最有价值的一次失败：PVE-断电" class="headerlink" title="六、最有价值的一次失败：PVE 断电"></a>六、最有价值的一次失败：PVE 断电</h1><p>阶段 2 进行到一半时，PVE 宿主意外断电重启。这个事件与 Hysteria 压测无关，却比一次顺利跑完更有价值：VM103 和 VM200 虽然恢复了，阶段 1 的 Hysteria Server 与临时 <code>inet hysteria_poc</code> table 却没有随开机回来；ycy Client 看起来仍是 active，但 SOCKS 请求全部失败。</p>
+<p>更隐蔽的是，OpenWrt Fake-IP 数据库重建后，Realm 地址从一个 <code>198.18.x.x</code> 变成了另一个。旧 ACL 即使被机械恢复，也会指向错误地址。</p>
+<p>这迫使我把“服务能不能重启”升级为“<strong>依赖能否按安全顺序重建</strong>”：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">network-online</span><br><span class="line">      ↓</span><br><span class="line">hysteria-home-firewall.service</span><br><span class="line">      ↓  nft --check + 原子加载 + 精确复核</span><br><span class="line">hysteria-home-server.service</span><br><span class="line">      ↓</span><br><span class="line">hysteria-home-health.timer</span><br></pre></td></tr></table></figure>
+
+<p>如果防火墙不存在，Server 就不应该运行；如果运行中规则漂移，健康检查应先停止 Server，而不是尝试放宽规则让它“恢复可用”。</p>
+<h1 id="七、从公共-Realm-切到私有-Realm"><a href="#七、从公共-Realm-切到私有-Realm" class="headerlink" title="七、从公共 Realm 切到私有 Realm"></a>七、从公共 Realm 切到私有 Realm</h1><p>公共 Realm 很适合验证机制，却是 best-effort 服务，而且配合 OpenWrt Fake-IP 会引入地址漂移。生产方案最终在 ycy 自建固定版本的 Realm Server，使用独立 TCP 端口和强随机 token：</p>
+<ul>
+<li>TCP&#x2F;443 继续留给原服务，Realm 使用独立的示例端口 <code>18443</code>；</li>
+<li>token 与随机 Realm 名称放在 root-only systemd credential 中；</li>
+<li>进程命令行、Git、日志和本文都不出现 token；</li>
+<li>VM103 直接访问 ycy 的固定公网地址，不再把 Realm Fake-IP 写进 ACL；</li>
+<li>rendezvous 失败时明确失败，不回退公共 Realm。</li>
+</ul>
+<p>生产部署不使用 <code>curl | sh</code>。二进制固定版本并在安装前校验摘要，下面仅展示流程，哈希为示例值：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -fL -o /tmp/hysteria \</span><br><span class="line">  https://example.invalid/releases/hysteria-linux-amd64</span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;%s  %s\n&#x27;</span> <span class="string">&#x27;&lt;EXPECTED_SHA256&gt;&#x27;</span> /tmp/hysteria | <span class="built_in">sha256sum</span> -c -</span><br><span class="line">sudo install -o root -g root -m 0755 /tmp/hysteria \</span><br><span class="line">  /usr/local/libexec/hysteria/hysteria</span><br></pre></td></tr></table></figure>
+
+<h1 id="八、双层-ACL：应用拒绝一次，内核再拒绝一次"><a href="#八、双层-ACL：应用拒绝一次，内核再拒绝一次" class="headerlink" title="八、双层 ACL：应用拒绝一次，内核再拒绝一次"></a>八、双层 ACL：应用拒绝一次，内核再拒绝一次</h1><p>只依靠 Hysteria 的应用 ACL 风险太高。配置错误、版本回归或启动时读错文件，都可能把家庭服务器变成未经授权的出口。</p>
+<p>因此 VM103 同时保留两层边界：</p>
+<ol>
+<li>Hysteria ACL 只允许获批的家庭网段和端口；</li>
+<li>nftables 按 Hysteria 专用 UID 限制进程实际能访问的目标，最后一条明确 <code>reject</code>。</li>
+</ol>
+<p>防火墙生成器先输出完整 batch，再做语法检查，最后用单一事务替换专用 table：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo nft --check -f /run/hysteria-home/firewall.nft</span><br><span class="line">sudo nft -f /run/hysteria-home/firewall.nft</span><br><span class="line">sudo nft list table inet hysteria_home</span><br></pre></td></tr></table></figure>
+
+<p>关键规则的结构类似：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">table inet hysteria_home &#123;</span><br><span class="line">    chain output &#123;</span><br><span class="line">        type filter hook output priority filter; policy accept;</span><br><span class="line"></span><br><span class="line">        meta skuid &lt;HYSTERIA_UID&gt; ip daddr &lt;RELAY_IP&gt; \</span><br><span class="line">            tcp dport 18443 accept</span><br><span class="line">        meta skuid &lt;HYSTERIA_UID&gt; ip daddr &#123; &lt;STUN_IPS&gt; &#125; \</span><br><span class="line">            udp dport 3478 accept</span><br><span class="line">        meta skuid &lt;HYSTERIA_UID&gt; ip daddr 192.0.2.0/24 accept</span><br><span class="line">        meta skuid &lt;HYSTERIA_UID&gt; counter reject</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意这里没有全局 <code>flush ruleset</code>，也没有把整个 Fake-IP 网段或任意 RFC1918 网络放开。规则只约束专用 UID，不影响系统其他进程。</p>
+<p>systemd 再把启动顺序写成依赖，而不是靠运气：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Unit]</span></span><br><span class="line"><span class="attr">Requires</span>=hysteria-home-firewall.service</span><br><span class="line"><span class="attr">After</span>=network-<span class="literal">on</span>line.target hysteria-home-firewall.service</span><br><span class="line"><span class="attr">BindsTo</span>=hysteria-home-firewall.service</span><br><span class="line"></span><br><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">ExecStartPre</span>=/usr/local/libexec/hysteria/verify-firewall</span><br><span class="line"><span class="attr">ExecStart</span>=/usr/local/libexec/hysteria/hysteria server \</span><br><span class="line">  --config /etc/hysteria/home-server.yaml</span><br></pre></td></tr></table></figure>
+
+<p>验收时我手工删除专用 nft table，再运行健康检查：Server 被停为 inactive。重建 ACL 后才能再次启动。这个负向测试比单纯看到 <code>active (running)</code> 更重要。</p>
+<h1 id="九、断电恢复和迁移前复验"><a href="#九、断电恢复和迁移前复验" class="headerlink" title="九、断电恢复和迁移前复验"></a>九、断电恢复和迁移前复验</h1><p>受控重启 VM103 后，日志显示防火墙先完成，Server 下一秒才启动。五秒后正向 HTTP 返回 200，PVE、OpenWrt、SSH 和普通公网目标仍全部被拒绝。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">systemctl is-active hysteria-home-firewall.service</span><br><span class="line">systemctl is-active hysteria-home-server.service</span><br><span class="line">systemctl is-active hysteria-home-health.timer</span><br><span class="line"></span><br><span class="line">curl --socks5-hostname 127.0.0.1:18007 \</span><br><span class="line">  --connect-timeout 4 -o /dev/null \</span><br><span class="line">  -w <span class="string">&#x27;http=%&#123;http_code&#125; time=%&#123;time_total&#125;\n&#x27;</span> \</span><br><span class="line">  http://192.0.2.20/</span><br></pre></td></tr></table></figure>
+
+<p>私有 Realm 持久化后又做了一轮 4 Mbit&#x2F;s、五分钟短复验：源端实测 3.985 Mbit&#x2F;s，38 次 management HTTP 全部 200，UDP <code>InErrors</code>&#x2F;<code>RcvbufErrors</code> 增量为 0，四条 bulk PID 不变，协调器没有动作。</p>
+<p>至此才具备生产迁移的条件。迁移保持一个原则：故障时明确失败，不悄悄回退到公共 Realm、旧站点或更宽松的 ACL。</p>
+<h1 id="十、回滚也必须是一等公民"><a href="#十、回滚也必须是一等公民" class="headerlink" title="十、回滚也必须是一等公民"></a>十、回滚也必须是一等公民</h1><p>生产变更前写好的回滚顺序是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 先撤销客户端对新 HOME 通道的使用</span></span><br><span class="line"><span class="comment"># 2. 停止公网侧 Hysteria HOME client</span></span><br><span class="line">sudo systemctl <span class="built_in">disable</span> --now hysteria-home-client.service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 停止家庭侧健康检查和 Server</span></span><br><span class="line">sudo systemctl <span class="built_in">disable</span> --now hysteria-home-health.timer</span><br><span class="line">sudo systemctl <span class="built_in">disable</span> --now hysteria-home-server.service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 删除的只能是专用 table，不能 flush 全局 ruleset</span></span><br><span class="line">sudo nft delete table inet hysteria_home</span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 最后停止私有 Realm，并复核原管理面</span></span><br><span class="line">sudo systemctl <span class="built_in">disable</span> --now hysteria-realm-server.service</span><br></pre></td></tr></table></figure>
+
+<p>回滚过程中不重启 ycy Xray、不同时重启全部 reverse lane，也不自动恢复公共 Realm。若要回到公共 PoC，必须重新核验当时的地址后再生成 ACL。</p>
+<h1 id="十一、VLESS-REALITY-与-Hysteria-2-实际测速对比"><a href="#十一、VLESS-REALITY-与-Hysteria-2-实际测速对比" class="headerlink" title="十一、VLESS&#x2F;REALITY 与 Hysteria 2 实际测速对比"></a>十一、VLESS&#x2F;REALITY 与 Hysteria 2 实际测速对比</h1><p>上一篇完成 reverse 多 lane 隔离后，VLESS&#x2F;REALITY 方案从真实客户端测得下载 74.9 Mbit&#x2F;s、上传 242.8 Mbit&#x2F;s、Ping 88ms、Jitter 0.3ms。迁移到 Hysteria 2 后，在实际客户端重新运行 OpenSpeedTest，得到下载 110.7 Mbit&#x2F;s、上传 223.0 Mbit&#x2F;s、Ping 89ms、Jitter 0.6ms。</p>
+<p>两张截图均裁去无关留白，并按相同结构并列展示：</p>
+<table>
+<thead>
+<tr>
+<th align="center">VLESS&#x2F;REALITY</th>
+<th align="center">Hysteria 2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/images/posts/xray-reverse-to-hysteria2/speedtest-vless-reality-cropped.png" alt="VLESS/REALITY：下载 74.9 Mbps，上传 242.8 Mbps，Ping 88 ms"></td>
+<td align="center"><img src="/images/posts/xray-reverse-to-hysteria2/speedtest-hysteria2-cropped.png" alt="Hysteria 2：下载 110.7 Mbps，上传 223.0 Mbps，Ping 89 ms"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">VLESS&#x2F;REALITY 多 lane</th>
+<th align="right">Hysteria 2</th>
+<th align="right">变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>下载</td>
+<td align="right">74.9 Mbit&#x2F;s</td>
+<td align="right">110.7 Mbit&#x2F;s</td>
+<td align="right"><strong>提升约 47.8%</strong></td>
+</tr>
+<tr>
+<td>上传</td>
+<td align="right">242.8 Mbit&#x2F;s</td>
+<td align="right">223.0 Mbit&#x2F;s</td>
+<td align="right">下降约 8.2%</td>
+</tr>
+<tr>
+<td>Ping</td>
+<td align="right">88ms</td>
+<td align="right">89ms</td>
+<td align="right">增加 1ms，基本持平</td>
+</tr>
+<tr>
+<td>Jitter</td>
+<td align="right">0.3ms</td>
+<td align="right">0.6ms</td>
+<td align="right">增加 0.3ms，绝对值仍很低</td>
+</tr>
+</tbody></table>
+<p>两代方案的端到端延迟几乎相同，说明 Hysteria 2 的主要收益不是把两段公网距离“变短”，而是把下载从约 75 Mbit&#x2F;s 提高到约 111 Mbit&#x2F;s，并消除旧 reverse TCP 在持续负载后固化到 180–200ms 的状态。上传略有下降，但仍超过 200 Mbit&#x2F;s，不是当前使用场景的瓶颈。</p>
+<p>和上一篇的现场截图一样，这仍不是同一时刻、同一网络背景流量下的实验室 A&#x2F;B。测速服务器负载、运营商时段和无线环境都可能影响数值；它适合说明迁移前后的实际体验，不应被解释成协议本身必然带来精确的 47.8% 提升。</p>
+<h2 id="NAS-文件复制"><a href="#NAS-文件复制" class="headerlink" title="NAS 文件复制"></a>NAS 文件复制</h2><p>合成测速能说明链路具备足够的瞬时吞吐，但家庭入口最终还是要服务真实文件。因此我又从 macOS 已挂载的 NAS 目录复制一个 622,302,285B 的视频到本机：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">time rsync -ah --progress --partial \</span><br><span class="line">  <span class="string">&quot;/Volumes/nas/vr/videos/欧洲野牛全景视频/欧洲野牛.mp4&quot;</span> \</span><br><span class="line">  <span class="string">&quot;<span class="variable">$HOME</span>/Downloads/欧洲野牛-hysteria-test.mp4&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">欧洲野牛.mp4</span><br><span class="line">      622302285 100%    4.85MB/s   00:02:02 (xfer#1, to-check=0/1)</span><br><span class="line">rsync -ah --progress --partial  2.26s user 2.67s system 4% cpu 2:02.62 total</span><br></pre></td></tr></table></figure>
+
+<p>按文件字节数和总耗时计算：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">622,302,285 B ÷ 122.62 s ≈ 4.84 MiB/s ≈ 40.6 Mbit/s</span><br></pre></td></tr></table></figure>
+
+<p>这组约 40.6 Mbit&#x2F;s 是更贴近使用体验的<strong>端到端有效吞吐</strong>。它不应与 OpenSpeedTest 的 110.7 Mbit&#x2F;s 下载结果直接比较：文件位于 macOS 挂载的 NAS 卷上，实际过程同时包含 NAS 磁盘、文件共享协议、macOS 客户端、单文件读写和 Hysteria 隧道的开销。它证明的是一个 622MB 真实文件能在约两分钟内稳定完成，而不是 Hysteria 本身的吞吐上限。</p>
+<h1 id="十二、这次迁移真正教会我的三件事"><a href="#十二、这次迁移真正教会我的三件事" class="headerlink" title="十二、这次迁移真正教会我的三件事"></a>十二、这次迁移真正教会我的三件事</h1><h2 id="1-限速必须发生在发送源"><a href="#1-限速必须发生在发送源" class="headerlink" title="1. 限速必须发生在发送源"></a>1. 限速必须发生在发送源</h2><p><code>curl --limit-rate</code> 测到的是客户端消费速度，不一定是隧道外层速率。只有在源端整形并读取发送字节计数，才能把 2、3、4、5 Mbit&#x2F;s 变成可复现的实验条件。</p>
+<h2 id="2-PoC-的验收必须包括“重启之后”"><a href="#2-PoC-的验收必须包括“重启之后”" class="headerlink" title="2. PoC 的验收必须包括“重启之后”"></a>2. PoC 的验收必须包括“重启之后”</h2><p>正向请求成功、压测漂亮，都不代表方案能上线。PVE 断电暴露了临时 nftables、disabled unit 和 Fake-IP 地址生命周期三个问题。一次意外重启让控制面从“能跑”变成了“可恢复”。</p>
+<h2 id="3-应用-ACL-后面还要有内核边界"><a href="#3-应用-ACL-后面还要有内核边界" class="headerlink" title="3. 应用 ACL 后面还要有内核边界"></a>3. 应用 ACL 后面还要有内核边界</h2><p>应用层 <code>reject(all)</code> 是第一道门，UID-scoped nftables 是第二道门。防火墙缺失时 Server 必须停机，这才叫 fail-closed；自动放宽地址直到服务恢复，只是把可用性问题变成安全问题。</p>
+<h1 id="十三、结论"><a href="#十三、结论" class="headerlink" title="十三、结论"></a>十三、结论</h1><p>这次迁移并不能证明 QUIC 在所有网络上都优于 TCP，也不能把 3–4 Mbit&#x2F;s 当成普遍的劣化阈值。它只证明了一个更有限、也更可靠的结论：在我的这条路径上，Xray reverse 的长寿命 TCP 会在持续负载后进入 179–193ms 的持久状态，而标准 Hysteria 2&#x2F;QUIC 在 2–5 Mbit&#x2F;s 阶梯、1 GiB 单流和 30 分钟持续流中没有复现这种跃迁。</p>
+<p>选择 Hysteria 2 不是因为一张吞吐图，而是因为它同时满足了四件事：避开原来的长 TCP 故障模式、管理面在负载下保持可用、负向 ACL 能严格拒绝未授权目标、断电后能按 fail-closed 顺序恢复。相比 VLESS&#x2F;REALITY 多 lane 的 74.9 Mbit&#x2F;s，迁移后的下载现场值达到 110.7 Mbit&#x2F;s；真实 NAS 文件复制也稳定得到约 40.6 Mbit&#x2F;s 的端到端有效吞吐。</p>
+<p>真正可上线的网络方案，从来不只是“跑得快”，还要能解释失败、限制失败，并且从失败里安全地回来。</p>
+</article><div class="tag_share"><div class="post_share"></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/site/avatar.jpg" onerror="this.onerror=null;this.src='/images/site/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">MR-Addict</div><div class="author-info__description">欢迎来到我的个人主页</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MR-Addict"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%9C%80%E7%BB%88%E6%8B%93%E6%89%91%EF%BC%9A%E5%85%AC%E7%BD%91%E4%BB%A3%E7%90%86%E5%92%8C%E5%AE%B6%E5%BA%AD%E5%85%A5%E5%8F%A3%E5%8F%AA%E4%BF%9D%E7%95%99%E4%B8%80%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%8D%8F%E8%AE%AE"><span class="toc-text">一、最终拓扑：公网代理和家庭入口只保留一种客户端协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%85%88%E5%86%99%E5%81%9C%E6%AD%A2%E6%9D%A1%E4%BB%B6%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E5%85%88%E8%A3%85%E8%BD%AF%E4%BB%B6"><span class="toc-text">二、先写停止条件，而不是先装软件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%9D%91%EF%BC%9A%E8%BF%9E%E5%BE%97%E4%B8%8A-Realm%EF%BC%8C%E4%B8%8D%E4%BB%A3%E8%A1%A8-STUN-%E8%B5%B0%E5%AF%B9%E4%BA%86"><span class="toc-text">三、第一个坑：连得上 Realm，不代表 STUN 走对了</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%9D%91%EF%BC%9A%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%99%90%E9%80%9F%E4%B8%8D%E6%98%AF%E9%93%BE%E8%B7%AF%E9%99%90%E9%80%9F"><span class="toc-text">四、第二个坑：客户端限速不是链路限速</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%AF%B9%E7%85%A7%E7%BB%93%E6%9E%9C%EF%BC%9ATCP-%E5%9C%A8%E6%9C%80%E4%BD%8E%E6%A1%A3%E5%A4%8D%E7%8E%B0%EF%BC%8CQUIC-%E6%B2%A1%E6%9C%89%E7%8A%B6%E6%80%81%E8%B7%83%E8%BF%81"><span class="toc-text">五、对照结果：TCP 在最低档复现，QUIC 没有状态跃迁</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E6%9C%80%E6%9C%89%E4%BB%B7%E5%80%BC%E7%9A%84%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%EF%BC%9APVE-%E6%96%AD%E7%94%B5"><span class="toc-text">六、最有价值的一次失败：PVE 断电</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E4%BB%8E%E5%85%AC%E5%85%B1-Realm-%E5%88%87%E5%88%B0%E7%A7%81%E6%9C%89-Realm"><span class="toc-text">七、从公共 Realm 切到私有 Realm</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E5%8F%8C%E5%B1%82-ACL%EF%BC%9A%E5%BA%94%E7%94%A8%E6%8B%92%E7%BB%9D%E4%B8%80%E6%AC%A1%EF%BC%8C%E5%86%85%E6%A0%B8%E5%86%8D%E6%8B%92%E7%BB%9D%E4%B8%80%E6%AC%A1"><span class="toc-text">八、双层 ACL：应用拒绝一次，内核再拒绝一次</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E6%96%AD%E7%94%B5%E6%81%A2%E5%A4%8D%E5%92%8C%E8%BF%81%E7%A7%BB%E5%89%8D%E5%A4%8D%E9%AA%8C"><span class="toc-text">九、断电恢复和迁移前复验</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E5%9B%9E%E6%BB%9A%E4%B9%9F%E5%BF%85%E9%A1%BB%E6%98%AF%E4%B8%80%E7%AD%89%E5%85%AC%E6%B0%91"><span class="toc-text">十、回滚也必须是一等公民</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81VLESS-REALITY-%E4%B8%8E-Hysteria-2-%E5%AE%9E%E9%99%85%E6%B5%8B%E9%80%9F%E5%AF%B9%E6%AF%94"><span class="toc-text">十一、VLESS&#x2F;REALITY 与 Hysteria 2 实际测速对比</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#NAS-%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6"><span class="toc-text">NAS 文件复制</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E8%BF%99%E6%AC%A1%E8%BF%81%E7%A7%BB%E7%9C%9F%E6%AD%A3%E6%95%99%E4%BC%9A%E6%88%91%E7%9A%84%E4%B8%89%E4%BB%B6%E4%BA%8B"><span class="toc-text">十二、这次迁移真正教会我的三件事</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%99%90%E9%80%9F%E5%BF%85%E9%A1%BB%E5%8F%91%E7%94%9F%E5%9C%A8%E5%8F%91%E9%80%81%E6%BA%90"><span class="toc-text">1. 限速必须发生在发送源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-PoC-%E7%9A%84%E9%AA%8C%E6%94%B6%E5%BF%85%E9%A1%BB%E5%8C%85%E6%8B%AC%E2%80%9C%E9%87%8D%E5%90%AF%E4%B9%8B%E5%90%8E%E2%80%9D"><span class="toc-text">2. PoC 的验收必须包括“重启之后”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%BA%94%E7%94%A8-ACL-%E5%90%8E%E9%9D%A2%E8%BF%98%E8%A6%81%E6%9C%89%E5%86%85%E6%A0%B8%E8%BE%B9%E7%95%8C"><span class="toc-text">3. 应用 ACL 后面还要有内核边界</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E7%BB%93%E8%AE%BA"><span class="toc-text">十三、结论</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/xray-reverse-to-hysteria2/" title="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2"><img src="/images/posts/xray-reverse-to-hysteria2/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2"/></a><div class="content"><a class="title" href="/posts/xray-reverse-to-hysteria2/" title="从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2">从 180ms 的长 TCP 到稳定 QUIC：我的家庭内网为什么迁移到 Hysteria 2</a><time datetime="2026-09-20T10:30:00.000Z" title="发表于 2026-09-20 18:30:00">2026-09-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/xray-reverse-tcp-latency/" title="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？"><img src="/images/posts/xray-reverse-tcp-latency/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？"/></a><div class="content"><a class="title" href="/posts/xray-reverse-tcp-latency/" title="一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？">一次 4 Mbit/s 下载，为什么让内网穿透延迟从 40ms 卡到 180ms？</a><time datetime="2026-09-18T10:30:00.000Z" title="发表于 2026-09-18 18:30:00">2026-09-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由"><img src="/images/posts/install-and-setup-bypass-router-on-pve/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox VE 上安装和设置旁路由"/></a><div class="content"><a class="title" href="/posts/install-and-setup-bypass-router-on-pve/" title="在 Proxmox VE 上安装和设置旁路由">在 Proxmox VE 上安装和设置旁路由</a><time datetime="2024-03-29T07:32:57.000Z" title="发表于 2024-03-29 15:32:57">2024-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本"><img src="/images/posts/njtech-home-auto-login-script-for-openwrt/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="南工大校园网路由器自动登录脚本"/></a><div class="content"><a class="title" href="/posts/njtech-home-auto-login-script-for-openwrt/" title="南工大校园网路由器自动登录脚本">南工大校园网路由器自动登录脚本</a><time datetime="2024-03-22T16:02:07.000Z" title="发表于 2024-03-23 00:02:07">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS"><img src="/images/posts/install-truenas-on-promox/cover.png" onerror="this.onerror=null;this.src='/images/site/404.png'" alt="在 Proxmox 上安装 TrueNAS"/></a><div class="content"><a class="title" href="/posts/install-truenas-on-promox/" title="在 Proxmox 上安装 TrueNAS">在 Proxmox 上安装 TrueNAS</a><time datetime="2024-01-06T09:10:30.000Z" title="发表于 2024-01-06 17:10:30">2024-01-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/posts/xray-reverse-to-hysteria2/cover.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2026 By MR-Addict</div><div class="footer_custom_text"><a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">苏ICP备2022032826号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MR-Addict/mr-addict.github.io',
+      'data-repo-id': 'MDEwOlJlcG9zaXRvcnk0MDEwNDU3NDM=',
+      'data-category-id': 'DIC_kwDOF-d4784CXLQ-',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
